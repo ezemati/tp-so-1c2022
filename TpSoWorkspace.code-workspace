@@ -1,0 +1,33 @@
+{
+	"folders": [
+		{
+			"path": "consola"
+		},
+		{
+			"path": "cpu"
+		},
+		{
+			"path": "kernel"
+		},
+		{
+			"path": "memoria"
+		}
+	],
+	"settings": {
+		"files.exclude": {
+			"**/.git": true,
+			"**/.svn": true,
+			"**/.hg": true,
+			"**/CVS": true,
+			"**/.DS_Store": true,
+
+			"**/Debug": true,
+			"**/obj": true,
+
+			// Archivos de Eclipse
+			"**/.settings/": true,
+			"**/.cproject": true,
+			"**/.project": true
+		}
+	}
+}
