@@ -8,7 +8,7 @@
             "name": "CPU",
             "type": "cppdbg",
             "request": "launch",
-            "preLaunchTask": "Make",
+            "preLaunchTask": "CPU - Make",
             "program": "${workspaceFolder}/cpu",
             "args": [
                 // "--test"

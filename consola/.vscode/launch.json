@@ -8,7 +8,7 @@
             "name": "Consola",
             "type": "cppdbg",
             "request": "launch",
-            "preLaunchTask": "Make",
+            "preLaunchTask": "Consola - Make",
             "program": "${workspaceFolder}/consola",
             "args": [
                 // "--test"

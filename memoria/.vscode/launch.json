@@ -8,7 +8,7 @@
             "name": "Memoria",
             "type": "cppdbg",
             "request": "launch",
-            "preLaunchTask": "Make",
+            "preLaunchTask": "Memoria - Make",
             "program": "${workspaceFolder}/memoria",
             "args": [
                 // "--test"
