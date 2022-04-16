@@ -1,4 +1,5 @@
 #include "consola.h"
+#include "utils.h"
 #include "tests.h"
 
 #include <stdio.h>
@@ -46,8 +47,10 @@ int main(int argc, char **argv)
 	t_list *instrucciones = leer_instrucciones(file_programa);
 	fclose(file_programa);
 
+	void *instrucciones_serializadas = serializar_instrucciones(instrucciones, tamanio_programa);
 	// TODO: serializar las instrucciones y mandarlas al Kernel
 
+	free(instrucciones_serializadas);
 	instrucciones_destroy(instrucciones);
 	terminar_consola();
 	return 0;
