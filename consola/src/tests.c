@@ -36,7 +36,9 @@ void serializar_deserializar_instrucciones()
     list_add(instrucciones, instruccion2);
 
     uint32_t tamanio_programa = 50;
-    void *serializado = serializar_instrucciones(instrucciones, tamanio_programa);
+
+    int bytes;
+    void *serializado = serializar_instrucciones(instrucciones, tamanio_programa, &bytes);
 
     int desplazamiento = 0;
 

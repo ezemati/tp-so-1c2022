@@ -12,5 +12,7 @@ void agregar_instruccion(char *linea, t_list *instrucciones);
 void instrucciones_destroy(t_list *instrucciones);
 void instruccion_destroy(void *buffer_instruccion);
 void terminar_consola();
+void enviar_instrucciones(int socket_kernel, void *instrucciones_serializadas, int bytes);
+int crear_conexion_con_kernel(char *ip, char *puerto);
 
 #endif

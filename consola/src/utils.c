@@ -5,10 +5,10 @@
 #include <string.h>
 #include <commons/collections/list.h>
 
-void *serializar_instrucciones(t_list *instrucciones, uint32_t tamanio_programa)
+void *serializar_instrucciones(t_list *instrucciones, uint32_t tamanio_programa, int *bytes)
 {
-    int bytes = cantidad_total_bytes_serializado(instrucciones, tamanio_programa);
-    void *buffer = malloc(bytes);
+    (*bytes) = cantidad_total_bytes_serializado(instrucciones, tamanio_programa);
+    void *buffer = malloc(*bytes);
 
     int desplazamiento = 0;
 
