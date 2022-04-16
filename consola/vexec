@@ -1,6 +1,6 @@
 #!/bin/bash
-FILE=consola
-make $FILE
-if test -f "./$FILE"; then
-    valgrind --tool=memcheck --leak-check=yes --show-possibly-lost=no --show-reachable=no --num-callers=20 ./$FILE cfg/programa.program 50
+FILE=consola.out
+make
+if test -f "./bin/$FILE"; then
+    valgrind --tool=memcheck --leak-check=yes --show-possibly-lost=no --show-reachable=no --num-callers=20 ./bin/$FILE cfg/programa.program 50
 fi

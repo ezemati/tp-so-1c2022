@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "preLaunchTask": "Consola - Make",
-            "program": "${workspaceFolder}/consola",
+            "program": "${workspaceFolder}/bin/consola.out",
             "args": [
                 // "--test"
                 "cfg/programa.program",

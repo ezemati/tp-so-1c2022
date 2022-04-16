@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "preLaunchTask": "Memoria - Make",
-            "program": "${workspaceFolder}/memoria",
+            "program": "${workspaceFolder}/bin/memoria.out",
             "args": [
                 // "--test"
             ],

@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "preLaunchTask": "Kernel - Make",
-            "program": "${workspaceFolder}/kernel",
+            "program": "${workspaceFolder}/bin/kernel.out",
             "args": [
                 // "--test"
             ],

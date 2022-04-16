@@ -1,6 +1,6 @@
 #!/bin/bash
-FILE=consola
-make $FILE
-if test -f "./$FILE"; then
-    ./$FILE cfg/programa.program 50
+FILE=consola.out
+make
+if test -f "./bin/$FILE"; then
+    ./bin/$FILE cfg/programa.program 50
 fi

@@ -1,4 +1,3 @@
-/Debug/
-
-# Ejecutable
-/memoria
+bin/
+obj/
+*.log

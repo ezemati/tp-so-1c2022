@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "preLaunchTask": "CPU - Make",
-            "program": "${workspaceFolder}/cpu",
+            "program": "${workspaceFolder}/bin/cpu.out",
             "args": [
                 // "--test"
             ],

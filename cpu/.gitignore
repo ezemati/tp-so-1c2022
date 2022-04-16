@@ -1,4 +1,3 @@
-/Debug/
-
-# Ejecutable
-/cpu
+bin/
+obj/
+*.log

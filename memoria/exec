@@ -1,6 +1,6 @@
 #!/bin/bash
-FILE=memoria
-make $FILE
-if test -f "./$FILE"; then
-    ./$FILE
+FILE=memoria.out
+make
+if test -f "./bin/$FILE"; then
+    ./bin/$FILE
 fi

@@ -1,6 +1,6 @@
 #!/bin/bash
-FILE=cpu
-make $FILE
-if test -f "./$FILE"; then
-    ./$FILE
+FILE=cpu.out
+make
+if test -f "./bin/$FILE"; then
+    ./bin/$FILE
 fi

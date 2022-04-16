@@ -1,4 +1,3 @@
-/Debug/
-
-# Ejecutable
-/consola
+bin/
+obj/
+*.log
