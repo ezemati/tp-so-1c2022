@@ -12,7 +12,8 @@
                 "/usr/lib/gcc/i686-linux-gnu/5/include-fixed",
                 "/usr/include/i386-linux-gnu",
                 "/usr/include",
-                "${workspaceFolder}/include"
+                "${workspaceFolder}/include",
+                "${workspaceFolder}/../shared/include"
             ],
             "defines": [
                 "_GNU_SOURCE"
@@ -22,6 +23,7 @@
                 "path": [
                     "${workspaceFolder}",
                     "${workspaceFolder}/include",
+                    "${workspaceFolder}/../shared/include",
                     "/usr/include/c++/5",
                     "/usr/include/i386-linux-gnu/c++/5",
                     "/usr/include/c++/5/backward",

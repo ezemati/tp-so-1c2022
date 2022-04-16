@@ -1,9 +1,9 @@
 # Libraries
-LIBS=commons readline pthread cunit
+LIBS=shared commons readline pthread cunit
 
 # Custom libraries' paths
 SHARED_LIBPATHS=
-STATIC_LIBPATHS=
+STATIC_LIBPATHS=../shared
 
 # Compiler flags
 CDEBUG=-g -Wall -DDEBUG
