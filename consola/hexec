@@ -2,5 +2,5 @@
 FILE=consola
 make $FILE
 if test -f "./$FILE"; then
-    valgrind --tool=helgrind ./$FILE
+    valgrind --tool=helgrind ./$FILE cfg/programa.program 50
 fi

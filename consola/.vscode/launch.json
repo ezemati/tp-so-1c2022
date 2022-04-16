@@ -12,6 +12,8 @@
             "program": "${workspaceFolder}/consola",
             "args": [
                 // "--test"
+                "cfg/programa.program",
+                "50"
             ],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",
