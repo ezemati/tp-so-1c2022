@@ -44,11 +44,12 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 	t_list *instrucciones = leer_instrucciones(file_programa);
+	fclose(file_programa);
 
 	// TODO: serializar las instrucciones y mandarlas al Kernel
 
-	fclose(file_programa);
-	terminar_consola(instrucciones);
+	instrucciones_destroy(instrucciones);
+	terminar_consola();
 	return 0;
 }
 
@@ -61,10 +62,9 @@ void inicializar_consola(char **argv)
 	t_config *config = config_create("cfg/consola.config");
 	ip_kernel = config_get_string_value(config, "IP_KERNEL");
 	puerto_kernel = config_get_string_value(config, "PUERTO_KERNEL");
+	config_destroy(config);
 
 	log_info(logger, "{ IP_KERNEL = %s, PUERTO_KERNEL = %s }", ip_kernel, puerto_kernel);
-
-	config_destroy(config);
 }
 
 t_list *leer_instrucciones(FILE *archivo)
@@ -108,7 +108,7 @@ void agregar_instruccion(char *linea, t_list *instrucciones)
 	{
 		t_instruccion *instruccion = malloc(sizeof(t_instruccion));
 
-		instruccion->codigo_instruccion = string_duplicate(linea_spliteada[0]);
+		instruccion->codigo_instruccion = string_duplicate(codigo_instruccion);
 
 		if (string_equals_ignore_case(instruccion->codigo_instruccion, "EXIT"))
 		{
@@ -137,17 +137,21 @@ void agregar_instruccion(char *linea, t_list *instrucciones)
 	string_array_destroy(linea_spliteada);
 }
 
-void terminar_consola(t_list *instrucciones)
+void terminar_consola()
 {
 	log_debug(logger, "Finalizando consola");
 
-	list_destroy_and_destroy_elements(instrucciones, instruccion_destroy);
-
 	log_destroy(logger);
+}
+
+void instrucciones_destroy(t_list *instrucciones)
+{
+	list_destroy_and_destroy_elements(instrucciones, instruccion_destroy);
 }
 
 void instruccion_destroy(void *buffer_instruccion)
 {
 	t_instruccion *instruccion = (t_instruccion *)buffer_instruccion;
 	free(instruccion->codigo_instruccion);
+	free(instruccion);
 }
