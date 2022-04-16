@@ -109,7 +109,7 @@ void agregar_instruccion(char *linea, t_list *instrucciones)
 		{
 			instruccion->cantidad_parametros = 0;
 		}
-		else if (string_equals_ignore_case(instruccion->codigo_instruccion, "NO_OP") || string_equals_ignore_case(instruccion->codigo_instruccion, "I/O") || string_equals_ignore_case(instruccion->codigo_instruccion, "READ"))
+		else if (string_equals_ignore_case(instruccion->codigo_instruccion, "I/O") || string_equals_ignore_case(instruccion->codigo_instruccion, "READ"))
 		{
 			instruccion->cantidad_parametros = 1;
 			instruccion->parametros[0] = strtoul(linea_spliteada[1], NULL, 10);
