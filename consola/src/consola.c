@@ -1,17 +1,4 @@
 #include "consola.h"
-#include "utils.h"
-#include "tests.h"
-
-#include <netdb.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <commons/config.h>
-#include <commons/log.h>
-#include <commons/string.h>
-#include <commons/txt.h>
 
 t_log *logger = NULL;
 
@@ -187,16 +174,4 @@ void terminar_consola()
 
 	free(ip_kernel);
 	free(puerto_kernel);
-}
-
-void instrucciones_destroy(t_list *instrucciones)
-{
-	list_destroy_and_destroy_elements(instrucciones, instruccion_destroy);
-}
-
-void instruccion_destroy(void *buffer_instruccion)
-{
-	t_instruccion *instruccion = (t_instruccion *)buffer_instruccion;
-	free(instruccion->codigo_instruccion);
-	free(instruccion);
 }

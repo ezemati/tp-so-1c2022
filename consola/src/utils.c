@@ -1,9 +1,16 @@
 #include "utils.h"
 
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
-#include <commons/collections/list.h>
+void instrucciones_destroy(t_list *instrucciones)
+{
+	list_destroy_and_destroy_elements(instrucciones, instruccion_destroy);
+}
+
+void instruccion_destroy(void *buffer_instruccion)
+{
+	t_instruccion *instruccion = (t_instruccion *)buffer_instruccion;
+	free(instruccion->codigo_instruccion);
+	free(instruccion);
+}
 
 void *serializar_instrucciones(t_list *instrucciones, uint32_t tamanio_programa, int *bytes)
 {

@@ -1,9 +1,4 @@
 #include "tests.h"
-#include "utils.h"
-
-#include <stdlib.h>
-#include <stdint.h>
-#include <CUnit/Basic.h>
 
 int run_tests()
 {
