@@ -54,3 +54,9 @@ dkms.conf
 # Logs
 *.log
 /.metadata/
+
+# Eclipse files
+**/RemoteSystemsTempFiles/
+**/.settings/
+**/.cproject
+**/.project
