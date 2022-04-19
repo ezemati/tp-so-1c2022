@@ -1,6 +1,0 @@
-#!/bin/bash
-FILE=kernel.out
-make
-if test -f "./bin/$FILE"; then
-    ./bin/$FILE
-fi
