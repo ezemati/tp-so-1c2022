@@ -2,7 +2,7 @@
 #define SERIALIZATION_PROGRAMA_H
 
 #include <types/programa.h>
-#include <serialization/instruccion.h>
+#include <serialization/serialization_instruccion.h>
 #include <serialization/serialization_utils.h>
 
 #include <stdint.h>

@@ -1,4 +1,4 @@
-#include <serialization/instruccion.h>
+#include <serialization/serialization_instruccion.h>
 
 void *serializar_instruccion(t_instruccion *instruccion, int *bytes)
 {
