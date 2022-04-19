@@ -2,14 +2,13 @@
 
 void instrucciones_destroy(t_list *instrucciones)
 {
-	list_destroy_and_destroy_elements(instrucciones, instruccion_destroy);
+	list_destroy_and_destroy_elements(instrucciones, instruccion_buffer_destroy);
 }
 
-void instruccion_destroy(void *buffer_instruccion)
+void instruccion_buffer_destroy(void *buffer_instruccion)
 {
 	t_instruccion *instruccion = (t_instruccion *)buffer_instruccion;
-	free(instruccion->codigo_instruccion);
-	free(instruccion);
+    instruccion_destroy(instruccion);
 }
 
 void *serializar_instrucciones(t_list *instrucciones, uint32_t tamanio_programa, int *bytes)

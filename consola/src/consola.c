@@ -1,12 +1,7 @@
 #include "consola.h"
 
 t_log *logger = NULL;
-
-char *ip_kernel = NULL;
-char *puerto_kernel = NULL;
-
-char *ruta_programa = NULL;
-uint32_t tamanio_programa = 0;
+t_consola_config *config = NULL;
 
 int main(int argc, char **argv)
 {
@@ -28,19 +23,19 @@ int main(int argc, char **argv)
 
 	inicializar_consola(argv);
 
-	FILE *file_programa = fopen(ruta_programa, "r");
+	FILE *file_programa = fopen(config->ruta_programa, "r");
 	if (file_programa == NULL)
 	{
-		log_error(logger, "No se pudo abrir el archivo especificado (%s)", ruta_programa);
+		log_error(logger, "No se pudo abrir el archivo especificado (%s)", config->ruta_programa);
 		return EXIT_FAILURE;
 	}
 	t_list *instrucciones = leer_instrucciones(file_programa);
 	fclose(file_programa);
 
 	int bytes;
-	void *instrucciones_serializadas = serializar_instrucciones(instrucciones, tamanio_programa, &bytes);
-	int socket_kernel = crear_conexion_con_kernel(ip_kernel, puerto_kernel);
-	enviar_instrucciones(socket_kernel, instrucciones_serializadas, bytes);
+	void *instrucciones_serializadas = serializar_instrucciones(instrucciones, config->tamanio_programa, &bytes);
+	int socket_kernel = crear_conexion(config->ip_kernel, config->puerto_kernel, logger);
+	enviar_por_socket(socket_kernel, instrucciones_serializadas, bytes);
 
 	free(instrucciones_serializadas);
 	instrucciones_destroy(instrucciones);
@@ -50,16 +45,7 @@ int main(int argc, char **argv)
 
 void inicializar_consola(char **argv)
 {
-	ruta_programa = argv[1];
-	tamanio_programa = strtoul(argv[2], NULL, 10);
-	log_info(logger, "{ RUTA = %s, TAMANIO = %d }", ruta_programa, tamanio_programa);
-
-	t_config *config = config_create("cfg/consola.config");
-	ip_kernel = string_duplicate(config_get_string_value(config, "IP_KERNEL"));
-	puerto_kernel = string_duplicate(config_get_string_value(config, "PUERTO_KERNEL"));
-	config_destroy(config);
-
-	log_info(logger, "{ IP_KERNEL = %s, PUERTO_KERNEL = %s }", ip_kernel, puerto_kernel);
+	config = consola_config_new(argv, "cfg/consola.config", logger);
 }
 
 t_list *leer_instrucciones(FILE *archivo)
@@ -93,85 +79,24 @@ void agregar_instruccion(char *linea, t_list *instrucciones)
 		int cantidad_noop = strtoul(linea_spliteada[1], NULL, 10);
 		for (int i = 1; i <= cantidad_noop; i++)
 		{
-			t_instruccion *instruccion = malloc(sizeof(t_instruccion));
-			instruccion->codigo_instruccion = string_duplicate(codigo_instruccion);
-			instruccion->cantidad_parametros = 0;
+			t_instruccion *instruccion = instruccion_new(codigo_instruccion, NULL);
 			list_add(instrucciones, instruccion);
 		}
 	}
 	else
 	{
-		t_instruccion *instruccion = malloc(sizeof(t_instruccion));
-
-		instruccion->codigo_instruccion = string_duplicate(codigo_instruccion);
-
-		if (string_equals_ignore_case(instruccion->codigo_instruccion, "EXIT"))
-		{
-			instruccion->cantidad_parametros = 0;
-		}
-		else if (string_equals_ignore_case(instruccion->codigo_instruccion, "I/O") || string_equals_ignore_case(instruccion->codigo_instruccion, "READ"))
-		{
-			instruccion->cantidad_parametros = 1;
-			instruccion->parametros[0] = strtoul(linea_spliteada[1], NULL, 10);
-		}
-		else if (string_equals_ignore_case(instruccion->codigo_instruccion, "WRITE") || string_equals_ignore_case(instruccion->codigo_instruccion, "COPY"))
-		{
-			instruccion->cantidad_parametros = 2;
-			instruccion->parametros[0] = strtoul(linea_spliteada[1], NULL, 10);
-			instruccion->parametros[1] = strtoul(linea_spliteada[2], NULL, 10);
-		}
-		else
-		{
-			log_error(logger, "Instruccion no reconocida: %s", instruccion->codigo_instruccion);
-			exit(EXIT_FAILURE);
-		}
-
+		// Los parametros empiezan en la segunda posicion del linea_spliteada (por eso el `+ 1`)
+		t_instruccion *instruccion = instruccion_new(codigo_instruccion, linea_spliteada + 1);
 		list_add(instrucciones, instruccion);
 	}
 
 	string_array_destroy(linea_spliteada);
 }
 
-int crear_conexion_con_kernel(char *ip, char *puerto)
-{
-	struct addrinfo hints, *servinfo;
-
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = AF_UNSPEC;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_flags = AI_PASSIVE;
-
-	getaddrinfo(ip, puerto, &hints, &servinfo);
-
-	int socket_kernel = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
-	if (socket_kernel == -1)
-	{
-		log_error(logger, "Error al crear el socket con el Kernel");
-		exit(EXIT_FAILURE);
-	}
-
-	int connect_result = connect(socket_kernel, servinfo->ai_addr, servinfo->ai_addrlen);
-	if (connect_result == -1)
-	{
-		log_error(logger, "Fallo la conexion con el socket del Kernel");
-		exit(EXIT_FAILURE);
-	}
-
-	freeaddrinfo(servinfo);
-
-	return socket_kernel;
-}
-
-void enviar_instrucciones(int socket_kernel, void *instrucciones_serializadas, int bytes)
-{
-	send(socket_kernel, instrucciones_serializadas, bytes, 0);
-}
-
 void terminar_consola()
 {
 	log_debug(logger, "Finalizando consola");
 	log_destroy(logger);
-
-	free(ip_kernel);
-	free(puerto_kernel);
+	
+	consola_config_destroy(config);
 }

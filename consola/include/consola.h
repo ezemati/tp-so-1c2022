@@ -3,6 +3,8 @@
 
 #include "utils.h"
 #include "tests.h"
+#include "consola_config.h"
+#include <types/instruccion.h>
 
 #include <netdb.h>
 #include <stdio.h>
@@ -15,12 +17,11 @@
 #include <commons/log.h>
 #include <commons/string.h>
 #include <commons/txt.h>
+#include <utils/sockets.h>
 
 void inicializar_consola(char **argv);
 t_list *leer_instrucciones(FILE *archivo);
 void agregar_instruccion(char *linea, t_list *instrucciones);
-int crear_conexion_con_kernel(char *ip, char *puerto);
-void enviar_instrucciones(int socket_kernel, void *instrucciones_serializadas, int bytes);
 void terminar_consola();
 
 #endif

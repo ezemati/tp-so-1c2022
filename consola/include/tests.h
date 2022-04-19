@@ -2,6 +2,7 @@
 #define TESTS_H
 
 #include "utils.h"
+#include <types/instruccion.h>
 
 #include <stdlib.h>
 #include <stdint.h>
