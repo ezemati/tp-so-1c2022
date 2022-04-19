@@ -34,3 +34,8 @@ int enviar_por_socket(int socket, void *buffer_serializado, int bytes)
 {
     return send(socket, buffer_serializado, bytes, 0);
 }
+
+void liberar_conexion(int socket)
+{
+    close(socket);
+}

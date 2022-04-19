@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <unistd.h>
 #include <commons/log.h>
 
 /**
@@ -23,5 +24,10 @@ int crear_conexion(char *ip, char *puerto, t_log *logger);
  * @RETURN: La cantidad de bytes enviados, o -1 en caso de error
  */
 int enviar_por_socket(int socket, void *buffer_serializado, int bytes);
+
+/**
+ * @DESC: Libera la conexion de un socket
+ */
+void liberar_conexion(int socket);
 
 #endif

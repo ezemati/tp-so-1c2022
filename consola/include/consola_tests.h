@@ -1,12 +1,16 @@
-#ifndef TESTS_H
-#define TESTS_H
+#ifndef CONSOLA_TESTS_H
+#define CONSOLA_TESTS_H
 
-#include "utils.h"
+#include <consola_utils.h>
 #include <types/instruccion.h>
+#include <serialization/instruccion.h>
+#include <serialization/programa.h>
 
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 #include <CUnit/Basic.h>
+#include <commons/collections/list.h>
 
 int run_tests();
 void serializar_deserializar_instrucciones();
