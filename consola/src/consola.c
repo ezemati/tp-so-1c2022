@@ -27,8 +27,15 @@ int main(int argc, char **argv)
 	int bytes;
 	void *programa_serializado = serializar_programa(programa, &bytes);
 	int socket_kernel = crear_conexion(config->ip_kernel, config->puerto_kernel, logger);
-	enviar_por_socket(socket_kernel, programa_serializado, bytes);
-	liberar_conexion(socket_kernel);
+	if (socket_kernel == -1)
+	{
+		log_error(logger, "Consola no pudo conectarse a Kernel");
+	}
+	else
+	{
+		enviar_por_socket(socket_kernel, programa_serializado, bytes);
+		liberar_conexion(socket_kernel);
+	}
 	free(programa_serializado);
 
 	terminar_consola();
