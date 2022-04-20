@@ -20,10 +20,28 @@
 int crear_conexion(char *ip, char *puerto, t_log *logger);
 
 /**
+ * @DESC: Crea un socket que escuche solicitudes de clientes en el puerto especificado
+ * @RETURN: El socket servidor, que escucha por conexiones de clientes
+ */
+int iniciar_servidor(char *puerto, t_log *logger);
+
+/**
+ * @DESC: Se bloquea hasta que se conecte un cliente al socket
+ * @RETURN: El socket de la conexion con el cliente
+ */
+int esperar_cliente(int socket_servidor);
+
+/**
  * @DESC: Envia los datos del buffer a traves del socket
  * @RETURN: La cantidad de bytes enviados, o -1 en caso de error
  */
 int enviar_por_socket(int socket, void *buffer_serializado, int bytes);
+
+/**
+ * @DESC: Recibe del socket los bytes especificados y los almacena en el buffer
+ * @RETURN: La cantidad de bytes verdaderamente recibidos
+ */
+int recibir_por_socket(int socket, void *buffer, int bytes);
 
 /**
  * @DESC: Libera la conexion de un socket

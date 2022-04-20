@@ -1,4 +1,4 @@
-#include "kernel.h"
+#include <kernel.h>
 
 int main(int argc, char **argv) {
 
@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
 
 	//Creamos una conexion a la Memoria
 	log_info(logger, "Creando conexion con Memoria...");
-	kernel_client_memoria_fd = crear_conexion(ip_memoria, puerto_memoria);
+	kernel_client_memoria_fd = crear_conexion(ip_memoria, puerto_memoria, logger);
 
 	//Enviamos un mensaje a la Memoria
 	log_info(logger, "Enviando mensaje a Memoria...");
@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
 
 	//Creamos conexion a la CPU
 	log_info(logger, "Creando conexion con CPU...");
-	kernel_client_cpu_fd = crear_conexion(ip_cpu, puerto_cpu_dispatch);
+	kernel_client_cpu_fd = crear_conexion(ip_cpu, puerto_cpu_dispatch, logger);
 
 	//Enviamos un mensaje a la CPU
 	log_info(logger, "Enviando mensaje a CPU...");
@@ -43,7 +43,8 @@ int main(int argc, char **argv) {
 
 	//Kernel como Servidor de Consola
 	log_info(logger, "Esperando conexion con Consola...");
-	kernel_server_consola_fd = iniciar_servidor(config);
+	char *puerto_escucha = config_get_string_value(config, "PUERTO_ESCUCHA");
+	kernel_server_consola_fd = iniciar_servidor(puerto_escucha, logger);
 	log_info(logger, "Servidor listo para recibir al cliente");
 	int cliente_fd = esperar_cliente(kernel_server_consola_fd);
 
@@ -59,6 +60,6 @@ t_config* iniciar_config(void) {
 }
 
 void terminar_programa(int conexion, t_log* logger, t_config* config) {
-	terminar_programa(conexion, logger, config);
+	// terminar_programa(conexion, logger, config); // ERROR: recursividad infinita
 	liberar_conexion(conexion);
 }

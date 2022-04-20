@@ -12,6 +12,16 @@ void log_info_if_logger_not_null(t_log *logger, char *format, ...)
     va_end(args);
 }
 
+void log_trace_if_logger_not_null(t_log *logger, char *format, ...)
+{
+    va_list args;
+    va_start(args, format);
+
+    log_if_logger_not_null(logger, LOG_LEVEL_TRACE, format, args);
+
+    va_end(args);
+}
+
 void log_error_if_logger_not_null(t_log *logger, char *format, ...)
 {
     va_list args;
