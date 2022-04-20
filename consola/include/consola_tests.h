@@ -3,8 +3,8 @@
 
 #include <consola_utils.h>
 #include <types/instruccion.h>
-#include <serialization/instruccion.h>
-#include <serialization/programa.h>
+#include <serialization/serialization_instruccion.h>
+#include <serialization/serialization_programa.h>
 
 #include <stdlib.h>
 #include <stdint.h>
