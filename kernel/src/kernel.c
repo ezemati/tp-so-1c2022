@@ -4,15 +4,21 @@ int main(int argc, char **argv) {
 
 	t_log * logger;
 	t_config * config;
+
 	int kernel_client_memoria_fd;
 	int kernel_client_cpu_fd;
 	int kernel_server_consola_fd;
+	int consola_cliente_kernel_fd;
 
 	logger = iniciar_logger();
 	logger = log_create("kernel.log", "Kernel", 1, LOG_LEVEL_DEBUG);
 	log_info(logger, "Iniciando Kernel...");
 
-	log_info(logger, "Carga archivo configuracion Kernel...");
+	if (argc < 2){
+		log_error(logger, "Falta parametro de archivo de configuracion. Ejemplo: ./kernel.out \"/home/utnso/tp-2022-1c-ElProtocoloMesi/kernel/cfg/kernel.config\"\n");
+		exit(1);
+	}
+
 	config = iniciar_config();
 	config = config_create(argv[1]);
 	char * ip_memoria = config_get_string_value(config, "IP_MEMORIA");
@@ -43,10 +49,10 @@ int main(int argc, char **argv) {
 
 	//Kernel como Servidor de Consola
 	log_info(logger, "Esperando conexion con Consola...");
-	char *puerto_escucha = config_get_string_value(config, "PUERTO_ESCUCHA");
+	char * puerto_escucha = config_get_string_value(config, "PUERTO_ESCUCHA");
 	kernel_server_consola_fd = iniciar_servidor(puerto_escucha, logger);
-	log_info(logger, "Servidor listo para recibir al cliente");
-	int cliente_fd = esperar_cliente(kernel_server_consola_fd);
+	log_info(logger, "Kernel listo para recibir a Consola");
+	consola_cliente_kernel_fd = esperar_cliente(kernel_server_consola_fd);
 
 	terminar_programa(kernel_client_memoria_fd, logger, config);
 	terminar_programa(kernel_client_cpu_fd, logger, config);
@@ -55,11 +61,12 @@ int main(int argc, char **argv) {
 
 t_config* iniciar_config(void) {
 	t_config* nuevo_config;
-
 	return nuevo_config;
 }
 
 void terminar_programa(int conexion, t_log* logger, t_config* config) {
-	// terminar_programa(conexion, logger, config); // ERROR: recursividad infinita
 	liberar_conexion(conexion);
+	log_destroy(logger);
+	config_destroy(config);
 }
+
