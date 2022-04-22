@@ -5,10 +5,10 @@ int main(int argc, char **argv) {
 	t_log * logger;
 	t_config * config;
 
-	int kernel_client_memoria_fd;
-	int kernel_client_cpu_fd;
-	int kernel_server_consola_fd;
-	int consola_cliente_kernel_fd;
+	int memoria_server_fd;
+	int cpu_server_fd;
+	int kernel_server_fd;
+	int consola_cliente_fd;
 
 	logger = iniciar_logger();
 	logger = log_create("kernel.log", "Kernel", 1, LOG_LEVEL_DEBUG);
@@ -29,33 +29,33 @@ int main(int argc, char **argv) {
 
 	//Creamos una conexion a la Memoria
 	log_info(logger, "Creando conexion con Memoria...");
-	kernel_client_memoria_fd = crear_conexion(ip_memoria, puerto_memoria, logger);
+	memoria_server_fd = crear_conexion(ip_memoria, puerto_memoria, logger);
 
 	//Enviamos un mensaje a la Memoria
 	log_info(logger, "Enviando mensaje a Memoria...");
 	int tamanioCadena = 50;
 	char * cadena = (char*) malloc(tamanioCadena * sizeof(char));
 	cadena = "Memoria, soy Kernel!!";
-	enviar_mensaje(cadena, kernel_client_memoria_fd);
+	enviar_mensaje(cadena, memoria_server_fd);
 
 	//Creamos conexion a la CPU
 	log_info(logger, "Creando conexion con CPU...");
-	kernel_client_cpu_fd = crear_conexion(ip_cpu, puerto_cpu_dispatch, logger);
+	cpu_server_fd = crear_conexion(ip_cpu, puerto_cpu_dispatch, logger);
 
 	//Enviamos un mensaje a la CPU
 	log_info(logger, "Enviando mensaje a CPU...");
 	cadena = "CPU, soy Kernel!!";
-	enviar_mensaje(cadena, kernel_client_cpu_fd);
+	enviar_mensaje(cadena, cpu_server_fd);
 
 	//Kernel como Servidor de Consola
 	log_info(logger, "Esperando conexion con Consola...");
 	char * puerto_escucha = config_get_string_value(config, "PUERTO_ESCUCHA");
-	kernel_server_consola_fd = iniciar_servidor(puerto_escucha, logger);
+	kernel_server_fd = iniciar_servidor(puerto_escucha, logger);
 	log_info(logger, "Kernel listo para recibir a Consola");
-	consola_cliente_kernel_fd = esperar_cliente(kernel_server_consola_fd);
+	consola_cliente_fd = esperar_cliente(kernel_server_fd);
 
-	terminar_programa(kernel_client_memoria_fd, logger, config);
-	terminar_programa(kernel_client_cpu_fd, logger, config);
+	terminar_programa(memoria_server_fd, logger, config);
+	terminar_programa(cpu_server_fd, logger, config);
 
 }
 
