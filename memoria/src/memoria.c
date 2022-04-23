@@ -6,7 +6,7 @@ t_memoria_config *config = NULL;
 int main(int argc, char **argv)
 {
 	logger = log_create("cfg/memoria.log", "Memoria", true, LOG_LEVEL_TRACE);
-	log_debug(logger, "Inicializando Memoria...");
+	log_debug(logger, "Inicializando memoria...");
 
 	inicializar_memoria(argv);
 
