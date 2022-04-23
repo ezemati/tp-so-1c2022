@@ -44,6 +44,12 @@ int enviar_por_socket(int socket, void *buffer_serializado, int bytes);
 int enviar_string_por_socket(int socket, char *cadena);
 
 /**
+ * @DESC: Envia un string con su longitud en uint32 a traves del socket
+ * @RETURN: La cantidad de bytes de la cadena enviados, o -1 en caso de error
+ */
+int enviar_string_con_longitud_por_socket(int socket, char *cadena);
+
+/**
  * @DESC: Envia un uint32 a traves del socket
  * @RETURN: La cantidad de bytes enviados, o -1 en caso de error
  */
@@ -60,6 +66,12 @@ int recibir_por_socket(int socket, void *buffer, int bytes);
  * @RETURN: La cantidad de bytes verdaderamente recibidos
  */
 int recibir_uint32_por_socket(int socket, uint32_t *numero);
+
+/**
+ * @DESC: Recibe del socket un string con una longitud especificada en uint32
+ * @RETURN: La cantidad de bytes del string verdaderamente recibidos
+ */
+int recibir_string_con_longitud_por_socket(int socket, char **buffer);
 
 /**
  * @DESC: Libera la conexion de un socket

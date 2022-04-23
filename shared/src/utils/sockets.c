@@ -104,6 +104,14 @@ int enviar_string_por_socket(int socket, char *cadena)
     return result;
 }
 
+int enviar_string_con_longitud_por_socket(int socket, char *cadena)
+{
+    uint32_t bytes = strlen(cadena) + 1;
+    enviar_uint32_por_socket(socket, bytes);
+
+    return enviar_string_por_socket(socket, cadena);
+}
+
 int enviar_uint32_por_socket(int socket, uint32_t numero)
 {
     uint32_t *alloc_numero = malloc(sizeof(uint32_t));
@@ -118,6 +126,15 @@ int enviar_uint32_por_socket(int socket, uint32_t numero)
 int recibir_por_socket(int socket, void *buffer, int bytes)
 {
     return recv(socket, buffer, bytes, MSG_WAITALL);
+}
+
+int recibir_string_con_longitud_por_socket(int socket, char **buffer)
+{
+    uint32_t tamanio;
+    recibir_uint32_por_socket(socket, &tamanio);
+
+    (*buffer) = malloc(tamanio);
+    return recibir_por_socket(socket, (*buffer), tamanio);
 }
 
 int recibir_uint32_por_socket(int socket, uint32_t *numero)

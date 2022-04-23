@@ -38,7 +38,7 @@ void *procesar_cliente(void *args)
 		break;
 
 	default:
-		enviar_uint32_por_socket(socket_cliente, -1);
+		enviar_string_con_longitud_por_socket(socket_cliente, "TEST: error");
 		break;
 	}
 
@@ -50,5 +50,5 @@ void *procesar_cliente(void *args)
 
 void inicializar_proceso(int socket_cliente)
 {
-	enviar_string_por_socket(socket_cliente, "TEST: inicializando proceso...\n");
+	enviar_string_con_longitud_por_socket(socket_cliente, "TEST: inicializando proceso...");
 }
