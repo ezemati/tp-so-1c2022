@@ -12,9 +12,9 @@ t_memoria_config *memoria_config_new(char *config_path, t_log *logger)
     mem_config->retardo_memoria = config_get_int_value(config, "RETARDO_MEMORIA");
     mem_config->algoritmo_reemplazo = string_duplicate(config_get_string_value(config, "ALGORITMO_REEMPLAZO"));
     mem_config->marcos_por_proceso = config_get_int_value(config, "MARCOS_POR_PROCESO");
-    mem_config->retardo_swap = config_get_int_value(config, "RETARDO_SWAP");    
+    mem_config->retardo_swap = config_get_int_value(config, "RETARDO_SWAP");
     mem_config->path_swap = string_duplicate(config_get_string_value(config, "PATH_SWAP"));
-    
+
     config_destroy(config);
 
     //log_info_if_logger_not_null(logger, "{ IP_KERNEL = %s, PUERTO_KERNEL = %s }", mem_config->ip_kernel, mem_config->puerto_kernel);

@@ -31,6 +31,8 @@ int crear_conexion(char *ip, char *puerto, t_log *logger)
 
 int iniciar_servidor(char *puerto, t_log *logger)
 {
+    bool error = false;
+
     struct addrinfo hints, *servinfo;
 
     memset(&hints, 0, sizeof(hints));
@@ -41,18 +43,40 @@ int iniciar_servidor(char *puerto, t_log *logger)
     getaddrinfo(NULL, puerto, &hints, &servinfo);
 
     // Creamos el socket de escucha del servidor
-    int socket_servidor = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
+    int socket_servidor;
+    if ((socket_servidor = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol)) == -1)
+    {
+        log_error_if_logger_not_null(logger, "Error al crear el socket de escucha, con puerto %s", puerto);
+        error = true;
+    }
+    else
+    {
+        int activado;
+        setsockopt(socket_servidor, SOL_SOCKET, SO_REUSEADDR, &activado, sizeof(activado));
 
-    // Asociamos el socket a un puerto
-    bind(socket_servidor, servinfo->ai_addr, servinfo->ai_addrlen);
-
-    // Escuchamos las conexiones entrantes
-    listen(socket_servidor, SOMAXCONN);
+        // Asociamos el socket a un puerto
+        if (bind(socket_servidor, servinfo->ai_addr, servinfo->ai_addrlen) != 0)
+        {
+            log_error_if_logger_not_null(logger, "Fallo el bind del socket de escucha");
+            error = true;
+        }
+        else
+        {
+            // Escuchamos las conexiones entrantes
+            if (listen(socket_servidor, SOMAXCONN) != 0)
+            {
+                log_error_if_logger_not_null(logger, "Fallo el listen del socket de escucha");
+                error = true;
+            }
+            else
+            {
+                log_trace_if_logger_not_null(logger, "Listo para escuchar a mi cliente");
+            }
+        }
+    }
 
     freeaddrinfo(servinfo);
-    log_trace_if_logger_not_null(logger, "Listo para escuchar a mi cliente");
-
-    return socket_servidor;
+    return error ? -1 : socket_servidor;
 }
 
 int esperar_cliente(int socket_servidor)

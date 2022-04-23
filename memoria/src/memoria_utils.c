@@ -22,7 +22,7 @@ void procesar_request(int socket_cliente)
 
 void *procesar_cliente(void *args)
 {
-	int socket_cliente = *((int *) args);
-	log_debug(logger,"Id Socket Cliente: %d", socket_cliente);
+	int socket_cliente = *((int *)args);
+	log_debug(logger, "Socket Cliente: %d", socket_cliente);
 	return NULL;
 }

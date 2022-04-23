@@ -10,14 +10,13 @@ int main(int argc, char **argv)
 
 	inicializar_memoria(argv);
 
-	int socket_servidor = iniciar_servidor(config->puerto_escucha,logger);
+	int socket_servidor = iniciar_servidor(config->puerto_escucha, logger);
 
-	while(true){
+	while (true)
+	{
 		int socket_cliente = esperar_cliente(socket_servidor);
 		procesar_request(socket_cliente);
 	}
-
-
 
 	return 0;
 }
