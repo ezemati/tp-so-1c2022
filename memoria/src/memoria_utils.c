@@ -24,5 +24,11 @@ void *procesar_cliente(void *args)
 {
 	int socket_cliente = *((int *)args);
 	log_debug(logger, "Socket Cliente: %d", socket_cliente);
+	
+	char *buffer = "Probando conexion                                  :)";
+	enviar_por_socket(socket_cliente,buffer, strlen(buffer)+1);
+
+	liberar_conexion(socket_cliente);
+	
 	return NULL;
 }
