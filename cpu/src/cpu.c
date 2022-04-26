@@ -5,9 +5,6 @@ t_cpu_config *config = NULL;
 
 int main(int argc, char **argv)
 {
-	int conexion;
-	int tamanioCadena = 50;
-
 	logger = log_create("cfg/cpu.log", "CPU", true, LOG_LEVEL_TRACE);
 	log_debug(logger, "Inicializando CPU...");
 
@@ -15,7 +12,7 @@ int main(int argc, char **argv)
 
 	//Me conecto a memoria
 	log_info(logger, "Creando conexion con Memoria...");
-	conexion = crear_conexion(config->ip_memoria, config->puerto_memoria, logger);
+	int conexion = crear_conexion(config->ip_memoria, config->puerto_memoria, logger);
 
 	if (conexion == -1)
 	{
@@ -24,15 +21,11 @@ int main(int argc, char **argv)
 	}
 
 	log_info(logger, "Enviando mensaje a Memoria...");
-	char *cadena = (char *)malloc(tamanioCadena * sizeof(char));
-	cadena = "Memoria, soy CPU...";
-	int mensajeEnviado = enviar_string_por_socket(conexion, cadena);
-
-	if(mensajeEnviado == -1)
-	{
-		log_error(logger, "No se pudo enviar el mensaje a Memoria....\"\n");
-		exit(1);
-	}
+	enviar_uint32_por_socket(conexion, INICIALIZAR_PROCESO);
+	
+	char *cadena = NULL;
+	recibir_string_con_longitud_por_socket(conexion, &cadena);
+	log_info(logger, "La Memoria me respondio: %s", cadena);
 
 	log_info(logger, "CPU finalizando...");
 	liberar_conexion(conexion);

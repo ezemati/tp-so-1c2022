@@ -19,5 +19,7 @@ typedef struct t_cpu_config
     uint32_t puerto_escucha_interrupt;
 } t_cpu_config;
 
+t_cpu_config *cpu_config_new(char *config_path, t_log *logger);
+void cpu_config_destroy(t_cpu_config *config);
 
 #endif
