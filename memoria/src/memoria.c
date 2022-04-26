@@ -18,5 +18,7 @@ int main(int argc, char **argv)
 		procesar_request(socket_cliente);
 	}
 
+	terminar_memoria();
+
 	return 0;
 }

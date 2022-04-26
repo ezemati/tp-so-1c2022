@@ -7,7 +7,7 @@ void inicializar_memoria(char **argv)
 
 void terminar_memoria()
 {
-	log_debug(logger, "Finalizando memoria");
+	log_debug(logger, "Finalizando memoria...");
 	log_destroy(logger);
 
 	memoria_config_destroy(config);
