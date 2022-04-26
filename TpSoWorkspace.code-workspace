@@ -33,7 +33,8 @@
 			"**/.project": true
 		},
 		"files.associations": {
-			"sockets.h": "c"
+			"sockets.h": "c",
+			"memoria_config.h": "c"
 		}
 	}
 }
