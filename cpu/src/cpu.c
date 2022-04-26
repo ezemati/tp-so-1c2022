@@ -12,23 +12,23 @@ int main(int argc, char **argv)
 
 	//Me conecto a memoria
 	log_info(logger, "Creando conexion con Memoria...");
-	int conexion = crear_conexion(config->ip_memoria, config->puerto_memoria, logger);
+	int conexion_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, logger);
 
-	if (conexion == -1)
+	if (conexion_memoria == -1)
 	{
 		log_error(logger, "No se pudo establecer la conexion con Memoria....\"\n");
 		exit(1);
 	}
 
 	log_info(logger, "Enviando mensaje a Memoria...");
-	enviar_uint32_por_socket(conexion, INICIALIZAR_PROCESO);
-	
-	char *cadena = NULL;
-	recibir_string_con_longitud_por_socket(conexion, &cadena);
-	log_info(logger, "La Memoria me respondio: %s", cadena);
+	enviar_uint32_por_socket(conexion_memoria, INICIALIZAR_PROCESO);
 
-	log_info(logger, "CPU finalizando...");
-	liberar_conexion(conexion);
+	char *cadena = NULL;
+	recibir_string_con_longitud_por_socket(conexion_memoria, &cadena);
+	log_info(logger, "La Memoria me respondio: %s", cadena);
 	free(cadena);
-	free(config);
+
+	liberar_conexion(conexion_memoria);
+
+	terminar_cpu();
 }
