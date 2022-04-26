@@ -13,7 +13,7 @@ typedef struct t_memoria_config
     char *puerto_escucha;
     uint32_t tamanio_memoria;
     uint32_t tamanio_pagina;
-    uint32_t paginas_por_tabla;
+    uint32_t entradas_por_tabla;
     uint32_t retardo_memoria;
     char *algoritmo_reemplazo;
     uint32_t marcos_por_proceso;

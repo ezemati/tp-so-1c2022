@@ -8,7 +8,7 @@ t_memoria_config *memoria_config_new(char *config_path, t_log *logger)
     mem_config->puerto_escucha = string_duplicate(config_get_string_value(config, "PUERTO_ESCUCHA"));
     mem_config->tamanio_memoria = config_get_int_value(config, "TAM_MEMORIA");
     mem_config->tamanio_pagina = config_get_int_value(config, "TAM_PAGINA");
-    mem_config->paginas_por_tabla = config_get_int_value(config, "PAGINAS_POR_TABLA");
+    mem_config->entradas_por_tabla = config_get_int_value(config, "ENTRADAS_POR_TABLA");
     mem_config->retardo_memoria = config_get_int_value(config, "RETARDO_MEMORIA");
     mem_config->algoritmo_reemplazo = string_duplicate(config_get_string_value(config, "ALGORITMO_REEMPLAZO"));
     mem_config->marcos_por_proceso = config_get_int_value(config, "MARCOS_POR_PROCESO");
