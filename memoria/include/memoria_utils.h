@@ -22,7 +22,7 @@
 void inicializar_memoria(char **argv);
 void terminar_memoria();
 void procesar_request(int socket_cliente);
-void *procesar_cliente(void *args);
+void *procesar_cliente(uint32_t *args);
 
 void inicializar_proceso(int socket_cliente);
 void suspender_proceso(int socket_cliente);

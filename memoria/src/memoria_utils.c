@@ -23,9 +23,9 @@ void procesar_request(int socket_cliente)
 	pthread_detach(thread_id); // Para que el hilo principal no se quede esperando a que el hilo handler termine
 }
 
-void *procesar_cliente(void *args)
+void *procesar_cliente(uint32_t *args)
 {
-	uint32_t socket_cliente = *((uint32_t *)args);
+	uint32_t socket_cliente = *args;
 	log_debug(logger, "Cliente conectado por socket %d", socket_cliente);
 
 	uint32_t id_op = -1;
