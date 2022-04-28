@@ -32,28 +32,6 @@ void *serializar_programa(t_programa *programa, int *bytes)
     return buffer;
 }
 
-t_programa *deserializar_programa(void *buffer)
-{
-    int desplazamiento = 0;
-
-    uint32_t bytes_programa_serializado = leer_uint32(buffer, &desplazamiento);
-
-    uint32_t tamanio = leer_uint32(buffer, &desplazamiento);
-
-    uint32_t cant_instrucciones = leer_uint32(buffer, &desplazamiento);
-
-    t_list *instrucciones = list_create();
-    for (int i = 0; i < cant_instrucciones; i++)
-    {
-        uint32_t bytes_instruccion_serializada;
-        t_instruccion *instruccion = deserializar_instruccion(buffer, &desplazamiento, &bytes_instruccion_serializada);
-        list_add(instrucciones, instruccion);
-    }
-
-    t_programa *programa = programa_new_with_instructions(instrucciones, tamanio);
-    return programa;
-}
-
 int bytes_totales_programa_serializado(t_programa *programa)
 {
     /*

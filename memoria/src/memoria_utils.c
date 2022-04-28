@@ -71,7 +71,18 @@ void *procesar_cliente(uint32_t *args)
 
 void inicializar_proceso(int socket_cliente)
 {
-	enviar_string_con_longitud_por_socket(socket_cliente, "TEST: inicializando proceso...");
+	uint32_t bytes_request;
+	recibir_uint32_por_socket(socket_cliente, &bytes_request);
+
+	void *buffer = malloc(bytes_request);
+	recibir_por_socket(socket_cliente, buffer, bytes_request);
+
+	t_inicializarproceso_request *request = deserializar_inicializarproceso_request(buffer);
+
+	log_debug(logger, "Inicializando estructuras para proceso %d con tamanio %d", request->pid, request->tamanio_proceso);
+
+	inicializarproceso_request_destroy(request);
+	free(buffer);
 }
 
 void suspender_proceso(int socket_cliente)
