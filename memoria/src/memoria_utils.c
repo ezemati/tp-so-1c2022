@@ -19,7 +19,7 @@ void procesar_request(int socket_cliente)
 	*socket_cliente_dup = socket_cliente; // Hay que duplicar el socket_cliente porque si no pasan cosas mamadas en el procesar_cliente
 
 	pthread_t thread_id;
-	pthread_create(&thread_id, NULL, procesar_cliente, socket_cliente_dup);
+	pthread_create(&thread_id, NULL, (void *)procesar_cliente, socket_cliente_dup);
 	pthread_detach(thread_id); // Para que el hilo principal no se quede esperando a que el hilo handler termine
 }
 
