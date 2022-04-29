@@ -1,7 +1,6 @@
 #ifndef MEMORIA_TABLA_PRIMERNIVEL_H
 #define MEMORIA_TABLA_PRIMERNIVEL_H
 
-#include <memoria_utils.h>
 #include <memoria_tabla_segundonivel.h>
 
 #include <stdint.h>

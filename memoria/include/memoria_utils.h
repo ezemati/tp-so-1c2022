@@ -3,6 +3,7 @@
 
 #include <memoria_config.h>
 #include <memoria_logger.h>
+#include <memoria_ram.h>
 #include <utils/sockets.h>
 #include <types/identificador_operacion.h>
 

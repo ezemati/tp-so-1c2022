@@ -3,6 +3,7 @@
 void inicializar_memoria(char **argv)
 {
 	config = memoria_config_new("cfg/memoria.config", logger);
+	memoria_ram = memoria_ram_new();
 }
 
 void terminar_memoria()
@@ -74,15 +75,23 @@ void inicializar_proceso(int socket_cliente)
 	uint32_t bytes_request;
 	recibir_uint32_por_socket(socket_cliente, &bytes_request);
 
-	void *buffer = malloc(bytes_request);
-	recibir_por_socket(socket_cliente, buffer, bytes_request);
+	void *buffer_request = malloc(bytes_request);
+	recibir_por_socket(socket_cliente, buffer_request, bytes_request);
 
-	t_memoria_inicializarproceso_request *request = deserializar_inicializarproceso_request(buffer);
+	t_memoria_inicializarproceso_request *request = deserializar_inicializarproceso_request(buffer_request);
 
 	log_debug(logger, "Inicializando estructuras para proceso %d con tamanio %d", request->pid, request->tamanio_proceso);
+	uint32_t numero_tablaprimernivel = memoria_ram_agregar_proceso(memoria_ram, request->pid, request->tamanio_proceso);
 
+	t_memoria_inicializarproceso_response *response = inicializarproceso_response_new(numero_tablaprimernivel);
+	int bytes;
+	void *buffer_response = serializar_inicializarproceso_response(response, &bytes);
+	enviar_por_socket(socket_cliente, buffer_response, bytes);
+
+	free(buffer_response);
+	inicializarproceso_response_destroy(response);
 	inicializarproceso_request_destroy(request);
-	free(buffer);
+	free(buffer_request);
 }
 
 void suspender_proceso(int socket_cliente)

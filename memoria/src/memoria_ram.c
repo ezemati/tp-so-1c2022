@@ -21,3 +21,10 @@ void memoria_ram_destroy(t_memoria_ram *memoria)
 
     free(memoria);
 }
+
+uint32_t memoria_ram_agregar_proceso(t_memoria_ram *self, uint32_t pid, uint32_t tamanio_proceso)
+{
+    t_tabla_primernivel *primernivel_nuevoproceso = tabla_primernivel_new(pid, tamanio_proceso, self->tablas_segundo_nivel);
+    list_add(self->tablas_primer_nivel, primernivel_nuevoproceso);
+    return primernivel_nuevoproceso->numero_tabla;
+}
