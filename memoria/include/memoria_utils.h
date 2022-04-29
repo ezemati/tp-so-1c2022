@@ -6,7 +6,7 @@
 #include <utils/sockets.h>
 #include <types/identificador_operacion.h>
 
-#include <serialization/serialization_inicializarproceso_request.h>
+#include <memoria/inicializar_proceso.h>
 
 #include <netdb.h>
 #include <stdio.h>

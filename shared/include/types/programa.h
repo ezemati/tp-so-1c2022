@@ -2,10 +2,12 @@
 #define TYPES_PROGRAMA_H
 
 #include <types/instruccion.h>
+#include <serialization/serialization_utils.h>
 
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <commons/collections/list.h>
 #include <commons/string.h>
 
@@ -40,5 +42,8 @@ void programa_destroy(t_programa *programa);
  * @DESC: Crea una lista de instrucciones en base al archivo de la ruta especificada
  */
 t_list *crear_instrucciones_de_archivo(char *ruta);
+
+void *serializar_programa(t_programa *programa, int *bytes);
+int bytes_totales_programa_serializado(t_programa *programa);
 
 #endif

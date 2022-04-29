@@ -77,7 +77,7 @@ void inicializar_proceso(int socket_cliente)
 	void *buffer = malloc(bytes_request);
 	recibir_por_socket(socket_cliente, buffer, bytes_request);
 
-	t_inicializarproceso_request *request = deserializar_inicializarproceso_request(buffer);
+	t_memoria_inicializarproceso_request *request = deserializar_inicializarproceso_request(buffer);
 
 	log_debug(logger, "Inicializando estructuras para proceso %d con tamanio %d", request->pid, request->tamanio_proceso);
 
