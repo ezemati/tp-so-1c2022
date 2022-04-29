@@ -15,3 +15,13 @@ void entrada_segundonivel_destroy(t_entrada_segundonivel *entrada_segundonivel)
 {
     free(entrada_segundonivel);
 }
+
+bool entrada_segundonivel_tiene_pagina_presente(t_entrada_segundonivel *entrada_segundonivel)
+{
+    return entrada_segundonivel->bit_presencia;
+}
+
+uint32_t obtener_marco_de_pagina_de_entrada_segundonivel(t_entrada_segundonivel *self)
+{
+    return self->numero_marco;
+}

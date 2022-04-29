@@ -101,7 +101,26 @@ void suspender_proceso(int socket_cliente)
 
 void finalizar_proceso(int socket_cliente)
 {
-	enviar_string_con_longitud_por_socket(socket_cliente, "TEST: finalizando proceso...");
+	uint32_t bytes_request;
+	recibir_uint32_por_socket(socket_cliente, &bytes_request);
+
+	void *buffer_request = malloc(bytes_request);
+	recibir_por_socket(socket_cliente, buffer_request, bytes_request);
+
+	t_memoria_finalizarproceso_request *request = deserializar_finalizarproceso_request(buffer_request);
+
+	log_debug(logger, "Finalizando proceso %d cuya tabla 1N es %d", request->pid, request->numero_tablaprimernivel);
+	memoria_ram_finalizar_proceso(memoria_ram, request->numero_tablaprimernivel);
+
+	t_memoria_finalizarproceso_response *response = finalizarproceso_response_new();
+	int bytes;
+	void *buffer_response = serializar_finalizarproceso_response(response, &bytes);
+	enviar_por_socket(socket_cliente, buffer_response, bytes);
+
+	free(buffer_response);
+	finalizarproceso_response_destroy(response);
+	finalizarproceso_request_destroy(request);
+	free(buffer_request);
 }
 
 void handshake_info_traduccion(int socket_cliente)

@@ -3,7 +3,9 @@
 
 #include <memoria_tabla_primernivel.h>
 
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <commons/collections/list.h>
 
 typedef struct t_memoria_ram
@@ -20,6 +22,11 @@ void memoria_ram_destroy(t_memoria_ram *memoria);
  * @DESC: Inicializa las estructuras necesarias y devuelve el numero de la tabla de 1er nivel del nuevo proceso
  */
 uint32_t memoria_ram_agregar_proceso(t_memoria_ram *self, uint32_t pid, uint32_t tamanio_proceso);
+
+/**
+ * @DESC: libera todos los recursos del proceso (incluyendo SWAP)
+ */
+void memoria_ram_finalizar_proceso(t_memoria_ram *self, uint32_t numero_tablaprimernivel);
 
 extern t_memoria_ram *memoria_ram;
 

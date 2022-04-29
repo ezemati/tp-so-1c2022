@@ -8,6 +8,7 @@
 #include <types/identificador_operacion.h>
 
 #include <memoria/inicializar_proceso.h>
+#include <memoria/finalizar_proceso.h>
 
 #include <netdb.h>
 #include <stdio.h>

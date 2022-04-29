@@ -1,10 +1,10 @@
 #include <memoria_tabla_primernivel.h>
 
-t_tabla_primernivel *tabla_primernivel_new(uint32_t pid, uint32_t tamanio_proceso, t_list *lista_tablas_segundonivel)
+t_tabla_primernivel *tabla_primernivel_new(uint32_t pid, uint32_t tamanio_proceso, uint32_t numero_tablaprimernivel, t_list *lista_tablas_segundonivel)
 {
     t_tabla_primernivel *tabla_primernivel = malloc(sizeof(t_tabla_primernivel));
     tabla_primernivel->pid = pid;
-    tabla_primernivel->numero_tabla = pid; // En principio el numero de la tabla de 1N es igual al PID, ver si habria que sacarlo
+    tabla_primernivel->numero_tablaprimernivel = numero_tablaprimernivel;
     tabla_primernivel->tamanio_proceso = tamanio_proceso;
 
     int total_segundonivel = list_size(lista_tablas_segundonivel);
