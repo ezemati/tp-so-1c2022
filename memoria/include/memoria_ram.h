@@ -3,6 +3,8 @@
 
 #include <memoria_tabla_primernivel.h>
 
+#include <memoria/leer_dato.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -27,6 +29,11 @@ uint32_t memoria_ram_agregar_proceso(t_memoria_ram *self, uint32_t pid, uint32_t
  * @DESC: libera todos los recursos del proceso (incluyendo SWAP)
  */
 void memoria_ram_finalizar_proceso(t_memoria_ram *self, uint32_t numero_tablaprimernivel);
+
+/**
+ * @DESC: lee los bytes especificados de la direccion fisica especificada
+ */
+void *memoria_ram_leer_dato(t_memoria_ram *self, t_memoria_leerdato_request *request);
 
 extern t_memoria_ram *memoria_ram;
 

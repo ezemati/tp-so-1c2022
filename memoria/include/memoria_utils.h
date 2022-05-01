@@ -9,6 +9,7 @@
 
 #include <memoria/inicializar_proceso.h>
 #include <memoria/finalizar_proceso.h>
+#include <memoria/leer_dato.h>
 
 #include <netdb.h>
 #include <stdio.h>

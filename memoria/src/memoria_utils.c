@@ -131,9 +131,27 @@ void handshake_info_traduccion(int socket_cliente)
 
 void leer_dato(int socket_cliente)
 {
-	uint32_t direccion_fisica_leer;
-	recibir_uint32_por_socket(socket_cliente, &direccion_fisica_leer);
-	// TODO
+	uint32_t bytes_request;
+	recibir_uint32_por_socket(socket_cliente, &bytes_request);
+
+	void *buffer_request = malloc(bytes_request);
+	recibir_por_socket(socket_cliente, buffer_request, bytes_request);
+
+	t_memoria_leerdato_request *request = deserializar_leerdato_request(buffer_request);
+
+	log_debug(logger, "Leyendo %d bytes de la direccion fisica %d", request->cantidad_bytes, request->direccion_fisica);
+	void *dato = memoria_ram_leer_dato(memoria_ram, request);
+
+	t_memoria_leerdato_response *response = leerdato_response_new(dato, request->cantidad_bytes);
+	int bytes;
+	void *buffer_response = serializar_leerdato_response(response, &bytes);
+	enviar_por_socket(socket_cliente, buffer_response, bytes);
+
+	free(buffer_response);
+	leerdato_response_destroy(response);
+	free(dato);
+	leerdato_request_destroy(request);
+	free(buffer_request);
 }
 
 void escribir_dato(int socket_cliente)

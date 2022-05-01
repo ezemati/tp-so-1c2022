@@ -22,6 +22,14 @@ char *leer_string_con_longitud(void *buffer, int *desplazamiento)
     return leer_string(buffer, len, desplazamiento);
 }
 
+void *leer_stream(void *buffer, uint32_t len, int *desplazamiento)
+{
+    void *stream = malloc(len);
+    memcpy(stream, buffer + *desplazamiento, len);
+    (*desplazamiento) += len;
+    return stream;
+}
+
 void escribir_uint32(void *buffer, int *desplazamiento, uint32_t valor)
 {
     memcpy(buffer + *desplazamiento, &valor, sizeof(uint32_t));

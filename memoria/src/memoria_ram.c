@@ -59,6 +59,13 @@ void memoria_ram_finalizar_proceso(t_memoria_ram *self, uint32_t numero_tablapri
     // TODO: falta liberar lo del SWAP
 }
 
+void *memoria_ram_leer_dato(t_memoria_ram *self, t_memoria_leerdato_request *request){
+    // TODO: ver si habria que validar que la pagina que se quiere leer este en memoria (en teoria ya se hace al pedir las direcciones para hacer la traduccion logica-fisica)
+    void *dato = malloc(request->cantidad_bytes);
+    memcpy(dato, self->memoria_usuario + request->direccion_fisica, request->cantidad_bytes);
+    return dato;
+}
+
 static t_tabla_primernivel *memoria_ram_obtener_tablaprimernivel(t_memoria_ram *self, uint32_t numero_tablaprimernivel)
 {
     return list_get(self->tablas_primer_nivel, numero_tablaprimernivel);
