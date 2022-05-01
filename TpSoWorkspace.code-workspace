@@ -25,6 +25,7 @@
 			"**/.DS_Store": true,
 
 			"**/Debug": true,
+			"**/bin": true,
 			"**/obj": true,
 
 			// Archivos de Eclipse
