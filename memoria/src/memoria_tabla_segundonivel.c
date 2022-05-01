@@ -23,3 +23,21 @@ void tabla_segundonivel_destroy(t_tabla_segundonivel *tabla_segundonivel)
 
     free(tabla_segundonivel);
 }
+
+t_entrada_segundonivel *tabla_segundonivel_obtener_entrada_segundo_nivel(t_tabla_segundonivel *self, uint32_t entrada_tablasegundonivel)
+{
+    t_entrada_segundonivel *entrada_buscada = NULL;
+
+    t_list_iterator *iterator = list_iterator_create(self->entradas_segundonivel);
+    while (list_iterator_has_next(iterator) && entrada_buscada == NULL)
+    {
+        t_entrada_segundonivel *entrada = list_iterator_next(iterator);
+        if (entrada->numero_entrada == entrada_tablasegundonivel)
+        {
+            entrada_buscada = entrada;
+        }
+    }
+    list_iterator_destroy(iterator);
+
+    return entrada_buscada;
+}

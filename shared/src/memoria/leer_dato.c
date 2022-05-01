@@ -1,8 +1,10 @@
 #include <memoria/leer_dato.h>
 
-t_memoria_leerdato_request *leerdato_request_new(uint32_t direccion_fisica, uint32_t cantidad_bytes)
+t_memoria_leerdato_request *leerdato_request_new(uint32_t numero_tablasegundonivel, uint32_t entrada_tablasegundonivel, uint32_t direccion_fisica, uint32_t cantidad_bytes)
 {
     t_memoria_leerdato_request *request = malloc(sizeof(t_memoria_leerdato_request));
+    request->numero_tablasegundonivel = numero_tablasegundonivel;
+    request->entrada_tablasegundonivel = entrada_tablasegundonivel;
     request->direccion_fisica = direccion_fisica;
     request->cantidad_bytes = cantidad_bytes;
     return request;
@@ -35,7 +37,7 @@ void leerdato_response_destroy(t_memoria_leerdato_response *response)
 
 void *serializar_leerdato_request(t_memoria_leerdato_request *request, int *bytes)
 {
-    // TAM_BUFFER_REQUEST (uint32), DIR_FISICA (uint32), CANT_BYTES (uint32)
+    // TAM_BUFFER_REQUEST (uint32), NUMERO_SEGUNDONIVEL (uint32), ENTRADA_SEGUNDONIVEL (uint32), DIR_FISICA (uint32), CANT_BYTES (uint32)
     uint32_t bytes_buffer_sin_tamanio = bytes_totales_leerdato_request_serializada(request);
     (*bytes) = sizeof(uint32_t) + bytes_buffer_sin_tamanio;
     void *buffer = malloc(*bytes);
@@ -44,6 +46,8 @@ void *serializar_leerdato_request(t_memoria_leerdato_request *request, int *byte
 
     escribir_uint32(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
 
+    escribir_uint32(buffer, &desplazamiento, request->numero_tablasegundonivel);
+    escribir_uint32(buffer, &desplazamiento, request->entrada_tablasegundonivel);
     escribir_uint32(buffer, &desplazamiento, request->direccion_fisica);
     escribir_uint32(buffer, &desplazamiento, request->cantidad_bytes);
 
@@ -54,18 +58,22 @@ t_memoria_leerdato_request *deserializar_leerdato_request(void *buffer)
 {
     int desplazamiento = 0;
 
+    uint32_t numero_tablasegundonivel = leer_uint32(buffer, &desplazamiento);
+    uint32_t entrada_tablasegundonivel = leer_uint32(buffer, &desplazamiento);
     uint32_t direccion_fisica = leer_uint32(buffer, &desplazamiento);
     uint32_t cantidad_bytes = leer_uint32(buffer, &desplazamiento);
 
-    t_memoria_leerdato_request *request = leerdato_request_new(direccion_fisica, cantidad_bytes);
+    t_memoria_leerdato_request *request = leerdato_request_new(numero_tablasegundonivel, entrada_tablasegundonivel, direccion_fisica, cantidad_bytes);
     return request;
 }
 
 int bytes_totales_leerdato_request_serializada(t_memoria_leerdato_request *request)
 {
-    // DIR_FISICA (uint32), CANT_BYTES (uint32)
+    // NUMERO_SEGUNDONIVEL (uint32), ENTRADA_SEGUNDONIVEL (uint32), DIR_FISICA (uint32), CANT_BYTES (uint32)
     int bytes = 0;
 
+    bytes += sizeof(request->numero_tablasegundonivel);
+    bytes += sizeof(request->entrada_tablasegundonivel);
     bytes += sizeof(request->direccion_fisica);
     bytes += sizeof(request->cantidad_bytes);
 
@@ -97,6 +105,9 @@ t_memoria_leerdato_response *deserializar_leerdato_response(void *buffer)
     void *dato = leer_stream(buffer, cantidad_bytes, &desplazamiento);
 
     t_memoria_leerdato_response *response = leerdato_response_new(dato, cantidad_bytes);
+
+    free(dato);
+
     return response;
 }
 

@@ -2,8 +2,10 @@
 #define MEMORIA_RAM_H
 
 #include <memoria_tabla_primernivel.h>
+#include <memoria_tabla_segundonivel.h>
 
 #include <memoria/leer_dato.h>
+#include <memoria/escribir_dato.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,7 +15,7 @@
 typedef struct t_memoria_ram
 {
     void *memoria_usuario;
-    t_list *tablas_primer_nivel; // De tipo t_tabla_primernivel, hay una por proceso
+    t_list *tablas_primer_nivel;  // De tipo t_tabla_primernivel, hay una por proceso
     t_list *tablas_segundo_nivel; // De tipo t_tabla_segundonivel
 } t_memoria_ram;
 
@@ -34,6 +36,11 @@ void memoria_ram_finalizar_proceso(t_memoria_ram *self, uint32_t numero_tablapri
  * @DESC: lee los bytes especificados de la direccion fisica especificada
  */
 void *memoria_ram_leer_dato(t_memoria_ram *self, t_memoria_leerdato_request *request);
+
+/**
+ * @DESC: escribe los bytes especificados en la direccion fisica especificada
+ */
+void memoria_ram_escribir_dato(t_memoria_ram *self, t_memoria_escribirdato_request *request);
 
 extern t_memoria_ram *memoria_ram;
 

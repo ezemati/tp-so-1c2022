@@ -156,10 +156,26 @@ void leer_dato(int socket_cliente)
 
 void escribir_dato(int socket_cliente)
 {
-	uint32_t direccion_fisica_escribir, dato_escribir;
-	recibir_uint32_por_socket(socket_cliente, &direccion_fisica_escribir);
-	recibir_uint32_por_socket(socket_cliente, &dato_escribir);
-	// TODO
+	uint32_t bytes_request;
+	recibir_uint32_por_socket(socket_cliente, &bytes_request);
+
+	void *buffer_request = malloc(bytes_request);
+	recibir_por_socket(socket_cliente, buffer_request, bytes_request);
+
+	t_memoria_escribirdato_request *request = deserializar_escribirdato_request(buffer_request);
+
+	log_debug(logger, "Escribiendo %d bytes en la direccion fisica %d", request->cantidad_bytes, request->direccion_fisica);
+	memoria_ram_escribir_dato(memoria_ram, request);
+
+	t_memoria_escribirdato_response *response = escribirdato_response_new(request->cantidad_bytes);
+	int bytes;
+	void *buffer_response = serializar_escribirdato_response(response, &bytes);
+	enviar_por_socket(socket_cliente, buffer_response, bytes);
+
+	free(buffer_response);
+	escribirdato_response_destroy(response);
+	escribirdato_request_destroy(request);
+	free(buffer_request);
 }
 
 void obtener_numero_tabla_2_para_entrada_tabla_1(int socket_cliente)
