@@ -26,6 +26,7 @@ void inicializar_proceso(int socket_cliente)
 
 void suspender_proceso(int socket_cliente)
 {
+	//TODO
 	enviar_string_con_longitud_por_socket(socket_cliente, "TEST: suspendiendo proceso...");
 }
 
@@ -115,17 +116,48 @@ void escribir_dato(int socket_cliente)
 
 void obtener_numero_tabla_2_para_entrada_tabla_1(int socket_cliente)
 {
-	uint32_t numero_tabla_1, entrada_tabla_1;
-	recibir_uint32_por_socket(socket_cliente, &numero_tabla_1);
-	recibir_uint32_por_socket(socket_cliente, &entrada_tabla_1);
-	// TODO
+	uint32_t bytes_request;
+	recibir_uint32_por_socket(socket_cliente, &bytes_request);
+
+	void *buffer_request = malloc(bytes_request);
+	recibir_por_socket(socket_cliente, buffer_request, bytes_request);
+
+	t_memoria_numerotabla2paraentradatabla1_request *request = deserializar_numerotabla2paraentradatabla1_request(buffer_request);
+
+	log_debug(logger, "Buscando número de tabla 2 para entrada %d de la tabla de primer nivel %d", request->entrada_tablaprimernivel, request->numero_tablaprimernivel);
+	uint32_t numero_tablasegundonivel = memoria_ram_obtener_numero_tabla_2_para_entrada_tabla_1(memoria_ram, request);
+
+	t_memoria_numerotabla2paraentradatabla1_response *response = numerotabla2paraentradatabla1_response_new(numero_tablasegundonivel);
+	int bytes;
+	void *buffer_response = serializar_numerotabla2paraentradatabla1_response(response, &bytes);
+	enviar_por_socket(socket_cliente, buffer_response, bytes);
+
+	free(buffer_response);
+	numerotabla2paraentradatabla1_response_destroy(response);
+	numerotabla2paraentradatabla1_request_destroy(request);
+	free(buffer_request);
 }
 
 void obtener_marco_para_entrada_tabla_2(int socket_cliente)
 {
-	uint32_t numero_tabla_1, numero_tabla_2, entrada_tabla_2;
-	recibir_uint32_por_socket(socket_cliente, &numero_tabla_1);
-	recibir_uint32_por_socket(socket_cliente, &numero_tabla_2);
-	recibir_uint32_por_socket(socket_cliente, &entrada_tabla_2);
-	//TODO
+	uint32_t bytes_request;
+	recibir_uint32_por_socket(socket_cliente, &bytes_request);
+
+	void *buffer_request = malloc(bytes_request);
+	recibir_por_socket(socket_cliente, buffer_request, bytes_request);
+
+	t_memoria_marcoparaentradatabla2_request *request = deserializar_marcoparaentradatabla2_request(buffer_request);
+
+	log_debug(logger, "Buscando numero de marco para entrada %d de la tabla de segundo nivel %d", request->entrada_tablasegundonivel, request->numero_tablasegundonivel);
+	uint32_t numero_marco = memoria_ram_obtener_numero_marco_para_entrada_tabla_2(memoria_ram, request);
+
+	t_memoria_marcoparaentradatabla2_response *response = marcoparaentradatabla2_response_new(numero_marco);
+	int bytes;
+	void *buffer_response = serializar_marcoparaentradatabla2_response(response, &bytes);
+	enviar_por_socket(socket_cliente, buffer_response, bytes);
+
+	free(buffer_response);
+	marcoparaentradatabla2_response_destroy(response);
+	marcoparaentradatabla2_request_destroy(request);
+	free(buffer_request);
 }

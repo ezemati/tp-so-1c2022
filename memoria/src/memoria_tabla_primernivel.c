@@ -26,3 +26,11 @@ void tabla_primernivel_destroy(t_tabla_primernivel *tabla_primernivel)
     free(tabla_primernivel->indices_tablas_segundonivel);
     free(tabla_primernivel);
 }
+
+uint32_t tabla_primernivel_obtener_numero_tabla_segundo_nivel_en_entrada(t_tabla_primernivel *self, t_list *tablas_segundo_nivel, uint32_t entrada_tablaprimernivel)
+{
+    uint32_t index_tablasegundonivel = self->indices_tablas_segundonivel[entrada_tablaprimernivel];
+    t_entrada_segundonivel *entrada = list_get(tablas_segundo_nivel, index_tablasegundonivel);
+
+    return entrada->numero_entrada;
+}

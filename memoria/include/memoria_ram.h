@@ -6,6 +6,8 @@
 
 #include <memoria/leer_dato.h>
 #include <memoria/escribir_dato.h>
+#include <memoria/numero_tabla_2_para_entrada_tabla_1.h>
+#include <memoria/marco_para_entrada_tabla_2.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,6 +43,10 @@ void *memoria_ram_leer_dato(t_memoria_ram *self, t_memoria_leerdato_request *req
  * @DESC: escribe los bytes especificados en la direccion fisica especificada
  */
 void memoria_ram_escribir_dato(t_memoria_ram *self, t_memoria_escribirdato_request *request);
+
+uint32_t memoria_ram_obtener_numero_tabla_2_para_entrada_tabla_1(t_memoria_ram *self, t_memoria_numerotabla2paraentradatabla1_request *request);
+
+uint32_t memoria_ram_obtener_numero_marco_para_entrada_tabla_2(t_memoria_ram *self, t_memoria_marcoparaentradatabla2_request *request);
 
 extern t_memoria_ram *memoria_ram;
 

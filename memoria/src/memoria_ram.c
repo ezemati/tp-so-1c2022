@@ -80,6 +80,25 @@ void memoria_ram_escribir_dato(t_memoria_ram *self, t_memoria_escribirdato_reque
     memoria_ram_marcar_pagina_modificada(self, request->numero_tablasegundonivel, request->entrada_tablasegundonivel);
 }
 
+uint32_t memoria_ram_obtener_numero_tabla_2_para_entrada_tabla_1(t_memoria_ram *self, t_memoria_numerotabla2paraentradatabla1_request *request)
+{
+    t_tabla_primernivel *tablaPrimerNivel = memoria_ram_obtener_tablaprimernivel(self, request->numero_tablaprimernivel);
+
+    uint32_t numero_tablasegundonivel = tabla_primernivel_obtener_numero_tabla_segundo_nivel_en_entrada(tablaPrimerNivel, self->tablas_segundo_nivel, request->entrada_tablaprimernivel);
+
+    return numero_tablasegundonivel;
+}
+
+uint32_t memoria_ram_obtener_numero_marco_para_entrada_tabla_2(t_memoria_ram *self, t_memoria_marcoparaentradatabla2_request *request)
+{
+    //TODO: ver si la pagina esta presente, si no cargarla (usar algoritmos de reemplazo)
+    t_tabla_segundonivel *tablaSegundoNivel = memoria_ram_obtener_tablasegundonivel(self, request->numero_tablasegundonivel);
+
+    t_entrada_segundonivel *entrada_segundonivel = tabla_segundonivel_obtener_entrada_segundo_nivel(tablaSegundoNivel, request->entrada_tablasegundonivel);
+
+    return entrada_segundonivel->numero_marco;
+}
+
 static t_tabla_primernivel *memoria_ram_obtener_tablaprimernivel(t_memoria_ram *self, uint32_t numero_tablaprimernivel)
 {
     return list_get(self->tablas_primer_nivel, numero_tablaprimernivel);

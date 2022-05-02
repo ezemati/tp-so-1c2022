@@ -1,0 +1,34 @@
+#ifndef MEMORIA_NUMEROTABLA2PARAENTRADATABLA1_H
+#define MEMORIA_NUMEROTABLA2PARAENTRADATABLA1_H
+
+#include <serialization/serialization_utils.h>
+
+#include <stdint.h>
+#include <stdlib.h>
+
+typedef struct t_memoria_numerotabla2paraentradatabla1_request
+{
+    uint32_t numero_tablaprimernivel;
+    uint32_t entrada_tablaprimernivel;
+} t_memoria_numerotabla2paraentradatabla1_request;
+
+typedef struct t_memoria_numerotabla2paraentradatabla1_response
+{
+    uint32_t numero_tablasegundonivel;
+} t_memoria_numerotabla2paraentradatabla1_response;
+
+t_memoria_numerotabla2paraentradatabla1_request *numerotabla2paraentradatabla1_request_new(uint32_t numero_tablaprimernivel, uint32_t entrada_tablaprimernivel);
+void numerotabla2paraentradatabla1_request_destroy(t_memoria_numerotabla2paraentradatabla1_request *request);
+
+t_memoria_numerotabla2paraentradatabla1_response *numerotabla2paraentradatabla1_response_new(uint32_t numero_tablasegundonivel);
+void numerotabla2paraentradatabla1_response_destroy(t_memoria_numerotabla2paraentradatabla1_response *response);
+
+void *serializar_numerotabla2paraentradatabla1_request(t_memoria_numerotabla2paraentradatabla1_request *request, int *bytes);
+t_memoria_numerotabla2paraentradatabla1_request *deserializar_numerotabla2paraentradatabla1_request(void *buffer);
+int bytes_totales_numerotabla2paraentradatabla1_request_serializada(t_memoria_numerotabla2paraentradatabla1_request *request);
+
+void *serializar_numerotabla2paraentradatabla1_response(t_memoria_numerotabla2paraentradatabla1_response *response, int *bytes);
+t_memoria_numerotabla2paraentradatabla1_response *deserializar_numerotabla2paraentradatabla1_response(void *buffer);
+int bytes_totales_numerotabla2paraentradatabla1_response_serializada(t_memoria_numerotabla2paraentradatabla1_response *response);
+
+#endif

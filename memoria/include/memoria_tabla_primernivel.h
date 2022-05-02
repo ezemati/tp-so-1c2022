@@ -19,4 +19,6 @@ typedef struct t_tabla_primernivel
 t_tabla_primernivel *tabla_primernivel_new(uint32_t pid, uint32_t tamanio_proceso, uint32_t numero_tablaprimernivel, t_list *lista_tablas_segundonivel);
 void tabla_primernivel_destroy(t_tabla_primernivel *tabla_primernivel);
 
+uint32_t tabla_primernivel_obtener_numero_tabla_segundo_nivel_en_entrada(t_tabla_primernivel *self, t_list *tablas_segundo_nivel, uint32_t entrada_tablaprimernivel);
+
 #endif

@@ -9,11 +9,6 @@
 #include <utils/sockets.h>
 #include <types/identificador_operacion.h>
 
-#include <memoria/inicializar_proceso.h>
-#include <memoria/finalizar_proceso.h>
-#include <memoria/leer_dato.h>
-#include <memoria/escribir_dato.h>
-
 #include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
