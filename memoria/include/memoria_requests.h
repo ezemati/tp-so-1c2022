@@ -11,6 +11,7 @@
 #include <memoria/finalizar_proceso.h>
 #include <memoria/leer_dato.h>
 #include <memoria/escribir_dato.h>
+#include <memoria/handshake_configuraciones.h>
 
 #include <netdb.h>
 #include <stdio.h>
