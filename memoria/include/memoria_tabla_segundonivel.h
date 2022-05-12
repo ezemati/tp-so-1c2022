@@ -1,7 +1,6 @@
 #ifndef MEMORIA_TABLA_SEGUNDONIVEL_H
 #define MEMORIA_TABLA_SEGUNDONIVEL_H
 
-#include <memoria_logger.h>
 #include <memoria_config.h>
 #include <memoria_entrada_segundonivel.h>
 

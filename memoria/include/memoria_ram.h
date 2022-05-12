@@ -22,6 +22,7 @@ typedef struct t_memoria_ram
 } t_memoria_ram;
 
 t_memoria_ram *memoria_ram_new();
+
 void memoria_ram_destroy(t_memoria_ram *memoria);
 
 /**
@@ -47,7 +48,5 @@ void memoria_ram_escribir_dato(t_memoria_ram *self, t_memoria_escribirdato_reque
 uint32_t memoria_ram_obtener_numero_tabla_2_para_entrada_tabla_1(t_memoria_ram *self, t_memoria_numerotabla2paraentradatabla1_request *request);
 
 uint32_t memoria_ram_obtener_numero_marco_para_entrada_tabla_2(t_memoria_ram *self, t_memoria_marcoparaentradatabla2_request *request);
-
-extern t_memoria_ram *memoria_ram;
 
 #endif

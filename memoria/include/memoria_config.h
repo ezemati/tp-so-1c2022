@@ -31,6 +31,4 @@ t_memoria_config *memoria_config_new(char *config_path, t_log *logger);
  */
 void memoria_config_destroy(t_memoria_config *config);
 
-extern t_memoria_config *config;
-
 #endif
