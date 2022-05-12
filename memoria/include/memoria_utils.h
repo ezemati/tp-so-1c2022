@@ -2,7 +2,6 @@
 #define MEMORIA_UTILS_H
 
 #include <memoria_config.h>
-#include <memoria_logger.h>
 #include <memoria_ram.h>
 #include <memoria_requests.h>
 

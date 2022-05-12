@@ -16,12 +16,34 @@ void entrada_segundonivel_destroy(t_entrada_segundonivel *entrada_segundonivel)
     free(entrada_segundonivel);
 }
 
-bool entrada_segundonivel_tiene_pagina_presente(t_entrada_segundonivel *entrada_segundonivel)
+bool entrada_segundonivel_tiene_pagina_presente(t_entrada_segundonivel *self)
 {
-    return entrada_segundonivel->bit_presencia;
+    return self->bit_presencia;
 }
 
-uint32_t obtener_marco_de_pagina_de_entrada_segundonivel(t_entrada_segundonivel *self)
+uint32_t marco_de_pagina_de_entrada_segundonivel(t_entrada_segundonivel *self)
 {
+    if (!entrada_segundonivel_tiene_pagina_presente(self))
+    {
+        log_error_if_logger_not_null(logger, "Marco solicitado a una entrada de 2do nivel cuya pagina no esta presente: entrada nro %d", self->numero_entrada);
+        return -1;
+    }
+
     return self->numero_marco;
+}
+
+void entrada_segundonivel_marcar_pagina_cargada(t_entrada_segundonivel *self, uint32_t numero_marco)
+{
+    self->numero_marco = numero_marco;
+    self->bit_presencia = true;
+    self->bit_modificado = false;
+    self->bit_uso = true;
+}
+
+void entrada_segundonivel_marcar_pagina_descargada(t_entrada_segundonivel *self)
+{
+    self->numero_marco = 131313;
+    self->bit_presencia = false;
+    self->bit_modificado = false;
+    self->bit_uso = false;
 }

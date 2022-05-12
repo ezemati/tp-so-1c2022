@@ -6,6 +6,7 @@ t_tabla_primernivel *tabla_primernivel_new(uint32_t pid, uint32_t tamanio_proces
     tabla_primernivel->pid = pid;
     tabla_primernivel->numero_tablaprimernivel = numero_tablaprimernivel;
     tabla_primernivel->tamanio_proceso = tamanio_proceso;
+    tabla_primernivel->clock = clock_new(config->algoritmo_reemplazo);
 
     int total_segundonivel = list_size(lista_tablas_segundonivel);
     tabla_primernivel->indices_tablas_segundonivel = malloc(sizeof(uint32_t) * config->entradas_por_tabla);
@@ -24,6 +25,7 @@ t_tabla_primernivel *tabla_primernivel_new(uint32_t pid, uint32_t tamanio_proces
 void tabla_primernivel_destroy(t_tabla_primernivel *tabla_primernivel)
 {
     free(tabla_primernivel->indices_tablas_segundonivel);
+    clock_destroy(tabla_primernivel->clock);
     free(tabla_primernivel);
 }
 

@@ -12,6 +12,14 @@ t_memoria_ram *memoria_ram_new()
 {
     t_memoria_ram *memoria = malloc(sizeof(t_memoria_ram));
     memoria->memoria_usuario = malloc(config->tamanio_memoria);
+
+    uint32_t cantidad_marcos = memoria_ram_obtener_cantidad_marcos_totales();
+    memoria->bitmap_marcos_libres = malloc(sizeof(bool) * cantidad_marcos);
+    for (int i = 0; i < cantidad_marcos; i++)
+    {
+        memoria->bitmap_marcos_libres[i] = true;
+    }
+
     memoria->tablas_primer_nivel = list_create();
     memoria->tablas_segundo_nivel = list_create();
     return memoria;
@@ -20,6 +28,7 @@ t_memoria_ram *memoria_ram_new()
 void memoria_ram_destroy(t_memoria_ram *memoria)
 {
     free(memoria->memoria_usuario);
+    free(memoria->bitmap_marcos_libres);
 
     list_destroy_and_destroy_elements(memoria->tablas_primer_nivel, (void *)tabla_primernivel_destroy);
     free(memoria->tablas_primer_nivel);
@@ -53,8 +62,7 @@ void memoria_ram_finalizar_proceso(t_memoria_ram *self, uint32_t numero_tablapri
             {
                 memoria_ram_limpiar_marco(self, entradaSegundoNivel->numero_marco);
             }
-            entradaSegundoNivel->bit_presencia = 0;
-            entradaSegundoNivel->numero_marco = -1;
+            entrada_segundonivel_marcar_pagina_descargada(entradaSegundoNivel);
         }
         list_iterator_destroy(iteratorEntradasSegundoNivel);
     }
@@ -91,12 +99,120 @@ uint32_t memoria_ram_obtener_numero_tabla_2_para_entrada_tabla_1(t_memoria_ram *
 
 uint32_t memoria_ram_obtener_numero_marco_para_entrada_tabla_2(t_memoria_ram *self, t_memoria_marcoparaentradatabla2_request *request)
 {
-    //TODO: ver si la pagina esta presente, si no cargarla (usar algoritmos de reemplazo)
     t_tabla_segundonivel *tablaSegundoNivel = memoria_ram_obtener_tablasegundonivel(self, request->numero_tablasegundonivel);
 
     t_entrada_segundonivel *entrada_segundonivel = tabla_segundonivel_obtener_entrada_segundo_nivel(tablaSegundoNivel, request->entrada_tablasegundonivel);
+    if (!entrada_segundonivel_tiene_pagina_presente(entrada_segundonivel))
+    {
+        t_tabla_primernivel *tablaPrimerNivel = memoria_ram_obtener_tablaprimernivel(self, request->numero_tablaprimernivel);
+        memoria_ram_cargar_pagina(self, entrada_segundonivel, tablaPrimerNivel->clock);
+    }
 
     return entrada_segundonivel->numero_marco;
+}
+
+void memoria_ram_cargar_pagina(t_memoria_ram *self, t_entrada_segundonivel *entradaNueva, t_clock *clock)
+{
+    if (!clock_esta_lleno(clock))
+    {
+        // Todavia no se asignaron todos los marcos al proceso, asi que puedo asignarle uno nuevo
+        log_info_if_logger_not_null(logger, "Asignando pagina %d a nuevo marco", entradaNueva->numero_entrada);
+        uint32_t numero_marco_libre = memoria_ram_obtener_numero_marco_libre(self);
+        entrada_segundonivel_marcar_pagina_cargada(entradaNueva, numero_marco_libre);
+        memoria_ram_marcar_marco_ocupado(self, numero_marco_libre);
+        log_info_if_logger_not_null(logger, "Pagina %d asignada a marco %d", entradaNueva->numero_entrada, entradaNueva->numero_marco);
+
+        clock_agregar_entrada(clock, entradaNueva);
+        log_info_if_logger_not_null(logger, "Nueva cantidad de marcos en memoria: %d", clock_cantidad_entradas_llenas(clock));
+
+        return;
+    }
+
+    log_info_if_logger_not_null(logger, "El proceso ya tiene todos los marcos posibles asignados - Usando algoritmo de reemplazo %s", config->algoritmo_reemplazo);
+    uint32_t posicionEntradaAReemplazar = clock_obtener_posicion_pagina_a_reemplazar(clock);
+    t_entrada_segundonivel *entradaVieja = clock_obtener_entrada_en_posicion(clock, posicionEntradaAReemplazar);
+    log_info_if_logger_not_null(logger, "Reemplazando marco %d", entradaVieja->numero_marco);
+    memoria_ram_reemplazar_pagina(self, entradaNueva, entradaVieja);
+    clock_reemplazar_entrada(clock, entradaNueva, posicionEntradaAReemplazar);
+}
+
+void memoria_ram_reemplazar_pagina(t_memoria_ram *self, t_entrada_segundonivel *entradaNueva, t_entrada_segundonivel *entradaVieja)
+{
+    if (entradaVieja->bit_modificado == true)
+    {
+        // TODO: guardar las modificaciones a la pagina que va a ser reemplazada
+    }
+
+    uint32_t numero_marco = entradaVieja->numero_marco;
+    entrada_segundonivel_marcar_pagina_descargada(entradaVieja);
+    memoria_ram_vaciar_marco(self, numero_marco);
+    entrada_segundonivel_marcar_pagina_cargada(entradaNueva, numero_marco);
+    memoria_ram_marcar_marco_ocupado(self, numero_marco);
+}
+
+void memoria_ram_vaciar_marco(t_memoria_ram *self, uint32_t numero_marco)
+{
+    uint32_t bytes_comienzo_marco = numero_marco * config->tamanio_pagina;
+    memset(self->memoria_usuario + bytes_comienzo_marco, 0, config->tamanio_memoria);
+}
+
+int32_t memoria_ram_obtener_numero_marco_libre(t_memoria_ram *self)
+{
+    uint32_t cantidad_marcos = memoria_ram_obtener_cantidad_marcos_totales();
+
+    for (int i = 0; i < cantidad_marcos; i++)
+    {
+        if (memoria_ram_marco_esta_libre(self, i))
+        {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+void memoria_ram_marcar_marco_ocupado(t_memoria_ram *self, uint32_t numero_marco)
+{
+    self->bitmap_marcos_libres[numero_marco] = false;
+}
+
+uint32_t memoria_ram_obtener_cantidad_marcos_totales()
+{
+    return config->tamanio_memoria / config->tamanio_pagina;
+}
+
+bool memoria_ram_marco_esta_libre(t_memoria_ram *self, uint32_t numero_marco)
+{
+    return self->bitmap_marcos_libres[numero_marco] == true;
+}
+
+t_entrada_segundonivel *memoria_ram_obtener_pagina_en_marco(t_memoria_ram *self, uint32_t numero_marco)
+{
+    t_entrada_segundonivel *entradaBuscada = NULL;
+
+    t_list_iterator *iteratorTablasPrimerNivel = list_iterator_create(self->tablas_primer_nivel);
+    while (list_iterator_has_next(iteratorTablasPrimerNivel) && entradaBuscada == NULL)
+    {
+        t_tabla_primernivel *tablaPrimerNivel = list_iterator_next(iteratorTablasPrimerNivel);
+        for (int i = 0; i < config->entradas_por_tabla && entradaBuscada == NULL; i++)
+        {
+            uint32_t indiceTablaSegundoNivel = tablaPrimerNivel->indices_tablas_segundonivel[i];
+            t_tabla_segundonivel *tablaSegundoNivel = memoria_ram_obtener_tablasegundonivel(self, indiceTablaSegundoNivel);
+            t_list_iterator *iteratorEntradasSegundoNivel = list_iterator_create(tablaSegundoNivel->entradas_segundonivel);
+            while (list_iterator_has_next(iteratorEntradasSegundoNivel) && entradaBuscada == NULL)
+            {
+                t_entrada_segundonivel *entradaSegundoNivel = list_iterator_next(iteratorEntradasSegundoNivel);
+                if (entrada_segundonivel_tiene_pagina_presente(entradaSegundoNivel) && entradaSegundoNivel->numero_marco == numero_marco)
+                {
+                    entradaBuscada = entradaSegundoNivel;
+                }
+            }
+            list_iterator_destroy(iteratorEntradasSegundoNivel);
+        }
+    }
+    list_iterator_destroy(iteratorTablasPrimerNivel);
+
+    return entradaBuscada;
 }
 
 static t_tabla_primernivel *memoria_ram_obtener_tablaprimernivel(t_memoria_ram *self, uint32_t numero_tablaprimernivel)
