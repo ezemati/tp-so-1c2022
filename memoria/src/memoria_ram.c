@@ -99,7 +99,6 @@ uint32_t memoria_ram_obtener_numero_tabla_2_para_entrada_tabla_1(t_memoria_ram *
 
 uint32_t memoria_ram_obtener_numero_marco_para_entrada_tabla_2(t_memoria_ram *self, t_memoria_marcoparaentradatabla2_request *request)
 {
-    //TODO: ver si la pagina esta presente, si no cargarla (usar algoritmos de reemplazo)
     t_tabla_segundonivel *tablaSegundoNivel = memoria_ram_obtener_tablasegundonivel(self, request->numero_tablasegundonivel);
 
     t_entrada_segundonivel *entrada_segundonivel = tabla_segundonivel_obtener_entrada_segundo_nivel(tablaSegundoNivel, request->entrada_tablasegundonivel);
@@ -117,16 +116,22 @@ void memoria_ram_cargar_pagina(t_memoria_ram *self, t_entrada_segundonivel *entr
     if (!clock_esta_lleno(clock))
     {
         // Todavia no se asignaron todos los marcos al proceso, asi que puedo asignarle uno nuevo
+        log_info_if_logger_not_null(logger, "Asignando pagina %d a nuevo marco", entradaNueva->numero_entrada);
         uint32_t numero_marco_libre = memoria_ram_obtener_numero_marco_libre(self);
         entrada_segundonivel_marcar_pagina_cargada(entradaNueva, numero_marco_libre);
         memoria_ram_marcar_marco_ocupado(self, numero_marco_libre);
-        
+        log_info_if_logger_not_null(logger, "Pagina %d asignada a marco %d", entradaNueva->numero_entrada, entradaNueva->numero_marco);
+
         clock_agregar_entrada(clock, entradaNueva);
+        log_info_if_logger_not_null(logger, "Nueva cantidad de marcos en memoria: %d", clock_cantidad_entradas_llenas(clock));
+
         return;
     }
 
+    log_info_if_logger_not_null(logger, "El proceso ya tiene todos los marcos posibles asignados - Usando algoritmo de reemplazo %s", config->algoritmo_reemplazo);
     uint32_t posicionEntradaAReemplazar = clock_obtener_posicion_pagina_a_reemplazar(clock);
     t_entrada_segundonivel *entradaVieja = clock_obtener_entrada_en_posicion(clock, posicionEntradaAReemplazar);
+    log_info_if_logger_not_null(logger, "Reemplazando marco %d", entradaVieja->numero_marco);
     memoria_ram_reemplazar_pagina(self, entradaNueva, entradaVieja);
     clock_reemplazar_entrada(clock, entradaNueva, posicionEntradaAReemplazar);
 }

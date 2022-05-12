@@ -31,5 +31,6 @@ void clock_agregar_entrada(t_clock *self, t_entrada_segundonivel *entradaNueva);
 void clock_reemplazar_entrada(t_clock *self, t_entrada_segundonivel *entradaNueva, uint32_t posicion);
 t_entrada_segundonivel *clock_obtener_entrada_en_posicion(t_clock *self, uint32_t index);
 bool clock_esta_lleno(t_clock *self);
+uint32_t clock_cantidad_entradas_llenas(t_clock *self);
 
 #endif

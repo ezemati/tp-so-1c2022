@@ -56,7 +56,12 @@ t_entrada_segundonivel *clock_obtener_entrada_en_posicion(t_clock *self, uint32_
 
 bool clock_esta_lleno(t_clock *self)
 {
-    return list_size(self->entradas_segundonivel) == config->marcos_por_proceso;
+    return clock_cantidad_entradas_llenas(self) >= config->marcos_por_proceso;
+}
+
+uint32_t clock_cantidad_entradas_llenas(t_clock *self)
+{
+    return list_size(self->entradas_segundonivel);
 }
 
 static uint32_t clock_obtener_posicion_pagina_a_reemplazar_clock(t_clock *self)
