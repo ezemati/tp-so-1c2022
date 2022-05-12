@@ -1,8 +1,9 @@
 #include <memoria/marco_para_entrada_tabla_2.h>
 
-t_memoria_marcoparaentradatabla2_request *marcoparaentradatabla2_request_new(uint32_t numero_tablasegundonivel, uint32_t entrada_tablasegundonivel)
+t_memoria_marcoparaentradatabla2_request *marcoparaentradatabla2_request_new(uint32_t numero_tablaprimernivel, uint32_t numero_tablasegundonivel, uint32_t entrada_tablasegundonivel)
 {
     t_memoria_marcoparaentradatabla2_request *request = malloc(sizeof(t_memoria_marcoparaentradatabla2_request));
+    request->numero_tablaprimernivel = numero_tablaprimernivel;
     request->numero_tablasegundonivel = numero_tablasegundonivel;
     request->entrada_tablasegundonivel = entrada_tablasegundonivel;
     return request;
@@ -29,7 +30,7 @@ void marcoparaentradatabla2_response_destroy(t_memoria_marcoparaentradatabla2_re
 
 void *serializar_marcoparaentradatabla2_request(t_memoria_marcoparaentradatabla2_request *request, int *bytes)
 {
-    // TAM_BUFFER_REQUEST (uint32), NUMERO_SEGUNDONIVEL (uint32), ENTRADA_SEGUNDONIVEL (uint32)
+    // TAM_BUFFER_REQUEST (uint32), NUMERO_PRIMERNIVEL (uint32), NUMERO_SEGUNDONIVEL (uint32), ENTRADA_SEGUNDONIVEL (uint32)
     uint32_t bytes_buffer_sin_tamanio = bytes_totales_marcoparaentradatabla2_request_serializada(request);
     (*bytes) = sizeof(uint32_t) + bytes_buffer_sin_tamanio;
     void *buffer = malloc(*bytes);
@@ -38,6 +39,7 @@ void *serializar_marcoparaentradatabla2_request(t_memoria_marcoparaentradatabla2
 
     escribir_uint32(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
 
+    escribir_uint32(buffer, &desplazamiento, request->numero_tablaprimernivel);
     escribir_uint32(buffer, &desplazamiento, request->numero_tablasegundonivel);
     escribir_uint32(buffer, &desplazamiento, request->entrada_tablasegundonivel);
 
@@ -48,19 +50,21 @@ t_memoria_marcoparaentradatabla2_request *deserializar_marcoparaentradatabla2_re
 {
     int desplazamiento = 0;
 
+    uint32_t numero_tablaprimernivel = leer_uint32(buffer, &desplazamiento);
     uint32_t numero_tablasegundonivel = leer_uint32(buffer, &desplazamiento);
     uint32_t entrada_tablasegundonivel = leer_uint32(buffer, &desplazamiento);
 
-    t_memoria_marcoparaentradatabla2_request *request = marcoparaentradatabla2_request_new(numero_tablasegundonivel, entrada_tablasegundonivel);
+    t_memoria_marcoparaentradatabla2_request *request = marcoparaentradatabla2_request_new(numero_tablaprimernivel, numero_tablasegundonivel, entrada_tablasegundonivel);
 
     return request;
 }
 
 int bytes_totales_marcoparaentradatabla2_request_serializada(t_memoria_marcoparaentradatabla2_request *request)
 {
-    // NUMERO_SEGUNDONIVEL (uint32), ENTRADA_SEGUNDONIVEL (uint32)
+    // NUMERO_PRIMERNIVEL (uint32), NUMERO_SEGUNDONIVEL (uint32), ENTRADA_SEGUNDONIVEL (uint32)
     int bytes = 0;
 
+    bytes += sizeof(request->numero_tablaprimernivel);
     bytes += sizeof(request->numero_tablasegundonivel);
     bytes += sizeof(request->entrada_tablasegundonivel);
 

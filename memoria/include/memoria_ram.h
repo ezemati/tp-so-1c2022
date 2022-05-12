@@ -3,6 +3,7 @@
 
 #include <memoria_tabla_primernivel.h>
 #include <memoria_tabla_segundonivel.h>
+#include <memoria_variables_globales.h>
 
 #include <memoria/leer_dato.h>
 #include <memoria/escribir_dato.h>
@@ -13,10 +14,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <commons/collections/list.h>
+#include <commons/string.h>
 
 typedef struct t_memoria_ram
 {
     void *memoria_usuario;
+    bool *bitmap_marcos_libres; // true significa libre, false significa ocupado
     t_list *tablas_primer_nivel;  // De tipo t_tabla_primernivel, hay una por proceso
     t_list *tablas_segundo_nivel; // De tipo t_tabla_segundonivel
 } t_memoria_ram;
@@ -48,5 +51,14 @@ void memoria_ram_escribir_dato(t_memoria_ram *self, t_memoria_escribirdato_reque
 uint32_t memoria_ram_obtener_numero_tabla_2_para_entrada_tabla_1(t_memoria_ram *self, t_memoria_numerotabla2paraentradatabla1_request *request);
 
 uint32_t memoria_ram_obtener_numero_marco_para_entrada_tabla_2(t_memoria_ram *self, t_memoria_marcoparaentradatabla2_request *request);
+
+void memoria_ram_cargar_pagina(t_memoria_ram *self, t_entrada_segundonivel *entradaNueva, t_clock *clock);
+void memoria_ram_reemplazar_pagina(t_memoria_ram *self, t_entrada_segundonivel *entradaNueva, t_entrada_segundonivel *entradaVieja);
+void memoria_ram_vaciar_marco(t_memoria_ram *self, uint32_t numero_marco);
+int32_t memoria_ram_obtener_numero_marco_libre(t_memoria_ram *self);
+void memoria_ram_marcar_marco_ocupado(t_memoria_ram *self, uint32_t numero_marco);
+uint32_t memoria_ram_obtener_cantidad_marcos_totales();
+bool memoria_ram_marco_esta_libre(t_memoria_ram *self, uint32_t numero_marco);
+t_entrada_segundonivel *memoria_ram_obtener_pagina_en_marco(t_memoria_ram *self, uint32_t numero_marco);
 
 #endif

@@ -31,3 +31,19 @@ uint32_t marco_de_pagina_de_entrada_segundonivel(t_entrada_segundonivel *self)
 
     return self->numero_marco;
 }
+
+void entrada_segundonivel_marcar_pagina_cargada(t_entrada_segundonivel *self, uint32_t numero_marco)
+{
+    self->numero_marco = numero_marco;
+    self->bit_presencia = true;
+    self->bit_modificado = false;
+    self->bit_uso = true;
+}
+
+void entrada_segundonivel_marcar_pagina_descargada(t_entrada_segundonivel *self)
+{
+    self->numero_marco = 131313;
+    self->bit_presencia = false;
+    self->bit_modificado = false;
+    self->bit_uso = false;
+}
