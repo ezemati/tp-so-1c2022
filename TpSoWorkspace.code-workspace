@@ -35,7 +35,12 @@
 		},
 		"files.associations": {
 			"sockets.h": "c",
-			"memoria_config.h": "c"
+			"memoria_config.h": "c",
+			"memoria_requests.h": "c",
+			"numero_tabla_2_para_entrada_tabla_1.h": "c",
+			"marco_para_entrada_tabla_2.h": "c",
+			"memoria_ram.h": "c",
+			"memoria_tabla_primernivel.h": "c"
 		}
 	}
 }
