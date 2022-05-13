@@ -1,72 +1,24 @@
-#include <kernel.h>
+#include "kernel.h"
 
-int main(int argc, char **argv) {
+t_log *logger = NULL;
+t_kernel_config *config = NULL;
 
-	t_log * logger;
-	t_config * config;
+int main(int argc, char **argv)
+{
+	logger = log_create("cfg/kernel.log", "Kernel", true, LOG_LEVEL_TRACE);
+	log_debug(logger, "Inicializando Kernel...");
 
-	int memoria_server_fd;
-	int cpu_server_fd;
-	int kernel_server_fd;
-	int consola_cliente_fd;
+	inicializar_kernel(argv);
 
-	logger = iniciar_logger();
-	logger = log_create("kernel.log", "Kernel", 1, LOG_LEVEL_DEBUG);
-	log_info(logger, "Iniciando Kernel...");
+	int socket_servidor = iniciar_servidor(config->puerto_escucha, logger);
 
-	if (argc < 2){
-		log_error(logger, "Falta parametro de archivo de configuracion. Ejemplo: ./kernel.out \"/home/utnso/tp-2022-1c-ElProtocoloMesi/kernel/cfg/kernel.config\"\n");
-		exit(1);
+	while (true)
+	{
+		int socket_cliente = esperar_cliente(socket_servidor);
+		procesar_request(socket_cliente);
 	}
 
-	config = iniciar_config();
-	config = config_create(argv[1]);
-	char * ip_memoria = config_get_string_value(config, "IP_MEMORIA");
-	char * puerto_memoria = config_get_string_value(config, "PUERTO_MEMORIA");
-	char * ip_cpu = config_get_string_value(config, "IP_CPU");
-	char * puerto_cpu_dispatch = config_get_string_value(config,"PUERTO_CPU_DISPATCH");
-	char * puerto_cpu_interrupt = config_get_string_value(config,"PUERTO_CPU_INTERRUPT");
+	terminar_kernel();
 
-	//Creamos una conexion a la Memoria
-	log_info(logger, "Creando conexion con Memoria...");
-	memoria_server_fd = crear_conexion(ip_memoria, puerto_memoria, logger);
-
-	//Enviamos un mensaje a la Memoria
-	log_info(logger, "Enviando mensaje a Memoria...");
-	int tamanioCadena = 50;
-	char * cadena = (char*) malloc(tamanioCadena * sizeof(char));
-	cadena = "Memoria, soy Kernel!!";
-	enviar_mensaje(cadena, memoria_server_fd);
-
-	//Creamos conexion a la CPU
-	log_info(logger, "Creando conexion con CPU...");
-	cpu_server_fd = crear_conexion(ip_cpu, puerto_cpu_dispatch, logger);
-
-	//Enviamos un mensaje a la CPU
-	log_info(logger, "Enviando mensaje a CPU...");
-	cadena = "CPU, soy Kernel!!";
-	enviar_mensaje(cadena, cpu_server_fd);
-
-	//Kernel como Servidor de Consola
-	log_info(logger, "Esperando conexion con Consola...");
-	char * puerto_escucha = config_get_string_value(config, "PUERTO_ESCUCHA");
-	kernel_server_fd = iniciar_servidor(puerto_escucha, logger);
-	log_info(logger, "Kernel listo para recibir a Consola");
-	consola_cliente_fd = esperar_cliente(kernel_server_fd);
-
-	terminar_programa(memoria_server_fd, logger, config);
-	terminar_programa(cpu_server_fd, logger, config);
-
+	return 0;
 }
-
-t_config* iniciar_config(void) {
-	t_config* nuevo_config;
-	return nuevo_config;
-}
-
-void terminar_programa(int conexion, t_log* logger, t_config* config) {
-	liberar_conexion(conexion);
-	log_destroy(logger);
-	config_destroy(config);
-}
-

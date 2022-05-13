@@ -3,6 +3,7 @@
 
 #include <cpu_config.h>
 #include <utils/sockets.h>
+#include <types/identificador_operacion.h>
 
 #include <netdb.h>
 #include <stdio.h>
