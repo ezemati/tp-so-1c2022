@@ -10,25 +10,13 @@ int main(int argc, char **argv)
 
 	inicializar_cpu(argv);
 
-	//Me conecto a memoria
-	log_info(logger, "Creando conexion con Memoria...");
-	int conexion_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, logger);
+	realizar_handshake_con_memoria(config);
 
-	if (conexion_memoria == -1)
+	while (true)
 	{
-		log_error(logger, "No se pudo establecer la conexion con Memoria....\"\n");
-		exit(1);
+		// TODO: ver aca como deberia ser (la CPU tiene que escuchar por dos puertos a la vez)
+		break;
 	}
-
-	log_info(logger, "Enviando mensaje a Memoria...");
-	enviar_uint32_por_socket(conexion_memoria, INICIALIZAR_PROCESO);
-
-	char *cadena = NULL;
-	recibir_string_con_longitud_por_socket(conexion_memoria, &cadena);
-	log_info(logger, "La Memoria me respondio: %s", cadena);
-	free(cadena);
-
-	liberar_conexion(conexion_memoria);
 
 	terminar_cpu();
 }

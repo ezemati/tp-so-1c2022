@@ -10,13 +10,16 @@
 
 typedef struct t_cpu_config
 {
-    uint32_t entradas_tbl;
-    char *reemplazo_tbl;
+    uint32_t entradas_tlb;
+    char *reemplazo_tlb;
     uint32_t retardo_noop;
     char *ip_memoria;
     uint32_t puerto_memoria;
     uint32_t puerto_escucha_dispatch;
     uint32_t puerto_escucha_interrupt;
+
+    uint32_t memoria_entradas_por_tabla;
+    uint32_t memoria_tamanio_pagina;
 } t_cpu_config;
 
 t_cpu_config *cpu_config_new(char *config_path, t_log *logger);

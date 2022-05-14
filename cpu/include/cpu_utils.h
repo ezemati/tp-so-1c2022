@@ -4,6 +4,7 @@
 #include <cpu_config.h>
 #include <utils/sockets.h>
 #include <types/identificador_operacion.h>
+#include <memoria/handshake_configuraciones.h>
 
 #include <netdb.h>
 #include <stdio.h>
@@ -23,6 +24,7 @@
 
 void inicializar_cpu(char **argv);
 void terminar_cpu();
+void realizar_handshake_con_memoria(t_cpu_config *config);
 
 extern t_log *logger;
 extern t_cpu_config *config;
