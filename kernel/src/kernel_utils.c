@@ -1,4 +1,4 @@
-#include "kernel_utils.h"
+#include <kernel_utils.h>
 
 void inicializar_kernel(char **argv)
 {
@@ -34,7 +34,7 @@ void *procesar_cliente(uint32_t *args)
 	switch (id_op)
 	{
 	case REQUEST_PROCESO_CONSOLA:
-		request_proceso_consola(socket_cliente);
+		request_proceso_consola_new(socket_cliente);
 		break;
 	default:
 		enviar_string_con_longitud_por_socket(socket_cliente, "TEST: error");

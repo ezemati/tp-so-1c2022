@@ -1,6 +1,6 @@
 #include <kernel/request_proceso_consola.h>
 
-t_kernel_request_proceso_consola *request_proceso_consola(uint32_t tamanio_proceso, char **lista_instrucciones)
+t_kernel_request_proceso_consola *request_proceso_consola_new(uint32_t tamanio_proceso, char **lista_instrucciones)
 {
 	t_kernel_request_proceso_consola *request = malloc(sizeof(t_kernel_request_proceso_consola));
 	request->tamanio_proceso = tamanio_proceso;
@@ -13,7 +13,7 @@ void request_proceso_consola_destroy(t_kernel_request_proceso_consola *request)
     free(request);
 }
 
-t_kernel_response_proceso_consola *response_proceso_consola(t_kernel_pcb pcb)
+t_kernel_response_proceso_consola *response_proceso_consola_new(t_kernel_pcb pcb)
 {
 	t_kernel_response_proceso_consola *response = malloc(sizeof(t_kernel_response_proceso_consola));
 	response->pcb = pcb;

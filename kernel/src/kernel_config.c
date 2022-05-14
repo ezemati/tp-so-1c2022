@@ -1,4 +1,4 @@
-#include "kernel_config.h"
+#include <kernel_config.h>
 
 t_kernel_config *kernel_config_new(char *config_path, t_log *logger)
 {

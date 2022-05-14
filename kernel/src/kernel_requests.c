@@ -1,6 +1,6 @@
 #include <kernel_requests.h>
 
-void request_proceso_consola_new(socket_cliente)
+void request_proceso_consola_new(int socket_cliente)
 {
 	uint32_t bytes_request;
 	recibir_uint32_por_socket(socket_cliente, &bytes_request);

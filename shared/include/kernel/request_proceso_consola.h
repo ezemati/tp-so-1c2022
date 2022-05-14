@@ -1,5 +1,5 @@
-#ifndef INCLUDE_KERNEL_REQUEST_PROCESO_CONSOLA_H_
-#define INCLUDE_KERNEL_REQUEST_PROCESO_CONSOLA_H_
+#ifndef KERNEL_REQUEST_PROCESO_CONSOLA_H
+#define KERNEL_REQUEST_PROCESO_CONSOLA_H
 
 #include <serialization/serialization_utils.h>
 
@@ -40,6 +40,5 @@ int bytes_totales_request_proceso_consola_serializada(t_kernel_request_proceso_c
 void *serializar_response_proceso_consola(t_kernel_response_proceso_consola *response, int *bytes);
 t_kernel_response_proceso_consola *deserializar_response_proceso_consola(void *buffer);
 int bytes_totales_response_proceso_consola_serializada(t_kernel_response_proceso_consola *response);
-
 
 #endif
