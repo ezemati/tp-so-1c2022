@@ -56,6 +56,27 @@ void instrucciones_destroy(t_list *instrucciones)
     list_destroy_and_destroy_elements(instrucciones, (void *)instruccion_destroy);
 }
 
+char *format_instruccion_para_print(t_instruccion *instruccion)
+{
+    char str[100];
+    snprintf(
+        str,
+        100,
+        "%s %s %s",
+        instruccion->codigo_instruccion,
+        instruccion->cantidad_parametros >= 1
+            ? int_to_string(instruccion->parametros[0])
+            : "-",
+        instruccion->cantidad_parametros >= 2
+            ? int_to_string(instruccion->parametros[1])
+            : "-");
+
+    int size = strlen(str) + 1;
+    char *alloc_string = malloc(size);
+    memcpy(alloc_string, str, size);
+    return alloc_string;
+}
+
 /***************************** SERIALIZACION *****************************/
 
 void *serializar_instruccion(t_instruccion *instruccion, int *bytes)

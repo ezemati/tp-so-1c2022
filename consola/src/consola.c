@@ -34,6 +34,17 @@ int main(int argc, char **argv)
 	else
 	{
 		enviar_instruccion_por_socket(socket_kernel, CREAR_PROCESO, programa_serializado, bytes);
+		uint32_t response;
+		recibir_uint32_por_socket(socket_kernel, &response);
+		if (response == 1)
+		{
+			log_info_if_logger_not_null(logger, "Conexion con Kernel finalizada correctamente");
+		}
+		else
+		{
+			log_error_if_logger_not_null(logger, "Ocurrio un error en la conexion con Kernel");
+		}
+
 		liberar_conexion(socket_kernel);
 	}
 	free(programa_serializado);

@@ -2,6 +2,7 @@
 #define KERNEL_UTILS_H
 
 #include <kernel_config.h>
+#include <kernel_pcb.h>
 #include <kernel_requests.h>
 #include <kernel_variables_globales.h>
 
@@ -28,6 +29,9 @@ void inicializar_kernel(char **argv);
 void terminar_kernel();
 void procesar_request(int socket_cliente);
 void *procesar_cliente(uint32_t *args);
+
 uint32_t obtener_proximo_pid();
+void print_instrucciones(t_kernel_pcb *pcb);
+void print_instrucciones_de_todos_los_procesos(t_list *pcbs);
 
 #endif

@@ -53,5 +53,32 @@ void *procesar_cliente(uint32_t *args)
 uint32_t obtener_proximo_pid()
 {
 	t_kernel_pcb *ultimo_proceso = (t_kernel_pcb *)list_get_last_element(lista_procesos);
-	return ultimo_proceso->id + 1;
+	return ultimo_proceso == NULL
+			   ? 0 // Si no hay ningun proceso cargado, el primer PID es 0
+			   : ultimo_proceso->id + 1;
+}
+
+void print_instrucciones(t_kernel_pcb *pcb)
+{
+	t_list_iterator *iterator = list_iterator_create(pcb->lista_instrucciones);
+	while (list_iterator_has_next(iterator))
+	{
+		t_instruccion *instruccion = list_iterator_next(iterator);
+		char *format_instruccion = format_instruccion_para_print(instruccion);
+		log_trace_if_logger_not_null(logger, "Instruccion: %s", format_instruccion);
+		free(format_instruccion);
+	}
+	list_iterator_destroy(iterator);
+}
+
+void print_instrucciones_de_todos_los_procesos(t_list *pcbs)
+{
+	t_list_iterator *iterator = list_iterator_create(pcbs);
+	while (list_iterator_has_next(iterator))
+	{
+		t_kernel_pcb *pcb = list_iterator_next(iterator);
+		log_trace_if_logger_not_null(logger, "PID %d", pcb->id);
+		print_instrucciones(pcb);
+	}
+	list_iterator_destroy(iterator);
 }

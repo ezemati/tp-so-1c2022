@@ -17,6 +17,8 @@ void crear_proceso(int socket_cliente)
 	// TODO: hacer request a memoria para obtener la tabla de primer nivel de este nuevo proceso
 	list_add(lista_procesos, nuevo_pcb);
 
+	print_instrucciones_de_todos_los_procesos(lista_procesos); // Para Debug
+
 	uint32_t response = 1;
 	enviar_uint32_por_socket(socket_cliente, response);
 

@@ -11,7 +11,7 @@ t_consola_config *consola_config_new(char *config_path, t_log *logger)
 
     config_destroy(config);
 
-    log_info_if_logger_not_null(logger, "{ IP_KERNEL = %s, PUERTO_KERNEL = %s }", cons_config->ip_kernel, cons_config->puerto_kernel);
+    log_info_if_logger_not_null(logger, "{ IP_KERNEL = %s, PUERTO_KERNEL = %d }", cons_config->ip_kernel, cons_config->puerto_kernel);
 
     return cons_config;
 }
