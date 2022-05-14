@@ -14,7 +14,7 @@ typedef struct t_cpu_config
     char *reemplazo_tbl;
     uint32_t retardo_noop;
     char *ip_memoria;
-    char *puerto_memoria;
+    uint32_t puerto_memoria;
     uint32_t puerto_escucha_dispatch;
     uint32_t puerto_escucha_interrupt;
 } t_cpu_config;

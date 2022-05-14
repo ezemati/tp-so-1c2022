@@ -5,7 +5,8 @@ t_memoria_config *memoria_config_new(char *config_path, t_log *logger)
     t_memoria_config *mem_config = malloc(sizeof(t_memoria_config));
 
     t_config *config = config_create("cfg/memoria.config");
-    mem_config->puerto_escucha = string_duplicate(config_get_string_value(config, "PUERTO_ESCUCHA"));
+
+    mem_config->puerto_escucha = config_get_int_value(config, "PUERTO_ESCUCHA");
     mem_config->tamanio_memoria = config_get_int_value(config, "TAM_MEMORIA");
     mem_config->tamanio_pagina = config_get_int_value(config, "TAM_PAGINA");
     mem_config->entradas_por_tabla = config_get_int_value(config, "ENTRADAS_POR_TABLA");
@@ -24,7 +25,6 @@ t_memoria_config *memoria_config_new(char *config_path, t_log *logger)
 
 void memoria_config_destroy(t_memoria_config *config)
 {
-    free(config->puerto_escucha);
     free(config->algoritmo_reemplazo);
     free(config->path_swap);
     free(config);

@@ -10,7 +10,7 @@
 
 typedef struct t_memoria_config
 {
-    char *puerto_escucha;
+    uint32_t puerto_escucha;
     uint32_t tamanio_memoria;
     uint32_t tamanio_pagina;
     uint32_t entradas_por_tabla;

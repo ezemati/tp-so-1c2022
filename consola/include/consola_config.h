@@ -11,7 +11,7 @@
 typedef struct t_consola_config
 {
     char *ip_kernel;
-    char *puerto_kernel;
+    uint32_t puerto_kernel;
 } t_consola_config;
 
 /**

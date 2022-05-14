@@ -2,6 +2,7 @@
 #define UTILS_SOCKETS_H
 
 #include <utils/logs.h>
+#include <utils/string.h>
 
 #include <netdb.h>
 #include <stdbool.h>
@@ -17,13 +18,13 @@
  * @DESC: Crea una conexion con un socket en la IP y PUERTO especificado
  * @RETURN: El fd del socket, o -1 en caso de error
  */
-int crear_conexion(char *ip, char *puerto, t_log *logger);
+int crear_conexion(char *ip, uint32_t puerto, t_log *logger);
 
 /**
  * @DESC: Crea un socket que escuche solicitudes de clientes en el puerto especificado
  * @RETURN: El socket servidor, que escucha por conexiones de clientes
  */
-int iniciar_servidor(char *puerto, t_log *logger);
+int iniciar_servidor(uint32_t puerto, t_log *logger);
 
 /**
  * @DESC: Se bloquea hasta que se conecte un cliente al socket

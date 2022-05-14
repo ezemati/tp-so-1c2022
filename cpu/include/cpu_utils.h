@@ -23,9 +23,6 @@
 
 void inicializar_cpu(char **argv);
 void terminar_cpu();
-int crear_conexion(char *ip, char *puerto, t_log *logger);
-int enviar_string_por_socket(int socket, char *cadena);
-void liberar_conexion(int socket);
 
 extern t_log *logger;
 extern t_cpu_config *config;
