@@ -17,10 +17,10 @@ void serializar_deserializar_instrucciones()
 {
     t_list *instrucciones = list_create();
 
-    t_instruccion *instruccion0 = instruccion_new_with_numeric_params("NO_OP", 0, NULL);
+    t_instruccion *instruccion0 = instruccion_new_with_numeric_params(string_duplicate("NO_OP"), 0, NULL);
 
     uint32_t parametros1[2] = {13, 26};
-    t_instruccion *instruccion1 = instruccion_new_with_numeric_params("WRITE", 2, parametros1);
+    t_instruccion *instruccion1 = instruccion_new_with_numeric_params(string_duplicate("WRITE"), 2, parametros1);
 
     list_add(instrucciones, instruccion0);
     list_add(instrucciones, instruccion1);

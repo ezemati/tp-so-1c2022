@@ -23,13 +23,13 @@ t_instruccion *instruccion_new(char *codigo_instruccion, char **parametros)
         num_parametros[i] = strtoul(parametros[i], NULL, 10);
     }
 
-    return instruccion_new_with_numeric_params(codigo_instruccion, cantidad_parametros, num_parametros);
+    return instruccion_new_with_numeric_params(string_duplicate(codigo_instruccion), cantidad_parametros, num_parametros);
 }
 
 t_instruccion *instruccion_new_with_numeric_params(char *codigo_instruccion, uint32_t cant_parametros, uint32_t *parametros)
 {
     t_instruccion *instruccion = malloc(sizeof(t_instruccion));
-    instruccion->codigo_instruccion = string_duplicate(codigo_instruccion);
+    instruccion->codigo_instruccion = codigo_instruccion;
     instruccion->cantidad_parametros = cant_parametros;
 
     for (int i = 0; i < instruccion->cantidad_parametros; i++)
@@ -42,7 +42,7 @@ t_instruccion *instruccion_new_with_numeric_params(char *codigo_instruccion, uin
 
 t_instruccion *instruccion_duplicate(t_instruccion *instruccion)
 {
-    return instruccion_new_with_numeric_params(instruccion->codigo_instruccion, instruccion->cantidad_parametros, instruccion->parametros);
+    return instruccion_new_with_numeric_params(string_duplicate(instruccion->codigo_instruccion), instruccion->cantidad_parametros, instruccion->parametros);
 }
 
 void instruccion_destroy(t_instruccion *instruccion)

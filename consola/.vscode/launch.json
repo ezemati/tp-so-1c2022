@@ -11,9 +11,9 @@
             "preLaunchTask": "Consola - Make",
             "program": "${workspaceFolder}/bin/consola.out",
             "args": [
-                // "--test"
-                "cfg/programa.program",
-                "50"
+                "--test"
+                // "cfg/programa.program",
+                // "50"
             ],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",
