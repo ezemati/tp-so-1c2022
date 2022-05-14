@@ -1,6 +1,6 @@
 #include <memoria/handshake_configuraciones.h>
 
-t_memoria_handshakeconfiguraciones_response *handshakeconfiguraciones_response_new(uint32_t entradas_por_tabla, uint32_t tamanio_pagina)
+t_memoria_handshakeconfiguraciones_response *handshakeconfiguraciones_memoria_response_new(uint32_t entradas_por_tabla, uint32_t tamanio_pagina)
 {
     t_memoria_handshakeconfiguraciones_response *response = malloc(sizeof(t_memoria_handshakeconfiguraciones_response));
     response->entradas_por_tabla = entradas_por_tabla;
@@ -8,17 +8,17 @@ t_memoria_handshakeconfiguraciones_response *handshakeconfiguraciones_response_n
     return response;
 }
 
-void handshakeconfiguraciones_response_destroy(t_memoria_handshakeconfiguraciones_response *response)
+void handshakeconfiguraciones_memoria_response_destroy(t_memoria_handshakeconfiguraciones_response *response)
 {
     free(response);
 }
 
 /***************************** SERIALIZACION *****************************/
 
-void *serializar_handshakeconfiguraciones_response(t_memoria_handshakeconfiguraciones_response *response, int *bytes)
+void *serializar_handshakeconfiguraciones_memoria_response(t_memoria_handshakeconfiguraciones_response *response, int *bytes)
 {
     // TAM_BUFFER_RESPONSE (uint32), ENTRADAS_POR_TABLA (uint32), TAMANIO_PAGINA (uint32)
-    uint32_t bytes_buffer_sin_tamanio = bytes_totales_handshakeconfiguraciones_response_serializada(response);
+    uint32_t bytes_buffer_sin_tamanio = bytes_totales_handshakeconfiguraciones_memoria_response_serializada(response);
     (*bytes) = sizeof(uint32_t) + bytes_buffer_sin_tamanio;
     void *buffer = malloc(*bytes);
 
@@ -32,19 +32,19 @@ void *serializar_handshakeconfiguraciones_response(t_memoria_handshakeconfigurac
     return buffer;
 }
 
-t_memoria_handshakeconfiguraciones_response *deserializar_handshakeconfiguraciones_response(void *buffer)
+t_memoria_handshakeconfiguraciones_response *deserializar_handshakeconfiguraciones_memoria_response(void *buffer)
 {
     int desplazamiento = 0;
 
     uint32_t entradas_por_tabla = leer_uint32(buffer, &desplazamiento);
     uint32_t tamanio_pagina = leer_uint32(buffer, &desplazamiento);
 
-    t_memoria_handshakeconfiguraciones_response *response = handshakeconfiguraciones_response_new(entradas_por_tabla, tamanio_pagina);
+    t_memoria_handshakeconfiguraciones_response *response = handshakeconfiguraciones_memoria_response_new(entradas_por_tabla, tamanio_pagina);
 
     return response;
 }
 
-int bytes_totales_handshakeconfiguraciones_response_serializada(t_memoria_handshakeconfiguraciones_response *response)
+int bytes_totales_handshakeconfiguraciones_memoria_response_serializada(t_memoria_handshakeconfiguraciones_response *response)
 {
     // ENTRADAS_POR_TABLA (uint32), TAMANIO_PAGINA (uint32)
     int bytes = 0;

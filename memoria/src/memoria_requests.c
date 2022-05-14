@@ -56,13 +56,13 @@ void finalizar_proceso(int socket_cliente)
 
 void handshake_info_traduccion(int socket_cliente)
 {
-	t_memoria_handshakeconfiguraciones_response *response = handshakeconfiguraciones_response_new(config->entradas_por_tabla, config->tamanio_pagina);
+	t_memoria_handshakeconfiguraciones_response *response = handshakeconfiguraciones_memoria_response_new(config->entradas_por_tabla, config->tamanio_pagina);
 	int bytes;
-	void *buffer_response = serializar_handshakeconfiguraciones_response(response, &bytes);
+	void *buffer_response = serializar_handshakeconfiguraciones_memoria_response(response, &bytes);
 	enviar_por_socket(socket_cliente, buffer_response, bytes);
 
 	free(buffer_response);
-	handshakeconfiguraciones_response_destroy(response);
+	handshakeconfiguraciones_memoria_response_destroy(response);
 }
 
 void leer_dato(int socket_cliente)
