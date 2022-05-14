@@ -27,6 +27,11 @@ t_instruccion *instruccion_new(char *codigo_instruccion, char **parametros);
 t_instruccion *instruccion_new_with_numeric_params(char *codigo_instruccion, uint32_t cant_parametros, uint32_t *parametros);
 
 /**
+ * @DESC: Duplica una instancia de t_instruccion
+ */
+t_instruccion *instruccion_duplicate(t_instruccion *instruccion);
+
+/**
  * @DESC: Libera los recursos de una t_instruccion
  */
 void instruccion_destroy(t_instruccion *instruccion);
@@ -37,7 +42,7 @@ void instruccion_destroy(t_instruccion *instruccion);
 void instrucciones_destroy(t_list *instrucciones);
 
 void *serializar_instruccion(t_instruccion *instruccion, int *bytes);
-t_instruccion *deserializar_instruccion(void *buffer, int *desplazamiento, uint32_t *bytes_instruccion_serializada);
+t_instruccion *deserializar_instruccion(void *buffer, int *desplazamiento);
 int bytes_totales_instruccion_serializada(t_instruccion *instruccion);
 
 #endif

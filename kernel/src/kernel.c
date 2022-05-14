@@ -1,7 +1,8 @@
-#include "kernel.h"
+#include <kernel.h>
 
 t_log *logger = NULL;
 t_kernel_config *config = NULL;
+t_list *lista_procesos = NULL;
 
 int main(int argc, char **argv)
 {

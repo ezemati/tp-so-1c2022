@@ -26,7 +26,7 @@ uint32_t programa_cantidad_instrucciones(t_programa *programa)
 
 void programa_destroy(t_programa *programa)
 {
-    free(programa->ruta);
+    free_if_not_null(programa->ruta);
     instrucciones_destroy(programa->instrucciones);
     free(programa);
 }
@@ -82,8 +82,6 @@ void agregar_instruccion(char *linea, t_list *instrucciones)
 
 void *serializar_programa(t_programa *programa, int *bytes)
 {
-    // Primero se manda un uint32 para indicar el tamanio total del paquete (asi al deserializar sabemos cuantos bytes leer)
-
     uint32_t bytes_buffer_sin_tamanio = bytes_totales_programa_serializado(programa);
     (*bytes) = sizeof(uint32_t) + bytes_buffer_sin_tamanio;
     void *buffer = malloc(*bytes);
@@ -112,10 +110,29 @@ void *serializar_programa(t_programa *programa, int *bytes)
     return buffer;
 }
 
+t_programa *deserializar_programa(void *buffer)
+{
+    int desplazamiento = 0;
+
+    uint32_t tamanio_programa = leer_uint32(buffer, &desplazamiento);
+
+    uint32_t cantidad_instrucciones = leer_uint32(buffer, &desplazamiento);
+
+    t_list *lista_instrucciones = list_create();
+    for (int i = 0; i < cantidad_instrucciones; i++)
+    {
+        t_instruccion *instruccion = deserializar_instruccion(buffer, &desplazamiento);
+        list_add(lista_instrucciones, instruccion);
+    }
+
+    t_programa *programa = programa_new_with_instructions(lista_instrucciones, tamanio_programa);
+    return programa;
+}
+
 int bytes_totales_programa_serializado(t_programa *programa)
 {
     /*
-        TAM_PROGRAMA (uint32), CANT_INSTRUCCIONES (uint32), { TAM_INSTRUCCION (uint32), TAM_CODIGO (uint32), CODIGO (TAM_CODIGO), CANT_PARAM (uint32)[, PARAM1 (uint32)[, PARAM2(uint32)]] }
+        TAM_PROGRAMA (uint32), CANT_INSTRUCCIONES (uint32), { TAM_CODIGO (uint32), CODIGO (TAM_CODIGO), CANT_PARAM (uint32)[, PARAM1 (uint32)[, PARAM2(uint32)]] }
     */
     int bytes = 0;
 
@@ -127,7 +144,6 @@ int bytes_totales_programa_serializado(t_programa *programa)
     {
         t_instruccion *instruccion = (t_instruccion *)list_iterator_next(iterator);
         int bytes_instruccion = bytes_totales_instruccion_serializada(instruccion);
-        bytes += sizeof(uint32_t);
         bytes += bytes_instruccion;
     }
 

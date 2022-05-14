@@ -7,5 +7,6 @@
 #include <string.h>
 
 char *int_to_string(uint32_t number);
+long string_to_long(char *string);
 
 #endif

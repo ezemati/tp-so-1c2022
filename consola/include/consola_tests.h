@@ -12,6 +12,6 @@
 
 int run_tests();
 void serializar_deserializar_instrucciones();
-void assert_instruccion_serializada(void *serializado, t_instruccion *instruccion, int *desplazamiento);
+void assert_instruccion_serializada(t_instruccion *instruccion_serializada, t_instruccion *instruccion);
 
 #endif

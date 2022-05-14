@@ -1,7 +1,5 @@
 #include <types/instruccion.h>
 
-static void instruccion_buffer_destroy(void *buffer_instruccion);
-
 t_instruccion *instruccion_new(char *codigo_instruccion, char **parametros)
 {
     uint32_t cantidad_parametros = 0;
@@ -42,6 +40,11 @@ t_instruccion *instruccion_new_with_numeric_params(char *codigo_instruccion, uin
     return instruccion;
 }
 
+t_instruccion *instruccion_duplicate(t_instruccion *instruccion)
+{
+    return instruccion_new_with_numeric_params(instruccion->codigo_instruccion, instruccion->cantidad_parametros, instruccion->parametros);
+}
+
 void instruccion_destroy(t_instruccion *instruccion)
 {
     free(instruccion->codigo_instruccion);
@@ -50,27 +53,19 @@ void instruccion_destroy(t_instruccion *instruccion)
 
 void instrucciones_destroy(t_list *instrucciones)
 {
-    list_destroy_and_destroy_elements(instrucciones, instruccion_buffer_destroy);
-}
-
-void instruccion_buffer_destroy(void *buffer_instruccion)
-{
-    t_instruccion *instruccion = (t_instruccion *)buffer_instruccion;
-    instruccion_destroy(instruccion);
+    list_destroy_and_destroy_elements(instrucciones, (void *)instruccion_destroy);
 }
 
 /***************************** SERIALIZACION *****************************/
 
 void *serializar_instruccion(t_instruccion *instruccion, int *bytes)
 {
-    // TAM_BUFFER_INSTRUCCION (uint32), TAM_CODIGO (uint32), CODIGO (TAM_CODIGO), CANT_PARAM (uint32)[, PARAM1 (uint32)[, PARAM2(uint32)]]
+    // TAM_CODIGO (uint32), CODIGO (TAM_CODIGO), CANT_PARAM (uint32)[, PARAM1 (uint32)[, PARAM2(uint32)]]
     uint32_t bytes_buffer_sin_tamanio = bytes_totales_instruccion_serializada(instruccion);
-    (*bytes) = sizeof(uint32_t) + bytes_buffer_sin_tamanio;
+    (*bytes) = bytes_buffer_sin_tamanio;
     void *buffer = malloc(*bytes);
 
     int desplazamiento = 0;
-
-    escribir_uint32(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
 
     escribir_string_con_longitud(buffer, &desplazamiento, instruccion->codigo_instruccion);
 
@@ -83,21 +78,18 @@ void *serializar_instruccion(t_instruccion *instruccion, int *bytes)
     return buffer;
 }
 
-t_instruccion *deserializar_instruccion(void *buffer, int *desplazamiento, uint32_t *bytes)
+t_instruccion *deserializar_instruccion(void *buffer, int *desplazamiento)
 {
-    (*bytes) = leer_uint32(buffer, desplazamiento);
+    char *codigo_instruccion = leer_string_con_longitud(buffer, desplazamiento);
 
-    t_instruccion *instruccion = malloc(*bytes);
-
-    instruccion->codigo_instruccion = leer_string_con_longitud(buffer, desplazamiento);
-
-    instruccion->cantidad_parametros = leer_uint32(buffer, desplazamiento);
-    for (int i = 0; i < instruccion->cantidad_parametros; i++)
+    uint32_t cantidad_parametros = leer_uint32(buffer, desplazamiento);
+    uint32_t parametros[2];
+    for (int i = 0; i < cantidad_parametros; i++)
     {
-        instruccion->parametros[i] = leer_uint32(buffer, desplazamiento);
+        parametros[i] = leer_uint32(buffer, desplazamiento);
     }
 
-    return instruccion;
+    return instruccion_new_with_numeric_params(codigo_instruccion, cantidad_parametros, parametros);
 }
 
 int bytes_totales_instruccion_serializada(t_instruccion *instruccion)

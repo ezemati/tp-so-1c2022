@@ -3,7 +3,9 @@
 
 #include <kernel_config.h>
 #include <kernel_requests.h>
+#include <kernel_variables_globales.h>
 
+#include <utils/list.h>
 #include <utils/sockets.h>
 #include <types/identificador_operacion.h>
 
@@ -26,5 +28,6 @@ void inicializar_kernel(char **argv);
 void terminar_kernel();
 void procesar_request(int socket_cliente);
 void *procesar_cliente(uint32_t *args);
+uint32_t obtener_proximo_pid();
 
 #endif

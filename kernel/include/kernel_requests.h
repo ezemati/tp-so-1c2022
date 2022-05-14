@@ -2,10 +2,14 @@
 #define KERNEL_REQUESTS_H
 
 #include <kernel_config.h>
+#include <kernel_utils.h>
+#include <kernel_pcb.h>
+#include <kernel_variables_globales.h>
+
+#include <types/programa.h>
+
 #include <utils/sockets.h>
 #include <types/identificador_operacion.h>
-
-#include <kernel/request_proceso_consola.h>
 
 #include <netdb.h>
 #include <stdio.h>
@@ -20,6 +24,6 @@
 #include <commons/string.h>
 #include <commons/txt.h>
 
-void request_proceso_consola_new(int socket_cliente);
+void crear_proceso(int socket_cliente);
 
 #endif

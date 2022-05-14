@@ -3,6 +3,8 @@
 
 #include <utils/logs.h>
 #include <utils/string.h>
+#include <serialization/serialization_utils.h>
+#include <types/identificador_operacion.h>
 
 #include <netdb.h>
 #include <stdbool.h>
@@ -37,6 +39,11 @@ int esperar_cliente(int socket_servidor);
  * @RETURN: La cantidad de bytes enviados, o -1 en caso de error
  */
 int enviar_por_socket(int socket, void *buffer_serializado, int bytes);
+
+/**
+ * @DESC: Envia un buffer para una operacion a traves del socket, incluyendo la cabecera (el codigo de la operacion y el tamanio en bytes del buffer)
+ */
+int enviar_instruccion_por_socket(int socket, identificador_operacion operacion, void *buffer_serializado, int bytes);
 
 /**
  * @DESC: Envia un string a traves del socket

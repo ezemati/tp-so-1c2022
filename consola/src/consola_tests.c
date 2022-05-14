@@ -17,13 +17,13 @@ void serializar_deserializar_instrucciones()
 {
     t_list *instrucciones = list_create();
 
-    t_instruccion *instruccion1 = instruccion_new_with_numeric_params("NO_OP", 0, NULL);
+    t_instruccion *instruccion0 = instruccion_new_with_numeric_params("NO_OP", 0, NULL);
 
-    uint32_t parametros2[2] = {13, 26};
-    t_instruccion *instruccion2 = instruccion_new_with_numeric_params("WRITE", 2, parametros2);
+    uint32_t parametros1[2] = {13, 26};
+    t_instruccion *instruccion1 = instruccion_new_with_numeric_params("WRITE", 2, parametros1);
 
+    list_add(instrucciones, instruccion0);
     list_add(instrucciones, instruccion1);
-    list_add(instrucciones, instruccion2);
 
     uint32_t tamanio_programa = 50;
     t_programa *programa = programa_new_with_instructions(instrucciones, tamanio_programa);
@@ -32,36 +32,31 @@ void serializar_deserializar_instrucciones()
     void *serializado = serializar_programa(programa, &bytes_programa_serializado);
 
     int desplazamiento = 0;
-
     uint32_t bytes_programa_deserializado = leer_uint32(serializado, &desplazamiento);
     CU_ASSERT_EQUAL(bytes_programa_deserializado, bytes_programa_serializado - sizeof(uint32_t)); // El deserializado no tiene en cuenta el uint32 inicial con el tamanio total
 
-    uint32_t tamanio_deserializado = leer_uint32(serializado, &desplazamiento);
-    CU_ASSERT_EQUAL(tamanio_deserializado, tamanio_programa);
+    t_programa *programa_deserializado = deserializar_programa(serializado + sizeof(uint32_t)); // Me salteo el uint32 que indica el tamanio total del buffer
 
-    uint32_t cant_instrucciones_deserializado = leer_uint32(serializado, &desplazamiento);
-    CU_ASSERT_EQUAL(cant_instrucciones_deserializado, programa_cantidad_instrucciones(programa));
+    CU_ASSERT_EQUAL(programa_deserializado->tamanio, tamanio_programa);
 
-    assert_instruccion_serializada(serializado, instruccion1, &desplazamiento);
-    assert_instruccion_serializada(serializado, instruccion2, &desplazamiento);
+    CU_ASSERT_EQUAL(programa_cantidad_instrucciones(programa_deserializado), 2);
+
+    assert_instruccion_serializada(list_get(programa_deserializado->instrucciones, 0), instruccion0);
+    assert_instruccion_serializada(list_get(programa_deserializado->instrucciones, 1), instruccion1);
+
+    programa_destroy(programa_deserializado);
+    free(serializado);
+    programa_destroy(programa);
 }
 
-void assert_instruccion_serializada(void *serializado, t_instruccion *instruccion, int *desplazamiento)
+void assert_instruccion_serializada(t_instruccion *instruccion_serializada, t_instruccion *instruccion)
 {
-    uint32_t bytes_instruccion_deserializada = leer_uint32(serializado, desplazamiento);
+    CU_ASSERT_STRING_EQUAL(instruccion_serializada->codigo_instruccion, instruccion->codigo_instruccion);
 
-    uint32_t tamanio_codigo_deserializado = leer_uint32(serializado, desplazamiento);
-    CU_ASSERT_EQUAL(tamanio_codigo_deserializado, strlen(instruccion->codigo_instruccion) + 1);
+    CU_ASSERT_EQUAL(instruccion_serializada->cantidad_parametros, instruccion->cantidad_parametros);
 
-    char *codigo_deserializado = leer_string(serializado, tamanio_codigo_deserializado, desplazamiento);
-    CU_ASSERT_STRING_EQUAL(codigo_deserializado, instruccion->codigo_instruccion);
-
-    uint32_t cant_parametros_deserializado = leer_uint32(serializado, desplazamiento);
-    CU_ASSERT_EQUAL(cant_parametros_deserializado, instruccion->cantidad_parametros);
-
-    for (int i = 0; i < cant_parametros_deserializado; i++)
+    for (int i = 0; i < instruccion_serializada->cantidad_parametros; i++)
     {
-        uint32_t parametro_deserializado = leer_uint32(serializado, desplazamiento);
-        CU_ASSERT_EQUAL(parametro_deserializado, instruccion->parametros[i]);
+        CU_ASSERT_EQUAL(instruccion_serializada->parametros[i], instruccion->parametros[i]);
     }
 }

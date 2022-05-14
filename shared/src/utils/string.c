@@ -1,6 +1,7 @@
 #include <utils/string.h>
 
-char *int_to_string(uint32_t number) {
+char *int_to_string(uint32_t number)
+{
     char str[100];
     sprintf(str, "%d", number);
 
@@ -8,4 +9,9 @@ char *int_to_string(uint32_t number) {
     char *allocatedStr = malloc(size);
     strncpy(allocatedStr, str, size);
     return allocatedStr;
+}
+
+long string_to_long(char *string)
+{
+    return strtol(string, NULL, 10);
 }

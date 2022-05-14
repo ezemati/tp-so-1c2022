@@ -3,6 +3,7 @@
 void inicializar_kernel(char **argv)
 {
 	config = kernel_config_new("cfg/kernel.config", logger);
+	lista_procesos = list_create();
 }
 
 void terminar_kernel()
@@ -11,6 +12,8 @@ void terminar_kernel()
 	log_destroy(logger);
 
 	kernel_config_destroy(config);
+
+	list_destroy_and_destroy_elements(lista_procesos, (void *)pcb_destroy);
 }
 
 void procesar_request(int socket_cliente)
@@ -33,8 +36,8 @@ void *procesar_cliente(uint32_t *args)
 
 	switch (id_op)
 	{
-	case REQUEST_PROCESO_CONSOLA:
-		request_proceso_consola_new(socket_cliente);
+	case CREAR_PROCESO:
+		crear_proceso(socket_cliente);
 		break;
 	default:
 		enviar_string_con_longitud_por_socket(socket_cliente, "TEST: error");
@@ -45,4 +48,10 @@ void *procesar_cliente(uint32_t *args)
 	free(args);
 
 	return NULL;
+}
+
+uint32_t obtener_proximo_pid()
+{
+	t_kernel_pcb *ultimo_proceso = (t_kernel_pcb *)list_get_last_element(lista_procesos);
+	return ultimo_proceso->id + 1;
 }

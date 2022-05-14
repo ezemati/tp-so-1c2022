@@ -3,6 +3,8 @@
 
 #include <consola_config.h>
 #include <utils/sockets.h>
+#include <utils/string.h>
+
 #include <types/instruccion.h>
 #include <types/programa.h>
 

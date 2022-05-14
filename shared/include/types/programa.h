@@ -3,6 +3,7 @@
 
 #include <types/instruccion.h>
 #include <serialization/serialization_utils.h>
+#include <utils/pointers.h>
 
 #include <stdint.h>
 #include <stdio.h>
@@ -15,7 +16,7 @@ typedef struct t_programa
 {
     char *ruta;
     uint32_t tamanio;
-    t_list *instrucciones;
+    t_list *instrucciones; // De tipo t_instruccion
 } t_programa;
 
 /**
@@ -44,6 +45,7 @@ void programa_destroy(t_programa *programa);
 t_list *crear_instrucciones_de_archivo(char *ruta);
 
 void *serializar_programa(t_programa *programa, int *bytes);
+t_programa *deserializar_programa(void *buffer);
 int bytes_totales_programa_serializado(t_programa *programa);
 
 #endif

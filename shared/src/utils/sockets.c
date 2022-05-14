@@ -97,6 +97,24 @@ int enviar_por_socket(int socket, void *buffer_serializado, int bytes)
     return send(socket, buffer_serializado, bytes, 0);
 }
 
+int enviar_instruccion_por_socket(int socket, identificador_operacion operacion, void *buffer_serializado, int bytes)
+{
+    int tamanio_buffer = sizeof(identificador_operacion) // El identificador de la instruccion
+                         + sizeof(uint32_t)              // Los bytes totales del buffer (para que el servidor sepa cuantos bytes recibir del socket)
+                         + bytes;
+    void *buffer = malloc(tamanio_buffer);
+
+    int desplazamiento = 0;
+    escribir_uint32(buffer, &desplazamiento, operacion);
+    escribir_uint32(buffer, &desplazamiento, bytes);
+    escribir_buffer(buffer, &desplazamiento, buffer_serializado, bytes);
+
+    int bytes_enviados = send(socket, buffer, tamanio_buffer, 0);
+    free(buffer);
+
+    return bytes_enviados;
+}
+
 int enviar_string_por_socket(int socket, char *cadena)
 {
     int bytes = strlen(cadena) + 1;

@@ -33,7 +33,7 @@ int main(int argc, char **argv)
 	}
 	else
 	{
-		enviar_por_socket(socket_kernel, programa_serializado, bytes);
+		enviar_instruccion_por_socket(socket_kernel, CREAR_PROCESO, programa_serializado, bytes);
 		liberar_conexion(socket_kernel);
 	}
 	free(programa_serializado);

@@ -3,6 +3,7 @@
 
 typedef enum identificador_operacion
 {
+	CREAR_PROCESO,
     INICIALIZAR_PROCESO,
     FINALIZAR_PROCESO,
     SUSPENDER_PROCESO,
@@ -10,9 +11,7 @@ typedef enum identificador_operacion
     LEER_DATO,
     ESCRIBIR_DATO,
     OBTENER_NUMERO_TABLA_2_PARA_ENTRADA_TABLA_1,
-    OBTENER_MARCO_PARA_ENTRADA_TABLA_2,
-	//Operaciones Kernel
-	REQUEST_PROCESO_CONSOLA
+    OBTENER_MARCO_PARA_ENTRADA_TABLA_2
 } identificador_operacion;
 
 #endif

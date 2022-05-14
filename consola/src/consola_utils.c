@@ -3,7 +3,7 @@
 void inicializar_consola(char **argv)
 {
 	config = consola_config_new("cfg/consola.config", logger);
-	programa = programa_new(argv[1], strtoul(argv[2], NULL, 10));
+	programa = programa_new(argv[1], string_to_long(argv[2]));
 }
 
 void terminar_consola()
