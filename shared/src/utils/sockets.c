@@ -167,6 +167,14 @@ int recibir_buffer_por_socket(int socket, void *buffer, int bytes)
     return recv(socket, buffer, bytes, MSG_WAITALL);
 }
 
+int recibir_buffer_con_bytes_por_socket(int socket, void **buffer)
+{
+    uint32_t bytes_buffer;
+    recibir_uint32_por_socket(socket, &bytes_buffer);
+    (*buffer) = malloc(bytes_buffer);
+    return recibir_buffer_por_socket(socket, *buffer, bytes_buffer);
+}
+
 int recibir_string_con_longitud_por_socket(int socket, char **buffer)
 {
     uint32_t tamanio;

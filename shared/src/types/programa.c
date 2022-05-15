@@ -82,13 +82,10 @@ void agregar_instruccion(char *linea, t_list *instrucciones)
 
 void *serializar_programa(t_programa *programa, int *bytes)
 {
-    uint32_t bytes_buffer_sin_tamanio = bytes_totales_programa_serializado(programa);
-    (*bytes) = sizeof(uint32_t) + bytes_buffer_sin_tamanio;
+    (*bytes) = bytes_totales_programa_serializado(programa);
     void *buffer = malloc(*bytes);
 
     int desplazamiento = 0;
-
-    escribir_uint32_en_buffer(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
 
     escribir_uint32_en_buffer(buffer, &desplazamiento, programa->tamanio);
 

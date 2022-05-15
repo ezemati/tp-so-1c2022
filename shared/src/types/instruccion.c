@@ -82,8 +82,7 @@ char *format_instruccion_para_print(t_instruccion *instruccion)
 void *serializar_instruccion(t_instruccion *instruccion, int *bytes)
 {
     // TAM_CODIGO (uint32), CODIGO (TAM_CODIGO), CANT_PARAM (uint32)[, PARAM1 (uint32)[, PARAM2(uint32)]]
-    uint32_t bytes_buffer_sin_tamanio = bytes_totales_instruccion_serializada(instruccion);
-    (*bytes) = bytes_buffer_sin_tamanio;
+    (*bytes) = bytes_totales_instruccion_serializada(instruccion);
     void *buffer = malloc(*bytes);
 
     int desplazamiento = 0;

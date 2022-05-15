@@ -29,14 +29,11 @@ void finalizarproceso_response_destroy(t_memoria_finalizarproceso_response *resp
 
 void *serializar_finalizarproceso_request(t_memoria_finalizarproceso_request *request, int *bytes)
 {
-    // TAM_BUFFER_REQUEST (uint32), PID (uint32), NUMERO_PRIMER_NIVEL (uint32)
-    uint32_t bytes_buffer_sin_tamanio = bytes_totales_finalizarproceso_request_serializada(request);
-    (*bytes) = sizeof(uint32_t) + bytes_buffer_sin_tamanio;
+    // PID (uint32), NUMERO_PRIMER_NIVEL (uint32)
+    (*bytes) = bytes_totales_finalizarproceso_request_serializada(request);
     void *buffer = malloc(*bytes);
 
     int desplazamiento = 0;
-
-    escribir_uint32_en_buffer(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
 
     escribir_uint32_en_buffer(buffer, &desplazamiento, request->pid);
     escribir_uint32_en_buffer(buffer, &desplazamiento, request->numero_tablaprimernivel);
@@ -68,14 +65,11 @@ int bytes_totales_finalizarproceso_request_serializada(t_memoria_finalizarproces
 
 void *serializar_finalizarproceso_response(t_memoria_finalizarproceso_response *response, int *bytes)
 {
-    // TAM_BUFFER_RESPONSE (uint32), ___
-    uint32_t bytes_buffer_sin_tamanio = bytes_totales_finalizarproceso_response_serializada(response);
-    (*bytes) = sizeof(uint32_t) + bytes_buffer_sin_tamanio;
+    // ???
+    (*bytes) = bytes_totales_finalizarproceso_response_serializada(response);
     void *buffer = malloc(*bytes);
 
     int desplazamiento = 0;
-
-    escribir_uint32_en_buffer(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
 
     // ???
 
@@ -94,7 +88,7 @@ t_memoria_finalizarproceso_response *deserializar_finalizarproceso_response(void
 
 int bytes_totales_finalizarproceso_response_serializada(t_memoria_finalizarproceso_response *response)
 {
-    // ___
+    // ???
     int bytes = 0;
 
     // ???

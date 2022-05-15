@@ -21,10 +21,8 @@ void realizar_handshake_con_memoria(t_cpu_config *config)
 
 	enviar_uint32_por_socket(socket_memoria, HANDSHAKE_INFO_TRADUCCION);
 
-	uint32_t bytes_response;
-	recibir_uint32_por_socket(socket_memoria, &bytes_response);
-	void *buffer_response = malloc(bytes_response);
-	recibir_buffer_por_socket(socket_memoria, buffer_response, bytes_response);
+	void *buffer_response = NULL;
+	recibir_buffer_con_bytes_por_socket(socket_memoria, &buffer_response);
 
 	t_memoria_handshakeconfiguraciones_response *response = deserializar_handshakeconfiguraciones_memoria_response(buffer_response);
 	config->memoria_entradas_por_tabla = response->entradas_por_tabla;

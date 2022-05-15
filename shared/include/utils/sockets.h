@@ -75,6 +75,11 @@ int enviar_uint32_por_socket(int socket, uint32_t numero);
 int recibir_buffer_por_socket(int socket, void *buffer, int bytes);
 
 /**
+ * @DESC: Recibe del socket un buffer cuya cabecera indica el tamanio en bytes de dicho buffer
+ */
+int recibir_buffer_con_bytes_por_socket(int socket, void **buffer);
+
+/**
  * @DESC: Recibe del socket un uint32
  * @RETURN: La cantidad de bytes verdaderamente recibidos
  */

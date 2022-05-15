@@ -37,14 +37,11 @@ void leerdato_response_destroy(t_memoria_leerdato_response *response)
 
 void *serializar_leerdato_request(t_memoria_leerdato_request *request, int *bytes)
 {
-    // TAM_BUFFER_REQUEST (uint32), NUMERO_SEGUNDONIVEL (uint32), ENTRADA_SEGUNDONIVEL (uint32), DIR_FISICA (uint32), CANT_BYTES (uint32)
-    uint32_t bytes_buffer_sin_tamanio = bytes_totales_leerdato_request_serializada(request);
-    (*bytes) = sizeof(uint32_t) + bytes_buffer_sin_tamanio;
+    // NUMERO_SEGUNDONIVEL (uint32), ENTRADA_SEGUNDONIVEL (uint32), DIR_FISICA (uint32), CANT_BYTES (uint32)
+    (*bytes) = bytes_totales_leerdato_request_serializada(request);
     void *buffer = malloc(*bytes);
 
     int desplazamiento = 0;
-
-    escribir_uint32_en_buffer(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
 
     escribir_uint32_en_buffer(buffer, &desplazamiento, request->numero_tablasegundonivel);
     escribir_uint32_en_buffer(buffer, &desplazamiento, request->entrada_tablasegundonivel);
@@ -82,14 +79,11 @@ int bytes_totales_leerdato_request_serializada(t_memoria_leerdato_request *reque
 
 void *serializar_leerdato_response(t_memoria_leerdato_response *response, int *bytes)
 {
-    // TAM_BUFFER_RESPONSE (uint32), CANT_BYTES (uint32), DATOS (cant_bytes)
-    uint32_t bytes_buffer_sin_tamanio = bytes_totales_leerdato_response_serializada(response);
-    (*bytes) = sizeof(uint32_t) + bytes_buffer_sin_tamanio;
+    // CANT_BYTES (uint32), DATOS (cant_bytes)
+    (*bytes) = bytes_totales_leerdato_response_serializada(response);
     void *buffer = malloc(*bytes);
 
     int desplazamiento = 0;
-
-    escribir_uint32_en_buffer(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
 
     escribir_uint32_en_buffer(buffer, &desplazamiento, response->cantidad_bytes);
     escribir_en_buffer(buffer, &desplazamiento, response->dato, response->cantidad_bytes);

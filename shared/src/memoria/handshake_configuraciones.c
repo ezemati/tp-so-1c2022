@@ -17,14 +17,11 @@ void handshakeconfiguraciones_memoria_response_destroy(t_memoria_handshakeconfig
 
 void *serializar_handshakeconfiguraciones_memoria_response(t_memoria_handshakeconfiguraciones_response *response, int *bytes)
 {
-    // TAM_BUFFER_RESPONSE (uint32), ENTRADAS_POR_TABLA (uint32), TAMANIO_PAGINA (uint32)
-    uint32_t bytes_buffer_sin_tamanio = bytes_totales_handshakeconfiguraciones_memoria_response_serializada(response);
-    (*bytes) = sizeof(uint32_t) + bytes_buffer_sin_tamanio;
+    // ENTRADAS_POR_TABLA (uint32), TAMANIO_PAGINA (uint32)
+    (*bytes) = bytes_totales_handshakeconfiguraciones_memoria_response_serializada(response);
     void *buffer = malloc(*bytes);
 
     int desplazamiento = 0;
-
-    escribir_uint32_en_buffer(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
 
     escribir_uint32_en_buffer(buffer, &desplazamiento, response->entradas_por_tabla);
     escribir_uint32_en_buffer(buffer, &desplazamiento, response->tamanio_pagina);

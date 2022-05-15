@@ -32,10 +32,8 @@ void serializar_deserializar_instrucciones()
     void *serializado = serializar_programa(programa, &bytes_programa_serializado);
 
     int desplazamiento = 0;
-    uint32_t bytes_programa_deserializado = leer_uint32_de_buffer(serializado, &desplazamiento);
-    CU_ASSERT_EQUAL(bytes_programa_deserializado, bytes_programa_serializado - sizeof(uint32_t)); // El deserializado no tiene en cuenta el uint32 inicial con el tamanio total
 
-    t_programa *programa_deserializado = deserializar_programa(serializado + sizeof(uint32_t)); // Me salteo el uint32 que indica el tamanio total del buffer
+    t_programa *programa_deserializado = deserializar_programa(serializado);
 
     CU_ASSERT_EQUAL(programa_deserializado->tamanio, tamanio_programa);
 
