@@ -92,23 +92,41 @@ int esperar_cliente(int socket_servidor)
     return socket_cliente;
 }
 
+int enviar_buffer_serializado_con_bytes_por_socket(int socket, void *buffer_serializado, int bytes)
+{
+    int tamanio_buffer = sizeof(uint32_t) // Tamanio total del buffer en bytes (para despues recibirlo del socket)
+                         + bytes;
+    void *buffer_con_tamanio = malloc(tamanio_buffer);
+
+    int desplazamiento = 0;
+    escribir_uint32_en_buffer(buffer_con_tamanio, &desplazamiento, bytes);
+    escribir_en_buffer(buffer_con_tamanio, &desplazamiento, buffer_serializado, bytes);
+
+    int bytes_enviados = enviar_buffer_por_socket(socket, buffer_con_tamanio, tamanio_buffer);
+    free(buffer_con_tamanio);
+
+    return bytes_enviados;
+}
+
 int enviar_buffer_por_socket(int socket, void *buffer_serializado, int bytes)
 {
     return send(socket, buffer_serializado, bytes, 0);
 }
 
-int enviar_instruccion_por_socket(int socket, identificador_operacion operacion, void *buffer_serializado, int bytes)
+int enviar_buffer_serializado_con_instruccion_y_bytes_por_socket(int socket, identificador_operacion operacion, void *buffer_serializado, int bytes)
 {
     int tamanio_buffer = sizeof(identificador_operacion) // El identificador de la instruccion
+                         + sizeof(uint32_t)              // Tamanio total del buffer en bytes (para despues recibirlo del socket)
                          + bytes;
-    void *buffer = malloc(tamanio_buffer);
+    void *buffer_con_instruccion_y_tamanio = malloc(tamanio_buffer);
 
     int desplazamiento = 0;
-    escribir_uint32_en_buffer(buffer, &desplazamiento, operacion);
-    escribir_en_buffer(buffer, &desplazamiento, buffer_serializado, bytes);
+    escribir_uint32_en_buffer(buffer_con_instruccion_y_tamanio, &desplazamiento, operacion);
+    escribir_uint32_en_buffer(buffer_con_instruccion_y_tamanio, &desplazamiento, bytes);
+    escribir_en_buffer(buffer_con_instruccion_y_tamanio, &desplazamiento, buffer_serializado, bytes);
 
-    int bytes_enviados = send(socket, buffer, tamanio_buffer, 0);
-    free(buffer);
+    int bytes_enviados = enviar_buffer_por_socket(socket, buffer_con_instruccion_y_tamanio, tamanio_buffer);
+    free(buffer_con_instruccion_y_tamanio);
 
     return bytes_enviados;
 }

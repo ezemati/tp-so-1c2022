@@ -35,15 +35,20 @@ int iniciar_servidor(uint32_t puerto, t_log *logger);
 int esperar_cliente(int socket_servidor);
 
 /**
+ * @DESC: Envia el buffer serializado por socket, agregandole como cabecera un uint32 con el tamanio en bytes del buffer (para despues saber cuantos bytes recibir del socket)
+ */
+int enviar_buffer_serializado_con_bytes_por_socket(int socket, void *buffer_serializado, int bytes);
+
+/**
  * @DESC: Envia los datos del buffer a traves del socket
  * @RETURN: La cantidad de bytes enviados, o -1 en caso de error
  */
 int enviar_buffer_por_socket(int socket, void *buffer_serializado, int bytes);
 
 /**
- * @DESC: Envia un buffer para una operacion a traves del socket, incluyendo la cabecera (el codigo de la operacion y el tamanio en bytes del buffer)
+ * @DESC: Envia un buffer para una operacion a traves del socket, agregandole como cabecera un uint32 con el codigo de la operacion, y otro uint32 con el tamanio en bytes del buffer
  */
-int enviar_instruccion_por_socket(int socket, identificador_operacion operacion, void *buffer_serializado, int bytes);
+int enviar_buffer_serializado_con_instruccion_y_bytes_por_socket(int socket, identificador_operacion operacion, void *buffer_serializado, int bytes);
 
 /**
  * @DESC: Envia un string a traves del socket

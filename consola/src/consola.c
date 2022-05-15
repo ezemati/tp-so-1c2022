@@ -33,7 +33,7 @@ int main(int argc, char **argv)
 	}
 	else
 	{
-		enviar_instruccion_por_socket(socket_kernel, CREAR_PROCESO, programa_serializado, bytes);
+		enviar_buffer_serializado_con_instruccion_y_bytes_por_socket(socket_kernel, CREAR_PROCESO, programa_serializado, bytes);
 		uint32_t response;
 		recibir_uint32_por_socket(socket_kernel, &response);
 		if (response == 1)
