@@ -38,7 +38,7 @@ int esperar_cliente(int socket_servidor);
  * @DESC: Envia los datos del buffer a traves del socket
  * @RETURN: La cantidad de bytes enviados, o -1 en caso de error
  */
-int enviar_por_socket(int socket, void *buffer_serializado, int bytes);
+int enviar_buffer_por_socket(int socket, void *buffer_serializado, int bytes);
 
 /**
  * @DESC: Envia un buffer para una operacion a traves del socket, incluyendo la cabecera (el codigo de la operacion y el tamanio en bytes del buffer)
@@ -67,7 +67,7 @@ int enviar_uint32_por_socket(int socket, uint32_t numero);
  * @DESC: Recibe del socket los bytes especificados y los almacena en el buffer
  * @RETURN: La cantidad de bytes verdaderamente recibidos
  */
-int recibir_por_socket(int socket, void *buffer, int bytes);
+int recibir_buffer_por_socket(int socket, void *buffer, int bytes);
 
 /**
  * @DESC: Recibe del socket un uint32

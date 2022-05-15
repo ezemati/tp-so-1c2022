@@ -6,7 +6,7 @@ void crear_proceso(int socket_cliente)
 	recibir_uint32_por_socket(socket_cliente, &bytes_request);
 
 	void *buffer_request = malloc(bytes_request);
-	recibir_por_socket(socket_cliente, buffer_request, bytes_request);
+	recibir_buffer_por_socket(socket_cliente, buffer_request, bytes_request);
 
 	t_programa *programa = deserializar_programa(buffer_request);
 

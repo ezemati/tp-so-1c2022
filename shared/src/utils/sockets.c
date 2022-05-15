@@ -92,7 +92,7 @@ int esperar_cliente(int socket_servidor)
     return socket_cliente;
 }
 
-int enviar_por_socket(int socket, void *buffer_serializado, int bytes)
+int enviar_buffer_por_socket(int socket, void *buffer_serializado, int bytes)
 {
     return send(socket, buffer_serializado, bytes, 0);
 }
@@ -119,7 +119,7 @@ int enviar_string_por_socket(int socket, char *cadena)
     char *alloc_cadena = malloc(bytes);
     memcpy(alloc_cadena, cadena, bytes);
 
-    int result = enviar_por_socket(socket, cadena, bytes);
+    int result = enviar_buffer_por_socket(socket, cadena, bytes);
 
     free(alloc_cadena);
     return result;
@@ -138,13 +138,13 @@ int enviar_uint32_por_socket(int socket, uint32_t numero)
     uint32_t *alloc_numero = malloc(sizeof(uint32_t));
     *alloc_numero = numero;
 
-    int result = enviar_por_socket(socket, alloc_numero, sizeof(uint32_t));
+    int result = enviar_buffer_por_socket(socket, alloc_numero, sizeof(uint32_t));
 
     free(alloc_numero);
     return result;
 }
 
-int recibir_por_socket(int socket, void *buffer, int bytes)
+int recibir_buffer_por_socket(int socket, void *buffer, int bytes)
 {
     return recv(socket, buffer, bytes, MSG_WAITALL);
 }
@@ -155,12 +155,12 @@ int recibir_string_con_longitud_por_socket(int socket, char **buffer)
     recibir_uint32_por_socket(socket, &tamanio);
 
     (*buffer) = malloc(tamanio);
-    return recibir_por_socket(socket, (*buffer), tamanio);
+    return recibir_buffer_por_socket(socket, (*buffer), tamanio);
 }
 
 int recibir_uint32_por_socket(int socket, uint32_t *numero)
 {
-    return recibir_por_socket(socket, numero, sizeof(uint32_t));
+    return recibir_buffer_por_socket(socket, numero, sizeof(uint32_t));
 }
 
 void liberar_conexion(int socket)
