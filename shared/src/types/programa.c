@@ -88,12 +88,12 @@ void *serializar_programa(t_programa *programa, int *bytes)
 
     int desplazamiento = 0;
 
-    escribir_uint32(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
 
-    escribir_uint32(buffer, &desplazamiento, programa->tamanio);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, programa->tamanio);
 
     uint32_t cant_instrucciones = programa_cantidad_instrucciones(programa);
-    escribir_uint32(buffer, &desplazamiento, cant_instrucciones);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, cant_instrucciones);
 
     t_list_iterator *iterator = list_iterator_create(programa->instrucciones);
     while (list_iterator_has_next(iterator))
@@ -101,7 +101,7 @@ void *serializar_programa(t_programa *programa, int *bytes)
         t_instruccion *instruccion = (t_instruccion *)list_iterator_next(iterator);
         int bytes_instruccion = 0;
         void *buffer_instruccion = serializar_instruccion(instruccion, &bytes_instruccion);
-        escribir_buffer(buffer, &desplazamiento, buffer_instruccion, bytes_instruccion);
+        escribir_en_buffer(buffer, &desplazamiento, buffer_instruccion, bytes_instruccion);
         free(buffer_instruccion);
     }
 
@@ -114,9 +114,9 @@ t_programa *deserializar_programa(void *buffer)
 {
     int desplazamiento = 0;
 
-    uint32_t tamanio_programa = leer_uint32(buffer, &desplazamiento);
+    uint32_t tamanio_programa = leer_uint32_de_buffer(buffer, &desplazamiento);
 
-    uint32_t cantidad_instrucciones = leer_uint32(buffer, &desplazamiento);
+    uint32_t cantidad_instrucciones = leer_uint32_de_buffer(buffer, &desplazamiento);
 
     t_list *lista_instrucciones = list_create();
     for (int i = 0; i < cantidad_instrucciones; i++)

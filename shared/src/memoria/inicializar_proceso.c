@@ -36,10 +36,10 @@ void *serializar_inicializarproceso_request(t_memoria_inicializarproceso_request
 
     int desplazamiento = 0;
 
-    escribir_uint32(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
 
-    escribir_uint32(buffer, &desplazamiento, request->pid);
-    escribir_uint32(buffer, &desplazamiento, request->tamanio_proceso);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, request->pid);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, request->tamanio_proceso);
 
     return buffer;
 }
@@ -48,8 +48,8 @@ t_memoria_inicializarproceso_request *deserializar_inicializarproceso_request(vo
 {
     int desplazamiento = 0;
 
-    uint32_t pid = leer_uint32(buffer, &desplazamiento);
-    uint32_t tamanio_proceso = leer_uint32(buffer, &desplazamiento);
+    uint32_t pid = leer_uint32_de_buffer(buffer, &desplazamiento);
+    uint32_t tamanio_proceso = leer_uint32_de_buffer(buffer, &desplazamiento);
 
     t_memoria_inicializarproceso_request *request = inicializarproceso_request_new(pid, tamanio_proceso);
     return request;
@@ -75,9 +75,9 @@ void *serializar_inicializarproceso_response(t_memoria_inicializarproceso_respon
 
     int desplazamiento = 0;
 
-    escribir_uint32(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
 
-    escribir_uint32(buffer, &desplazamiento, response->numero_tablaprimernivel);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, response->numero_tablaprimernivel);
 
     return buffer;
 }
@@ -86,7 +86,7 @@ t_memoria_inicializarproceso_response *deserializar_inicializarproceso_response(
 {
     int desplazamiento = 0;
 
-    uint32_t numero_tablaprimernivel = leer_uint32(buffer, &desplazamiento);
+    uint32_t numero_tablaprimernivel = leer_uint32_de_buffer(buffer, &desplazamiento);
 
     t_memoria_inicializarproceso_response *response = inicializarproceso_response_new(numero_tablaprimernivel);
     return response;

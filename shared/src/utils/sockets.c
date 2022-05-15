@@ -104,8 +104,8 @@ int enviar_instruccion_por_socket(int socket, identificador_operacion operacion,
     void *buffer = malloc(tamanio_buffer);
 
     int desplazamiento = 0;
-    escribir_uint32(buffer, &desplazamiento, operacion);
-    escribir_buffer(buffer, &desplazamiento, buffer_serializado, bytes);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, operacion);
+    escribir_en_buffer(buffer, &desplazamiento, buffer_serializado, bytes);
 
     int bytes_enviados = send(socket, buffer, tamanio_buffer, 0);
     free(buffer);

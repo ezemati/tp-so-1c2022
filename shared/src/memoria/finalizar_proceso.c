@@ -36,10 +36,10 @@ void *serializar_finalizarproceso_request(t_memoria_finalizarproceso_request *re
 
     int desplazamiento = 0;
 
-    escribir_uint32(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
 
-    escribir_uint32(buffer, &desplazamiento, request->pid);
-    escribir_uint32(buffer, &desplazamiento, request->numero_tablaprimernivel);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, request->pid);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, request->numero_tablaprimernivel);
 
     return buffer;
 }
@@ -48,8 +48,8 @@ t_memoria_finalizarproceso_request *deserializar_finalizarproceso_request(void *
 {
     int desplazamiento = 0;
 
-    uint32_t pid = leer_uint32(buffer, &desplazamiento);
-    uint32_t numero_tablaprimernivel = leer_uint32(buffer, &desplazamiento);
+    uint32_t pid = leer_uint32_de_buffer(buffer, &desplazamiento);
+    uint32_t numero_tablaprimernivel = leer_uint32_de_buffer(buffer, &desplazamiento);
 
     t_memoria_finalizarproceso_request *request = finalizarproceso_request_new(pid, numero_tablaprimernivel);
     return request;
@@ -75,7 +75,7 @@ void *serializar_finalizarproceso_response(t_memoria_finalizarproceso_response *
 
     int desplazamiento = 0;
 
-    escribir_uint32(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
 
     // ???
 

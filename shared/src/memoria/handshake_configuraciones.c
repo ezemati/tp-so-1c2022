@@ -24,10 +24,10 @@ void *serializar_handshakeconfiguraciones_memoria_response(t_memoria_handshakeco
 
     int desplazamiento = 0;
 
-    escribir_uint32(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
 
-    escribir_uint32(buffer, &desplazamiento, response->entradas_por_tabla);
-    escribir_uint32(buffer, &desplazamiento, response->tamanio_pagina);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, response->entradas_por_tabla);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, response->tamanio_pagina);
 
     return buffer;
 }
@@ -36,8 +36,8 @@ t_memoria_handshakeconfiguraciones_response *deserializar_handshakeconfiguracion
 {
     int desplazamiento = 0;
 
-    uint32_t entradas_por_tabla = leer_uint32(buffer, &desplazamiento);
-    uint32_t tamanio_pagina = leer_uint32(buffer, &desplazamiento);
+    uint32_t entradas_por_tabla = leer_uint32_de_buffer(buffer, &desplazamiento);
+    uint32_t tamanio_pagina = leer_uint32_de_buffer(buffer, &desplazamiento);
 
     t_memoria_handshakeconfiguraciones_response *response = handshakeconfiguraciones_memoria_response_new(entradas_por_tabla, tamanio_pagina);
 

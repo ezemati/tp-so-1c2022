@@ -36,10 +36,10 @@ void *serializar_numerotabla2paraentradatabla1_request(t_memoria_numerotabla2par
 
     int desplazamiento = 0;
 
-    escribir_uint32(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
 
-    escribir_uint32(buffer, &desplazamiento, request->numero_tablaprimernivel);
-    escribir_uint32(buffer, &desplazamiento, request->entrada_tablaprimernivel);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, request->numero_tablaprimernivel);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, request->entrada_tablaprimernivel);
 
     return buffer;
 }
@@ -48,8 +48,8 @@ t_memoria_numerotabla2paraentradatabla1_request *deserializar_numerotabla2paraen
 {
     int desplazamiento = 0;
 
-    uint32_t numero_tablaprimernivel = leer_uint32(buffer, &desplazamiento);
-    uint32_t entrada_tablaprimernivel = leer_uint32(buffer, &desplazamiento);
+    uint32_t numero_tablaprimernivel = leer_uint32_de_buffer(buffer, &desplazamiento);
+    uint32_t entrada_tablaprimernivel = leer_uint32_de_buffer(buffer, &desplazamiento);
 
     t_memoria_numerotabla2paraentradatabla1_request *request = numerotabla2paraentradatabla1_request_new(numero_tablaprimernivel, entrada_tablaprimernivel);
 
@@ -76,9 +76,9 @@ void *serializar_numerotabla2paraentradatabla1_response(t_memoria_numerotabla2pa
 
     int desplazamiento = 0;
 
-    escribir_uint32(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
 
-    escribir_uint32(buffer, &desplazamiento, response->numero_tablasegundonivel);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, response->numero_tablasegundonivel);
 
     return buffer;
 }
@@ -87,7 +87,7 @@ t_memoria_numerotabla2paraentradatabla1_response *deserializar_numerotabla2parae
 {
     int desplazamiento = 0;
 
-    uint32_t numero_tablasegundonivel = leer_uint32(buffer, &desplazamiento);
+    uint32_t numero_tablasegundonivel = leer_uint32_de_buffer(buffer, &desplazamiento);
 
     t_memoria_numerotabla2paraentradatabla1_response *response = numerotabla2paraentradatabla1_response_new(numero_tablasegundonivel);
 

@@ -88,12 +88,12 @@ void *serializar_instruccion(t_instruccion *instruccion, int *bytes)
 
     int desplazamiento = 0;
 
-    escribir_string_con_longitud(buffer, &desplazamiento, instruccion->codigo_instruccion);
+    escribir_string_con_longitud_en_buffer(buffer, &desplazamiento, instruccion->codigo_instruccion);
 
-    escribir_uint32(buffer, &desplazamiento, instruccion->cantidad_parametros);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, instruccion->cantidad_parametros);
     for (int i = 0; i < instruccion->cantidad_parametros; i++)
     {
-        escribir_uint32(buffer, &desplazamiento, instruccion->parametros[i]);
+        escribir_uint32_en_buffer(buffer, &desplazamiento, instruccion->parametros[i]);
     }
 
     return buffer;
@@ -101,13 +101,13 @@ void *serializar_instruccion(t_instruccion *instruccion, int *bytes)
 
 t_instruccion *deserializar_instruccion(void *buffer, int *desplazamiento)
 {
-    char *codigo_instruccion = leer_string_con_longitud(buffer, desplazamiento);
+    char *codigo_instruccion = leer_string_con_longitud_de_buffer(buffer, desplazamiento);
 
-    uint32_t cantidad_parametros = leer_uint32(buffer, desplazamiento);
+    uint32_t cantidad_parametros = leer_uint32_de_buffer(buffer, desplazamiento);
     uint32_t parametros[2];
     for (int i = 0; i < cantidad_parametros; i++)
     {
-        parametros[i] = leer_uint32(buffer, desplazamiento);
+        parametros[i] = leer_uint32_de_buffer(buffer, desplazamiento);
     }
 
     return instruccion_new_with_numeric_params(codigo_instruccion, cantidad_parametros, parametros);

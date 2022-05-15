@@ -43,13 +43,13 @@ void *serializar_escribirdato_request(t_memoria_escribirdato_request *request, i
 
     int desplazamiento = 0;
 
-    escribir_uint32(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
 
-    escribir_uint32(buffer, &desplazamiento, request->numero_tablasegundonivel);
-    escribir_uint32(buffer, &desplazamiento, request->entrada_tablasegundonivel);
-    escribir_uint32(buffer, &desplazamiento, request->direccion_fisica);
-    escribir_uint32(buffer, &desplazamiento, request->cantidad_bytes);
-    escribir_buffer(buffer, &desplazamiento, request->dato, request->cantidad_bytes);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, request->numero_tablasegundonivel);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, request->entrada_tablasegundonivel);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, request->direccion_fisica);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, request->cantidad_bytes);
+    escribir_en_buffer(buffer, &desplazamiento, request->dato, request->cantidad_bytes);
 
     return buffer;
 }
@@ -58,11 +58,11 @@ t_memoria_escribirdato_request *deserializar_escribirdato_request(void *buffer)
 {
     int desplazamiento = 0;
 
-    uint32_t numero_tablasegundonivel = leer_uint32(buffer, &desplazamiento);
-    uint32_t entrada_tablasegundonivel = leer_uint32(buffer, &desplazamiento);
-    uint32_t direccion_fisica = leer_uint32(buffer, &desplazamiento);
-    uint32_t cantidad_bytes = leer_uint32(buffer, &desplazamiento);
-    void *dato = leer_stream(buffer, cantidad_bytes, &desplazamiento);
+    uint32_t numero_tablasegundonivel = leer_uint32_de_buffer(buffer, &desplazamiento);
+    uint32_t entrada_tablasegundonivel = leer_uint32_de_buffer(buffer, &desplazamiento);
+    uint32_t direccion_fisica = leer_uint32_de_buffer(buffer, &desplazamiento);
+    uint32_t cantidad_bytes = leer_uint32_de_buffer(buffer, &desplazamiento);
+    void *dato = leer_stream_de_buffer(buffer, cantidad_bytes, &desplazamiento);
 
     t_memoria_escribirdato_request *request = escribirdato_request_new(numero_tablasegundonivel, entrada_tablasegundonivel, direccion_fisica, cantidad_bytes, dato);
 
@@ -94,9 +94,9 @@ void *serializar_escribirdato_response(t_memoria_escribirdato_response *response
 
     int desplazamiento = 0;
 
-    escribir_uint32(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
 
-    escribir_uint32(buffer, &desplazamiento, response->cantidad_bytes);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, response->cantidad_bytes);
 
     return buffer;
 }
@@ -105,7 +105,7 @@ t_memoria_escribirdato_response *deserializar_escribirdato_response(void *buffer
 {
     int desplazamiento = 0;
 
-    uint32_t cantidad_bytes = leer_uint32(buffer, &desplazamiento);
+    uint32_t cantidad_bytes = leer_uint32_de_buffer(buffer, &desplazamiento);
 
     t_memoria_escribirdato_response *response = escribirdato_response_new(cantidad_bytes);
 

@@ -37,11 +37,11 @@ void *serializar_marcoparaentradatabla2_request(t_memoria_marcoparaentradatabla2
 
     int desplazamiento = 0;
 
-    escribir_uint32(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
 
-    escribir_uint32(buffer, &desplazamiento, request->numero_tablaprimernivel);
-    escribir_uint32(buffer, &desplazamiento, request->numero_tablasegundonivel);
-    escribir_uint32(buffer, &desplazamiento, request->entrada_tablasegundonivel);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, request->numero_tablaprimernivel);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, request->numero_tablasegundonivel);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, request->entrada_tablasegundonivel);
 
     return buffer;
 }
@@ -50,9 +50,9 @@ t_memoria_marcoparaentradatabla2_request *deserializar_marcoparaentradatabla2_re
 {
     int desplazamiento = 0;
 
-    uint32_t numero_tablaprimernivel = leer_uint32(buffer, &desplazamiento);
-    uint32_t numero_tablasegundonivel = leer_uint32(buffer, &desplazamiento);
-    uint32_t entrada_tablasegundonivel = leer_uint32(buffer, &desplazamiento);
+    uint32_t numero_tablaprimernivel = leer_uint32_de_buffer(buffer, &desplazamiento);
+    uint32_t numero_tablasegundonivel = leer_uint32_de_buffer(buffer, &desplazamiento);
+    uint32_t entrada_tablasegundonivel = leer_uint32_de_buffer(buffer, &desplazamiento);
 
     t_memoria_marcoparaentradatabla2_request *request = marcoparaentradatabla2_request_new(numero_tablaprimernivel, numero_tablasegundonivel, entrada_tablasegundonivel);
 
@@ -80,9 +80,9 @@ void *serializar_marcoparaentradatabla2_response(t_memoria_marcoparaentradatabla
 
     int desplazamiento = 0;
 
-    escribir_uint32(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
 
-    escribir_uint32(buffer, &desplazamiento, response->numero_marco);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, response->numero_marco);
 
     return buffer;
 }
@@ -91,7 +91,7 @@ t_memoria_marcoparaentradatabla2_response *deserializar_marcoparaentradatabla2_r
 {
     int desplazamiento = 0;
 
-    uint32_t numero_marco = leer_uint32(buffer, &desplazamiento);
+    uint32_t numero_marco = leer_uint32_de_buffer(buffer, &desplazamiento);
 
     t_memoria_marcoparaentradatabla2_response *response = marcoparaentradatabla2_response_new(numero_marco);
 
