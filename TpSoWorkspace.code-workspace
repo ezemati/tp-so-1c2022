@@ -23,15 +23,15 @@
 			"**/.hg": true,
 			"**/CVS": true,
 			"**/.DS_Store": true,
-
 			"**/Debug": true,
 			"**/bin": true,
 			"**/obj": true,
-
 			// Archivos de Eclipse
 			"**/.settings/": true,
 			"**/.cproject": true,
-			"**/.project": true
+			"**/.project": true,
+			// Para no mostrar los warnings de includePaths
+			"**/c_cpp_properties.json": true
 		},
 		"files.associations": {
 			"sockets.h": "c",
