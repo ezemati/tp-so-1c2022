@@ -24,7 +24,7 @@
 #include <commons/string.h>
 #include <commons/txt.h>
 
-//Funciones del Kernel como servidor
+// Funciones del Kernel como servidor
 void inicializar_kernel(char **argv);
 void terminar_kernel();
 void procesar_request(int socket_cliente);

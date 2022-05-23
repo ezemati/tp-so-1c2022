@@ -19,27 +19,27 @@ typedef struct t_instruccion
 } t_instruccion;
 
 /**
- * @DESC: Crea un puntero a una estructura t_instruccion
+ * @brief Crea un puntero a una estructura t_instruccion
  */
 t_instruccion *instruccion_new(char *codigo_instruccion, char **parametros);
 
 /**
- * @DESC: Crea un puntero a una estructura t_instruccion, usando los parametros numericos pasados por parametro
+ * @brief Crea un puntero a una estructura t_instruccion, usando los parametros numericos pasados por parametro
  */
 t_instruccion *instruccion_new_with_numeric_params(char *codigo_instruccion, uint32_t cant_parametros, uint32_t *parametros);
 
 /**
- * @DESC: Duplica una instancia de t_instruccion
+ * @brief Duplica una instancia de t_instruccion
  */
 t_instruccion *instruccion_duplicate(t_instruccion *instruccion);
 
 /**
- * @DESC: Libera los recursos de una t_instruccion
+ * @brief Libera los recursos de una t_instruccion
  */
 void instruccion_destroy(t_instruccion *instruccion);
 
 /**
- * @DESC: Libera los recursos de todas las t_instruccion de una lista
+ * @brief Libera los recursos de todas las t_instruccion de una lista
  */
 void instrucciones_destroy(t_list *instrucciones);
 
