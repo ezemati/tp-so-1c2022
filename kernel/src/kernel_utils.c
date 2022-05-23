@@ -81,13 +81,13 @@ void pasar_proceso_new_a_ready(t_kernel_pcb *pcb)
 	free(request_serializada);
 	inicializarproceso_request_destroy(request);
 
-	void *buffer_response_serializada = NULL;
-	recibir_buffer_con_bytes_por_socket(socket_memoria, &buffer_response_serializada);
-	t_memoria_inicializarproceso_response *response_deserializada = deserializar_inicializarproceso_response(buffer_response_serializada);
-	pcb->tabla_paginas_primer_nivel = response_deserializada->numero_tablaprimernivel;
+	void *response_serializada = NULL;
+	recibir_buffer_con_bytes_por_socket(socket_memoria, &response_serializada);
+	t_memoria_inicializarproceso_response *response = deserializar_inicializarproceso_response(response_serializada);
+	pcb->tabla_paginas_primer_nivel = response->numero_tablaprimernivel;
 	pcb->estado = READY;
-	inicializarproceso_response_destroy(response_deserializada);
-	free(buffer_response_serializada);
+	inicializarproceso_response_destroy(response);
+	free(response_serializada);
 
 	liberar_conexion(socket_memoria);
 
@@ -108,6 +108,45 @@ uint32_t cantidad_procesos_con_estado(estado_proceso estado)
 	}
 	list_iterator_destroy(iterator);
 	return cantidad_con_estado;
+}
+
+void finalizar_proceso(t_kernel_pcb *pcb)
+{
+	pcb->estado = EXIT;
+	finalizar_proceso_en_memoria(pcb);
+	finalizar_proceso_en_consola(pcb);
+	eliminar_proceso_de_lista(pcb);
+	pcb_destroy(pcb);
+}
+
+void finalizar_proceso_en_memoria(t_kernel_pcb *pcb)
+{
+	int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, logger);
+
+	t_memoria_finalizarproceso_request *request = finalizarproceso_request_new(pcb->id, pcb->tabla_paginas_primer_nivel);
+	int bytes_request_serializada = 0;
+	void *request_serializada = serializar_finalizarproceso_request(request, &bytes_request_serializada);
+	enviar_buffer_serializado_con_instruccion_y_bytes_por_socket(socket_memoria, FINALIZAR_PROCESO, request_serializada, bytes_request_serializada);
+	free(request_serializada);
+	finalizarproceso_request_destroy(request);
+}
+
+void finalizar_proceso_en_consola(t_kernel_pcb *pcb)
+{
+	uint32_t proceso_finalizado_ok = 1;
+	enviar_uint32_por_socket(pcb->socket_consola, proceso_finalizado_ok);
+	liberar_conexion(pcb->socket_consola);
+}
+
+void eliminar_proceso_de_lista(t_kernel_pcb *pcb)
+{
+	bool remove_element(void *element)
+	{
+		t_kernel_pcb *elementPcb = element;
+		return elementPcb->id == pcb->id;
+	}
+
+	list_remove_by_condition(lista_procesos, remove_element);
 }
 
 void print_instrucciones(t_kernel_pcb *pcb)

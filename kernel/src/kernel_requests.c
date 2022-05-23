@@ -19,9 +19,6 @@ void crear_proceso(int socket_cliente)
 
 	// print_instrucciones_de_todos_los_procesos(lista_procesos); // Para Debug
 
-	uint32_t response = 1;
-	enviar_uint32_por_socket(socket_cliente, response);
-
 	programa_destroy(programa);
 	free(buffer_request);
 }

@@ -54,7 +54,7 @@ int iniciar_servidor(uint32_t puerto, t_log *logger)
     }
     else
     {
-        int activado;
+        int activado = 1;
         setsockopt(socket_servidor, SOL_SOCKET, SO_REUSEADDR, &activado, sizeof(activado));
 
         // Asociamos el socket a un puerto

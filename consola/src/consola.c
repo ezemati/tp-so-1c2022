@@ -30,23 +30,24 @@ int main(int argc, char **argv)
 	if (socket_kernel == -1)
 	{
 		log_error(logger, "Consola no pudo conectarse a Kernel");
+		terminar_consola();
+		exit(EXIT_FAILURE);
+	}
+
+	enviar_buffer_serializado_con_instruccion_y_bytes_por_socket(socket_kernel, CREAR_PROCESO, programa_serializado, bytes);
+	uint32_t response;
+	recibir_uint32_por_socket(socket_kernel, &response);
+	if (response == 1)
+	{
+		log_info_if_logger_not_null(logger, "Conexion con Kernel finalizada correctamente");
 	}
 	else
 	{
-		enviar_buffer_serializado_con_instruccion_y_bytes_por_socket(socket_kernel, CREAR_PROCESO, programa_serializado, bytes);
-		uint32_t response;
-		recibir_uint32_por_socket(socket_kernel, &response);
-		if (response == 1)
-		{
-			log_info_if_logger_not_null(logger, "Conexion con Kernel finalizada correctamente");
-		}
-		else
-		{
-			log_error_if_logger_not_null(logger, "Ocurrio un error en la conexion con Kernel");
-		}
-
-		liberar_conexion(socket_kernel);
+		log_error_if_logger_not_null(logger, "Ocurrio un error en la conexion con Kernel");
 	}
+
+	liberar_conexion(socket_kernel);
+
 	free(programa_serializado);
 
 	terminar_consola();
