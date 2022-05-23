@@ -44,7 +44,12 @@ void *procesar_cliente(uint32_t *args)
 		break;
 	}
 
-	liberar_conexion(socket_cliente);
+	if (id_op != CREAR_PROCESO)
+	{
+		// Si la operacion es CREAR_PROCESO, hay que dejar la conexion viva porque despues
+		// hay que avisarle a la Consola cuando el proceso termine la ejecucion
+		liberar_conexion(socket_cliente);
+	}
 	free(args);
 
 	return NULL;
@@ -56,6 +61,53 @@ uint32_t obtener_proximo_pid()
 	return ultimo_proceso == NULL
 			   ? 0 // Si no hay ningun proceso cargado, el primer PID es 0
 			   : ultimo_proceso->id + 1;
+}
+
+bool puedo_pasar_proceso_a_memoria()
+{
+	uint32_t cantidad_procesos_en_memoria = cantidad_procesos_con_estado(READY) + cantidad_procesos_con_estado(RUNNING) + cantidad_procesos_con_estado(BLOCKED);
+	log_trace_if_logger_not_null(logger, "Cantidad de procesos en memoria: %d", cantidad_procesos_en_memoria);
+	return cantidad_procesos_en_memoria < config->grado_multiprogramacion;
+}
+
+void pasar_proceso_new_a_ready(t_kernel_pcb *pcb)
+{
+	int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, logger);
+
+	t_memoria_inicializarproceso_request *request = inicializarproceso_request_new(pcb->id, pcb->tamanio);
+	int bytes_request_serializada = 0;
+	void *request_serializada = serializar_inicializarproceso_request(request, &bytes_request_serializada);
+	enviar_buffer_serializado_con_instruccion_y_bytes_por_socket(socket_memoria, INICIALIZAR_PROCESO, request_serializada, bytes_request_serializada);
+	free(request_serializada);
+	inicializarproceso_request_destroy(request);
+
+	void *buffer_response_serializada = NULL;
+	recibir_buffer_con_bytes_por_socket(socket_memoria, &buffer_response_serializada);
+	t_memoria_inicializarproceso_response *response_deserializada = deserializar_inicializarproceso_response(buffer_response_serializada);
+	pcb->tabla_paginas_primer_nivel = response_deserializada->numero_tablaprimernivel;
+	pcb->estado = READY;
+	inicializarproceso_response_destroy(response_deserializada);
+	free(buffer_response_serializada);
+
+	liberar_conexion(socket_memoria);
+
+	log_info_if_logger_not_null(logger, "Proceso %d pasado a READY, con numero de tabla de primer nivel %d", pcb->id, pcb->tabla_paginas_primer_nivel);
+}
+
+uint32_t cantidad_procesos_con_estado(estado_proceso estado)
+{
+	uint32_t cantidad_con_estado = 0;
+	t_list_iterator *iterator = list_iterator_create(lista_procesos);
+	while (list_iterator_has_next(iterator))
+	{
+		t_kernel_pcb *pcb = list_iterator_next(iterator);
+		if (pcb->estado == estado)
+		{
+			cantidad_con_estado++;
+		}
+	}
+	list_iterator_destroy(iterator);
+	return cantidad_con_estado;
 }
 
 void print_instrucciones(t_kernel_pcb *pcb)

@@ -10,7 +10,10 @@
 #include <utils/sockets.h>
 #include <types/identificador_operacion.h>
 
+#include <memoria/inicializar_proceso.h>
+
 #include <netdb.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -31,6 +34,18 @@ void procesar_request(int socket_cliente);
 void *procesar_cliente(uint32_t *args);
 
 uint32_t obtener_proximo_pid();
+/**
+ * @brief Devuelve un bool indicando si el grado de multiprogramacion me permite pasar un proceso a memoria
+ */
+bool puedo_pasar_proceso_a_memoria();
+
+/**
+ * @brief Mueve un proceso de estado NEW a READY
+ */
+void pasar_proceso_new_a_ready(t_kernel_pcb *pcb);
+
+uint32_t cantidad_procesos_con_estado(estado_proceso estado);
+
 void print_instrucciones(t_kernel_pcb *pcb);
 void print_instrucciones_de_todos_los_procesos(t_list *pcbs);
 

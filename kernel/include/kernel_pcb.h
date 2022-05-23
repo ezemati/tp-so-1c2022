@@ -8,7 +8,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-typedef enum estado_proceso {
+typedef enum estado_proceso
+{
     NEW,
     READY,
     RUNNING,
@@ -27,9 +28,10 @@ typedef struct t_kernel_pcb
     uint32_t program_counter;
     uint32_t tabla_paginas_primer_nivel;
     uint32_t estimacion_rafaga;
+    uint32_t socket_consola;
 } t_kernel_pcb;
 
-t_kernel_pcb *pcb_new(uint32_t pid, t_programa *programa);
+t_kernel_pcb *pcb_new(uint32_t pid, uint32_t socket_consola, t_programa *programa);
 void pcb_destroy(t_kernel_pcb *pcb);
 t_list *pcb_duplicar_instrucciones(t_programa *programa);
 

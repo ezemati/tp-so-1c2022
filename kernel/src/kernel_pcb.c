@@ -1,6 +1,6 @@
 #include <kernel_pcb.h>
 
-t_kernel_pcb *pcb_new(uint32_t pid, t_programa *programa)
+t_kernel_pcb *pcb_new(uint32_t pid, uint32_t socket_consola, t_programa *programa)
 {
     t_kernel_pcb *pcb = malloc(sizeof(t_kernel_pcb));
     pcb->id = pid;
@@ -10,6 +10,7 @@ t_kernel_pcb *pcb_new(uint32_t pid, t_programa *programa)
     pcb->estimacion_rafaga = config->estimacion_inicial; // Apenas se crea el PCB, la estimacion se inicializa con el valor inicial
     pcb->program_counter = 0;
     pcb->tabla_paginas_primer_nivel = 9999;
+    pcb->socket_consola = socket_consola;
     return pcb;
 }
 
