@@ -23,7 +23,7 @@ void inicializar_proceso(int socket_cliente)
 
 void suspender_proceso(int socket_cliente)
 {
-	//TODO
+	// TODO
 	enviar_string_con_longitud_por_socket(socket_cliente, "TEST: suspendiendo proceso...");
 }
 

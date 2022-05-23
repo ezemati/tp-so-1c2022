@@ -14,7 +14,7 @@ typedef struct t_tabla_primernivel
     uint32_t numero_tablaprimernivel;
     uint32_t pid;
     uint32_t tamanio_proceso;
-    uint32_t *indices_tablas_segundonivel; // Los indices de las tablas de segundo nivel en la lista de la memoria_ram    
+    uint32_t *indices_tablas_segundonivel; // Los indices de las tablas de segundo nivel en la lista de la memoria_ram
     t_clock *clock;
 } t_tabla_primernivel;
 
