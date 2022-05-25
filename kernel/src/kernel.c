@@ -9,6 +9,12 @@ t_list *lista_new = NULL;
 
 int main(int argc, char **argv)
 {
+	if (argc == 2 && string_equals_ignore_case(argv[1], "--test"))
+	{
+		run_tests();
+		return 0;
+	}
+
 	logger = log_create("cfg/kernel.log", "Kernel", true, LOG_LEVEL_TRACE);
 	log_debug(logger, "Inicializando Kernel...");
 

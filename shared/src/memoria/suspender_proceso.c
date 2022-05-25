@@ -71,7 +71,7 @@ void *serializar_suspenderproceso_response(t_memoria_suspenderproceso_response *
 
     int desplazamiento = 0;
 
-    escribir_bool_en_buffer(buffer, &desplazamiento, true);
+    escribir_bool_en_buffer(buffer, &desplazamiento, response->ok);
 
     return buffer;
 }

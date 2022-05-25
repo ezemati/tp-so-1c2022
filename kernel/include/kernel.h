@@ -3,5 +3,6 @@
 
 #include <kernel_utils.h>
 #include <kernel_variables_globales.h>
+#include <kernel_tests.h>
 
 #endif
