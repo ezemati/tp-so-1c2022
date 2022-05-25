@@ -2,6 +2,11 @@
 
 static t_kernel_pcb *obtener_proximo_para_ejecutar_fifo();
 static t_kernel_pcb *obtener_proximo_para_ejecutar_srt();
+static bool algoritmo_es_con_desalojo();
+static void enviar_interrupcion_a_cpu();
+static void enviar_nuevo_proceso_a_cpu(t_kernel_pcb *pcb_a_ejecutar);
+static void thread_proceso_blocked(void *args);
+static void thread_proceso_suspended_blocked(void *args);
 
 void inicializar_kernel(char **argv)
 {
@@ -101,6 +106,34 @@ void pasar_proceso_new_a_ready(t_kernel_pcb *pcb)
 	log_info_if_logger_not_null(logger, "Proceso %d pasado a READY, con numero de tabla de primer nivel %d", pcb->id, pcb->tabla_paginas_primer_nivel);
 }
 
+void intentar_pasar_proceso_a_memoria()
+{
+	/**
+	 * Hay que llamar a esta funcion cada vez que:
+	 * - se agrega un proceso a NEW (para intentar que pase a READY)
+	 * - un proceso pasa a EXIT (disminuye la multiprogramacion, hay un lugar mas)
+	 * - un proceso pasa a SUSPENDED_BLOCKED (disminuye la multiprogramacion, hay un lugar mas)
+	 * - un proceso pasa a SUSPENDED_READY (para intentar que pase a READY)
+	 */
+
+	if (!puedo_pasar_proceso_a_memoria())
+	{
+		return;
+	}
+
+	t_kernel_pcb *pcb_suspended_ready = list_get_first_element(lista_suspended_ready);
+	if (pcb_suspended_ready != NULL)
+	{
+		sacar_proceso_de_lista(lista_suspended_ready, pcb_suspended_ready);
+		log_info_if_logger_not_null(logger, "Proceso %d pasado desde SUSPENDED_READY a READY", pcb_suspended_ready->id);
+		agregar_proceso_a_ready(pcb_suspended_ready);
+		return;
+	}
+
+	// TODO: crear una cola de New de donde ir sacando procesos, en vez de pasar el PCB directamente cuando se crea
+	// t_kernel_pcb *pcb_new = list_get_first_element(lista_new);
+}
+
 t_list *obtener_procesos_con_estado(estado_proceso estado)
 {
 	bool proceso_tiene_estado(void *element)
@@ -126,8 +159,10 @@ void finalizar_proceso(t_kernel_pcb *pcb)
 	pcb->estado = EXIT;
 	finalizar_proceso_en_memoria(pcb);
 	finalizar_proceso_en_consola(pcb);
-	eliminar_proceso_de_lista(pcb);
+	sacar_proceso_de_lista(lista_procesos, pcb);
 	pcb_destroy(pcb);
+
+	intentar_pasar_proceso_a_memoria();
 }
 
 void finalizar_proceso_en_memoria(t_kernel_pcb *pcb)
@@ -149,7 +184,7 @@ void finalizar_proceso_en_consola(t_kernel_pcb *pcb)
 	liberar_conexion(pcb->socket_consola);
 }
 
-void eliminar_proceso_de_lista(t_kernel_pcb *pcb)
+void sacar_proceso_de_lista(t_list *lista, t_kernel_pcb *pcb)
 {
 	bool remove_element(void *element)
 	{
@@ -157,24 +192,29 @@ void eliminar_proceso_de_lista(t_kernel_pcb *pcb)
 		return elementPcb->id == pcb->id;
 	}
 
-	list_remove_by_condition(lista_procesos, remove_element);
+	list_remove_by_condition(lista, remove_element);
 }
 
-t_kernel_pcb *replanificar()
+void agregar_proceso_a_ready(t_kernel_pcb *pcb)
 {
-	t_kernel_pcb *pcb_a_ejecutar = NULL;
+	pcb->estado = READY;
+	list_add(lista_ready, pcb);
 
-	bool sacar_proximo_pcb_a_ejecutar_de_ready(void *element)
+	if (algoritmo_es_con_desalojo())
 	{
-		t_kernel_pcb *elementPcb = element;
-		return elementPcb->id == pcb_a_ejecutar->id;
+		replanificar();
 	}
+}
 
-	pcb_a_ejecutar = obtener_proximo_para_ejecutar();
-	list_remove_by_condition(lista_ready, sacar_proximo_pcb_a_ejecutar_de_ready);
+void replanificar()
+{
+	enviar_interrupcion_a_cpu();
+
+	t_kernel_pcb *pcb_a_ejecutar = obtener_proximo_para_ejecutar();
+	sacar_proceso_de_lista(lista_ready, pcb_a_ejecutar);
 	// pcb_a_ejecutar->estado = RUNNING;
 
-	return pcb_a_ejecutar;
+	enviar_nuevo_proceso_a_cpu(pcb_a_ejecutar);
 }
 
 t_kernel_pcb *obtener_proximo_para_ejecutar()
@@ -183,6 +223,61 @@ t_kernel_pcb *obtener_proximo_para_ejecutar()
 									   ? obtener_proximo_para_ejecutar_fifo()
 									   : obtener_proximo_para_ejecutar_srt();
 	return pcb_a_ejecutar;
+}
+
+void bloquear_o_suspender_proceso(t_kernel_pcb *pcb, uint32_t tiempo_bloqueo)
+{
+	pcb->bloqueo_pendiente = tiempo_bloqueo;
+	if (tiempo_bloqueo > config->tiempo_maximo_bloqueado)
+	{
+		suspender_proceso(pcb);
+	}
+	else
+	{
+		bloquear_proceso(pcb);
+	}
+}
+
+void bloquear_proceso(t_kernel_pcb *pcb)
+{
+	pcb->estado = BLOCKED;
+	pthread_t thread_id;
+	pthread_create(&thread_id, NULL, (void *)thread_proceso_blocked, pcb);
+	pthread_detach(thread_id);
+}
+
+void suspender_proceso(t_kernel_pcb *pcb)
+{
+	pcb->estado = SUSPENDED_BLOCKED;
+
+	int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, logger);
+
+	t_memoria_suspenderproceso_request *request = suspenderproceso_request_new(pcb->id, pcb->tabla_paginas_primer_nivel);
+	int bytes = 0;
+	void *request_serializada = serializar_suspenderproceso_request(request, &bytes);
+	enviar_buffer_serializado_con_instruccion_y_bytes_por_socket(socket_memoria, SUSPENDER_PROCESO, request_serializada, bytes);
+	free(request_serializada);
+	suspenderproceso_request_destroy(request);
+
+	void *response_serializada = NULL;
+	recibir_buffer_con_bytes_por_socket(socket_memoria, &response_serializada);
+	t_memoria_suspenderproceso_response *response = deserializar_suspenderproceso_response(response_serializada);
+	if (!response->ok)
+	{
+		log_error_if_logger_not_null(logger, "Fallo memoria al suspender al proceso %d", pcb->id);
+	}
+	else
+	{
+		intentar_pasar_proceso_a_memoria(); // Este proceso paso a SUSPENDED_BLOCKED asi que dejo un espacio de multiprogramacion libre
+
+		pthread_t thread_id;
+		pthread_create(&thread_id, NULL, (void *)thread_proceso_suspended_blocked, pcb);
+		pthread_detach(thread_id);
+	}
+	suspenderproceso_response_destroy(response);
+	free(response_serializada);
+
+	liberar_conexion(socket_memoria);
 }
 
 void print_instrucciones(t_kernel_pcb *pcb)
@@ -226,4 +321,48 @@ static t_kernel_pcb *obtener_proximo_para_ejecutar_srt()
 				   : elementPcb2;
 	}
 	return list_get_minimum(lista_ready, pcb_con_estimacion_minima);
+}
+
+static bool algoritmo_es_con_desalojo()
+{
+	return string_equals_ignore_case(config->algoritmo_planificacion, "SRT");
+}
+
+static void enviar_interrupcion_a_cpu()
+{
+	// TODO: tener en cuenta que CPU tiene que mandar el PCB actualizado, y Kernel tiene que actualizar los datos
+}
+
+static void enviar_nuevo_proceso_a_cpu(t_kernel_pcb *pcb_a_ejecutar)
+{
+	// TODO
+}
+
+static void thread_proceso_blocked(void *args)
+{
+	t_kernel_pcb *pcb = args;
+	int tiempo_bloqueo = pcb->bloqueo_pendiente;
+	int microsegundos = tiempo_bloqueo / 1000; // tiempo_bloqueo esta en milisegundos
+	log_info_if_logger_not_null(logger, "Proceso %d entrando en bloqueo por %dms", pcb->id, tiempo_bloqueo);
+
+	usleep(microsegundos);
+
+	log_info_if_logger_not_null(logger, "Proceso %d saliendo de bloqueo y pasando a READY", pcb->id);
+	pcb->bloqueo_pendiente = 0;
+	agregar_proceso_a_ready(pcb);
+}
+
+static void thread_proceso_suspended_blocked(void *args)
+{
+	t_kernel_pcb *pcb = args;
+	int tiempo_bloqueo = pcb->bloqueo_pendiente;
+	int microsegundos = tiempo_bloqueo / 1000; // tiempo_bloqueo esta en milisegundos
+	log_info_if_logger_not_null(logger, "Proceso %d entrando en suspension por %dms", pcb->id, tiempo_bloqueo);
+
+	usleep(microsegundos);
+
+	log_info_if_logger_not_null(logger, "Proceso %d saliendo de suspension", pcb->id);
+	pcb->bloqueo_pendiente = 0;
+	pcb->estado = SUSPENDED_READY;
+	list_add(lista_suspended_ready, pcb);
 }
