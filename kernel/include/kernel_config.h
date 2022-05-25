@@ -17,7 +17,7 @@ typedef struct t_kernel_config
     uint32_t puerto_cpu_interrupt;
     uint32_t puerto_escucha;
     char *algoritmo_planificacion;
-    uint32_t estimacion_inicial;
+    double estimacion_inicial;
     double alfa;
     uint32_t grado_multiprogramacion;
     uint32_t tiempo_maximo_bloqueado;

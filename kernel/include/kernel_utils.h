@@ -53,6 +53,7 @@ void pasar_proceso_new_a_ready(t_kernel_pcb *pcb);
 void intentar_pasar_proceso_a_memoria();
 
 t_list *obtener_procesos_con_estado(estado_proceso estado);
+t_kernel_pcb *obtener_proceso_por_pid(uint32_t pid);
 uint32_t cantidad_procesos_con_estado(estado_proceso estado);
 void finalizar_proceso(t_kernel_pcb *pcb);
 void finalizar_proceso_en_memoria(t_kernel_pcb *pcb);
@@ -64,7 +65,8 @@ t_kernel_pcb *obtener_proximo_para_ejecutar();
 void bloquear_o_suspender_proceso(t_kernel_pcb *pcb, uint32_t tiempo_bloqueo);
 void bloquear_proceso(t_kernel_pcb *pcb);
 void suspender_proceso(t_kernel_pcb *pcb);
-
+void recalcular_estimacion(t_kernel_pcb *pcb);
+void cargar_tiempo_ejecucion_en_cpu(t_kernel_pcb *pcb, time_t time_inicio_running, time_t time_fin_running);
 void print_instrucciones(t_kernel_pcb *pcb);
 void print_instrucciones_de_todos_los_procesos(t_list *pcbs);
 

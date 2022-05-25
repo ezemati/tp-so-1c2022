@@ -54,6 +54,9 @@ void *procesar_cliente(uint32_t *args)
 	case CREAR_PROCESO:
 		crear_proceso(socket_cliente);
 		break;
+	case BLOQUEAR_PROCESO:
+		atender_bloquear_proceso(socket_cliente);
+		break;
 	default:
 		enviar_string_con_longitud_por_socket(socket_cliente, "TEST: error");
 		break;
@@ -151,6 +154,17 @@ t_list *obtener_procesos_con_estado(estado_proceso estado)
 		return elementPcb->estado == estado;
 	}
 	return list_filter(lista_procesos, proceso_tiene_estado);
+}
+
+t_kernel_pcb *obtener_proceso_por_pid(uint32_t pid)
+{
+	bool get_element(void *element)
+	{
+		t_kernel_pcb *elementPcb = element;
+		return elementPcb->id == pid;
+	}
+
+	return list_find(lista_procesos, get_element);
 }
 
 uint32_t cantidad_procesos_con_estado(estado_proceso estado)
@@ -289,6 +303,16 @@ void suspender_proceso(t_kernel_pcb *pcb)
 	liberar_conexion(socket_memoria);
 }
 
+void recalcular_estimacion(t_kernel_pcb *pcb)
+{
+	double alfa = config->alfa;
+	double estimacion_anterior = pcb->estimacion_rafaga;
+	double real_anterior = pcb->milisegundos_en_running;
+	double nueva_estimacion = alfa * real_anterior + (1 - alfa) * estimacion_anterior;
+	pcb->estimacion_rafaga = nueva_estimacion;
+	log_info_if_logger_not_null(logger, "Nueva estimacion para el proceso %d: %d", pcb->id, nueva_estimacion);
+}
+
 void print_instrucciones(t_kernel_pcb *pcb)
 {
 	t_list_iterator *iterator = list_iterator_create(pcb->lista_instrucciones);
@@ -351,7 +375,7 @@ static void thread_proceso_blocked(void *args)
 {
 	t_kernel_pcb *pcb = args;
 	int tiempo_bloqueo = pcb->bloqueo_pendiente;
-	int microsegundos = tiempo_bloqueo / 1000; // tiempo_bloqueo esta en milisegundos
+	int microsegundos = tiempo_bloqueo * 1000; // tiempo_bloqueo esta en milisegundos
 	log_info_if_logger_not_null(logger, "Proceso %d entrando en bloqueo por %dms", pcb->id, tiempo_bloqueo);
 
 	usleep(microsegundos);
@@ -365,7 +389,7 @@ static void thread_proceso_suspended_blocked(void *args)
 {
 	t_kernel_pcb *pcb = args;
 	int tiempo_bloqueo = pcb->bloqueo_pendiente;
-	int microsegundos = tiempo_bloqueo / 1000; // tiempo_bloqueo esta en milisegundos
+	int microsegundos = tiempo_bloqueo * 1000; // tiempo_bloqueo esta en milisegundos
 	log_info_if_logger_not_null(logger, "Proceso %d entrando en suspension por %dms", pcb->id, tiempo_bloqueo);
 
 	usleep(microsegundos);

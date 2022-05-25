@@ -38,6 +38,12 @@ void *leer_stream_de_buffer(void *buffer, uint32_t len, int *desplazamiento)
     return stream;
 }
 
+void leer_stream_de_buffer_noalloc(void *buffer, void *buffer_dest, uint32_t len, int *desplazamiento)
+{
+    memcpy(buffer_dest, buffer + *desplazamiento, len);
+    (*desplazamiento) += len;
+}
+
 void escribir_uint32_en_buffer(void *buffer, int *desplazamiento, uint32_t valor)
 {
     memcpy(buffer + *desplazamiento, &valor, sizeof(uint32_t));

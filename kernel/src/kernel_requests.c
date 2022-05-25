@@ -20,3 +20,21 @@ void crear_proceso(int socket_cliente)
 	programa_destroy(programa);
 	free(buffer_request);
 }
+
+void atender_bloquear_proceso(int socket_cliente)
+{
+	void *buffer_request = NULL;
+	recibir_buffer_con_bytes_por_socket(socket_cliente, &buffer_request);
+
+	t_kernel_actualizarpcb_request *request = deserializar_actualizarpcb_request(buffer_request);
+
+	t_kernel_pcb *pcb = obtener_proceso_por_pid(request->pid);
+	pcb->program_counter = request->program_counter;
+	cargar_tiempo_ejecucion_en_cpu(pcb, request->time_inicio_running, request->time_fin_running);
+	recalcular_estimacion(pcb);
+
+	bloquear_o_suspender_proceso(pcb, request->bloqueo_pendiente);
+
+	actualizarpcb_request_destroy(request);
+	free(buffer_request);
+}
