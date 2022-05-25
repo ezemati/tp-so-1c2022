@@ -8,6 +8,7 @@ void inicializar_kernel(char **argv)
 	config = kernel_config_new("cfg/kernel.config", logger);
 	lista_procesos = list_create();
 	lista_ready = list_create();
+	lista_suspended_ready = list_create();
 }
 
 void terminar_kernel()

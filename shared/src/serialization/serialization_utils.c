@@ -8,6 +8,14 @@ uint32_t leer_uint32_de_buffer(void *buffer, int *desplazamiento)
     return valor;
 }
 
+bool leer_bool_de_buffer(void *buffer, int *desplazamiento)
+{
+    bool valor;
+    memcpy(&valor, buffer + *desplazamiento, sizeof(bool));
+    (*desplazamiento) += sizeof(bool);
+    return valor;
+}
+
 char *leer_string_de_buffer(void *buffer, uint32_t len, int *desplazamiento)
 {
     char *valor = malloc(len);
@@ -34,6 +42,12 @@ void escribir_uint32_en_buffer(void *buffer, int *desplazamiento, uint32_t valor
 {
     memcpy(buffer + *desplazamiento, &valor, sizeof(uint32_t));
     (*desplazamiento) += sizeof(uint32_t);
+}
+
+void escribir_bool_en_buffer(void *buffer, int *desplazamiento, bool valor)
+{
+    memcpy(buffer + *desplazamiento, &valor, sizeof(bool));
+    (*desplazamiento) += sizeof(bool);
 }
 
 void escribir_string_con_longitud_en_buffer(void *buffer, int *desplazamiento, char *string)

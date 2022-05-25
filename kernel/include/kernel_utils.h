@@ -12,6 +12,7 @@
 
 #include <memoria/inicializar_proceso.h>
 #include <memoria/finalizar_proceso.h>
+#include <memoria/suspender_proceso.h>
 
 #include <netdb.h>
 #include <stdbool.h>
@@ -35,6 +36,7 @@ void procesar_request(int socket_cliente);
 void *procesar_cliente(uint32_t *args);
 
 uint32_t obtener_proximo_pid();
+
 /**
  * @brief Devuelve un bool indicando si el grado de multiprogramacion me permite pasar un proceso a memoria
  */
