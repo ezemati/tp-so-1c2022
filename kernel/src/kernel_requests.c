@@ -12,10 +12,8 @@ void crear_proceso(int socket_cliente)
 	t_kernel_pcb *nuevo_pcb = pcb_new(proximo_pid, socket_cliente, programa);
 
 	list_add(lista_procesos, nuevo_pcb);
-	if (puedo_pasar_proceso_a_memoria())
-	{
-		pasar_proceso_new_a_ready(nuevo_pcb);
-	}
+	list_add(lista_new, nuevo_pcb);
+	intentar_pasar_proceso_a_memoria();
 
 	// print_instrucciones_de_todos_los_procesos(lista_procesos); // Para Debug
 

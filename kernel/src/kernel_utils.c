@@ -14,6 +14,7 @@ void inicializar_kernel(char **argv)
 	lista_procesos = list_create();
 	lista_ready = list_create();
 	lista_suspended_ready = list_create();
+	lista_new = list_create();
 }
 
 void terminar_kernel()
@@ -24,6 +25,8 @@ void terminar_kernel()
 	kernel_config_destroy(config);
 
 	list_destroy(lista_ready);
+	list_destroy(lista_suspended_ready);
+	list_destroy(lista_new);
 
 	list_destroy_and_destroy_elements(lista_procesos, (void *)pcb_destroy);
 }
@@ -98,6 +101,7 @@ void pasar_proceso_new_a_ready(t_kernel_pcb *pcb)
 	t_memoria_inicializarproceso_response *response = deserializar_inicializarproceso_response(response_serializada);
 	pcb->tabla_paginas_primer_nivel = response->numero_tablaprimernivel;
 	pcb->estado = READY;
+	agregar_proceso_a_ready(pcb);
 	inicializarproceso_response_destroy(response);
 	free(response_serializada);
 
@@ -125,13 +129,18 @@ void intentar_pasar_proceso_a_memoria()
 	if (pcb_suspended_ready != NULL)
 	{
 		sacar_proceso_de_lista(lista_suspended_ready, pcb_suspended_ready);
-		log_info_if_logger_not_null(logger, "Proceso %d pasado desde SUSPENDED_READY a READY", pcb_suspended_ready->id);
+		log_info_if_logger_not_null(logger, "Pasando proceso %d desde SUSPENDED_READY a READY", pcb_suspended_ready->id);
 		agregar_proceso_a_ready(pcb_suspended_ready);
 		return;
 	}
 
-	// TODO: crear una cola de New de donde ir sacando procesos, en vez de pasar el PCB directamente cuando se crea
-	// t_kernel_pcb *pcb_new = list_get_first_element(lista_new);
+	t_kernel_pcb *pcb_new = list_get_first_element(lista_new);
+	if (pcb_new != NULL)
+	{
+		sacar_proceso_de_lista(lista_new, pcb_new);
+		log_info_if_logger_not_null(logger, "Pasando proceso %d desde NEW a READY", pcb_new->id);
+		pasar_proceso_new_a_ready(pcb_new);
+	}
 }
 
 t_list *obtener_procesos_con_estado(estado_proceso estado)

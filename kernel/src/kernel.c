@@ -1,10 +1,11 @@
 #include <kernel.h>
 
-t_log *logger = NULL;
 t_kernel_config *config = NULL;
+t_log *logger = NULL;
 t_list *lista_procesos = NULL;
 t_list *lista_ready = NULL;
 t_list *lista_suspended_ready = NULL;
+t_list *lista_new = NULL;
 
 int main(int argc, char **argv)
 {
