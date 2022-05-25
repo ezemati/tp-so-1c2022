@@ -1,9 +1,13 @@
 #include <kernel_utils.h>
 
+static t_kernel_pcb *obtener_proximo_para_ejecutar_fifo();
+static t_kernel_pcb *obtener_proximo_para_ejecutar_srt();
+
 void inicializar_kernel(char **argv)
 {
 	config = kernel_config_new("cfg/kernel.config", logger);
 	lista_procesos = list_create();
+	lista_ready = list_create();
 }
 
 void terminar_kernel()
@@ -12,6 +16,8 @@ void terminar_kernel()
 	log_destroy(logger);
 
 	kernel_config_destroy(config);
+
+	list_destroy(lista_ready);
 
 	list_destroy_and_destroy_elements(lista_procesos, (void *)pcb_destroy);
 }
@@ -94,20 +100,24 @@ void pasar_proceso_new_a_ready(t_kernel_pcb *pcb)
 	log_info_if_logger_not_null(logger, "Proceso %d pasado a READY, con numero de tabla de primer nivel %d", pcb->id, pcb->tabla_paginas_primer_nivel);
 }
 
+t_list *obtener_procesos_con_estado(estado_proceso estado)
+{
+	bool proceso_tiene_estado(void *element)
+	{
+		t_kernel_pcb *elementPcb = element;
+		return elementPcb->estado == estado;
+	}
+	return list_filter(lista_procesos, proceso_tiene_estado);
+}
+
 uint32_t cantidad_procesos_con_estado(estado_proceso estado)
 {
-	uint32_t cantidad_con_estado = 0;
-	t_list_iterator *iterator = list_iterator_create(lista_procesos);
-	while (list_iterator_has_next(iterator))
+	bool proceso_tiene_estado(void *element)
 	{
-		t_kernel_pcb *pcb = list_iterator_next(iterator);
-		if (pcb->estado == estado)
-		{
-			cantidad_con_estado++;
-		}
+		t_kernel_pcb *elementPcb = element;
+		return elementPcb->estado == estado;
 	}
-	list_iterator_destroy(iterator);
-	return cantidad_con_estado;
+	return list_count_satisfying(lista_procesos, proceso_tiene_estado);
 }
 
 void finalizar_proceso(t_kernel_pcb *pcb)
@@ -149,6 +159,31 @@ void eliminar_proceso_de_lista(t_kernel_pcb *pcb)
 	list_remove_by_condition(lista_procesos, remove_element);
 }
 
+t_kernel_pcb *replanificar()
+{
+	t_kernel_pcb *pcb_a_ejecutar = NULL;
+
+	bool sacar_proximo_pcb_a_ejecutar_de_ready(void *element)
+	{
+		t_kernel_pcb *elementPcb = element;
+		return elementPcb->id == pcb_a_ejecutar->id;
+	}
+
+	pcb_a_ejecutar = obtener_proximo_para_ejecutar();
+	list_remove_by_condition(lista_ready, sacar_proximo_pcb_a_ejecutar_de_ready);
+	// pcb_a_ejecutar->estado = RUNNING;
+
+	return pcb_a_ejecutar;
+}
+
+t_kernel_pcb *obtener_proximo_para_ejecutar()
+{
+	t_kernel_pcb *pcb_a_ejecutar = string_equals_ignore_case(config->algoritmo_planificacion, "FIFO")
+									   ? obtener_proximo_para_ejecutar_fifo()
+									   : obtener_proximo_para_ejecutar_srt();
+	return pcb_a_ejecutar;
+}
+
 void print_instrucciones(t_kernel_pcb *pcb)
 {
 	t_list_iterator *iterator = list_iterator_create(pcb->lista_instrucciones);
@@ -172,4 +207,22 @@ void print_instrucciones_de_todos_los_procesos(t_list *pcbs)
 		print_instrucciones(pcb);
 	}
 	list_iterator_destroy(iterator);
+}
+
+static t_kernel_pcb *obtener_proximo_para_ejecutar_fifo()
+{
+	return list_get_first_element(lista_ready);
+}
+
+static t_kernel_pcb *obtener_proximo_para_ejecutar_srt()
+{
+	void *pcb_con_estimacion_minima(void *element1, void *element2)
+	{
+		t_kernel_pcb *elementPcb1 = element1;
+		t_kernel_pcb *elementPcb2 = element2;
+		return elementPcb1->estimacion_rafaga <= elementPcb2->estimacion_rafaga
+				   ? elementPcb1
+				   : elementPcb2;
+	}
+	return list_get_minimum(lista_ready, pcb_con_estimacion_minima);
 }

@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+void *list_get_first_element(t_list *list);
 void *list_get_last_element(t_list *list);
 
 #endif

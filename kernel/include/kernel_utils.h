@@ -45,11 +45,14 @@ bool puedo_pasar_proceso_a_memoria();
  */
 void pasar_proceso_new_a_ready(t_kernel_pcb *pcb);
 
+t_list *obtener_procesos_con_estado(estado_proceso estado);
 uint32_t cantidad_procesos_con_estado(estado_proceso estado);
 void finalizar_proceso(t_kernel_pcb *pcb);
 void finalizar_proceso_en_memoria(t_kernel_pcb *pcb);
 void finalizar_proceso_en_consola(t_kernel_pcb *pcb);
 void eliminar_proceso_de_lista(t_kernel_pcb *pcb);
+t_kernel_pcb *replanificar();
+t_kernel_pcb *obtener_proximo_para_ejecutar();
 
 void print_instrucciones(t_kernel_pcb *pcb);
 void print_instrucciones_de_todos_los_procesos(t_list *pcbs);
