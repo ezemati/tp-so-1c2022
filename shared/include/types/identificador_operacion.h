@@ -3,7 +3,7 @@
 
 typedef enum identificador_operacion
 {
-	CREAR_PROCESO,
+    CREAR_PROCESO,
     INICIALIZAR_PROCESO,
     FINALIZAR_PROCESO,
     SUSPENDER_PROCESO,

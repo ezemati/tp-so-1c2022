@@ -15,12 +15,12 @@ typedef struct t_consola_config
 } t_consola_config;
 
 /**
- * @DESC: Crea un puntero a una estructura t_consola_config
+ * @brief Crea un puntero a una estructura t_consola_config
  */
 t_consola_config *consola_config_new(char *config_path, t_log *logger);
 
 /**
- * @DESC: Libera los recursos de un t_consola_config
+ * @brief Libera los recursos de un t_consola_config
  */
 void consola_config_destroy(t_consola_config *config);
 
