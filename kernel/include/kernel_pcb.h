@@ -11,13 +11,13 @@
 
 typedef enum estado_proceso
 {
-    NEW,
-    READY,
-    RUNNING,
-    BLOCKED,
-    SUSPENDED_READY,
-    SUSPENDED_BLOCKED,
-    EXIT
+    S_NEW,
+    S_READY,
+    S_RUNNING,
+    S_BLOCKED,
+    S_SUSPENDED_READY,
+    S_SUSPENDED_BLOCKED,
+    S_EXIT
 } estado_proceso;
 
 typedef struct t_kernel_pcb

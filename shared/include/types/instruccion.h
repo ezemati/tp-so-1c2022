@@ -11,9 +11,19 @@
 #include <commons/string.h>
 #include <commons/collections/list.h>
 
+typedef enum code_instruccion
+{
+    NO_OP,
+    IO,
+    READ,
+    WRITE,
+    COPY,
+    EXIT
+} code_instruccion;
+
 typedef struct t_instruccion
 {
-    char *codigo_instruccion;
+    code_instruccion codigo_instruccion;
     int cantidad_parametros;
     uint32_t parametros[2];
 } t_instruccion;
@@ -26,7 +36,7 @@ t_instruccion *instruccion_new(char *codigo_instruccion, char **parametros);
 /**
  * @brief Crea un puntero a una estructura t_instruccion, usando los parametros numericos pasados por parametro
  */
-t_instruccion *instruccion_new_with_numeric_params(char *codigo_instruccion, uint32_t cant_parametros, uint32_t *parametros);
+t_instruccion *instruccion_new_with_numeric_params(code_instruccion codigo_instruccion, uint32_t cant_parametros, uint32_t *parametros);
 
 /**
  * @brief Duplica una instancia de t_instruccion

@@ -83,7 +83,7 @@ uint32_t obtener_proximo_pid()
 
 bool puedo_pasar_proceso_a_memoria()
 {
-	uint32_t cantidad_procesos_en_memoria = cantidad_procesos_con_estado(READY) + cantidad_procesos_con_estado(RUNNING) + cantidad_procesos_con_estado(BLOCKED);
+	uint32_t cantidad_procesos_en_memoria = cantidad_procesos_con_estado(S_READY) + cantidad_procesos_con_estado(S_RUNNING) + cantidad_procesos_con_estado(S_BLOCKED);
 	log_trace_if_logger_not_null(logger, "Cantidad de procesos en memoria: %d", cantidad_procesos_en_memoria);
 	return cantidad_procesos_en_memoria < config->grado_multiprogramacion;
 }
@@ -103,7 +103,7 @@ void pasar_proceso_new_a_ready(t_kernel_pcb *pcb)
 	recibir_buffer_con_bytes_por_socket(socket_memoria, &response_serializada);
 	t_memoria_inicializarproceso_response *response = deserializar_inicializarproceso_response(response_serializada);
 	pcb->tabla_paginas_primer_nivel = response->numero_tablaprimernivel;
-	pcb->estado = READY;
+	pcb->estado = S_READY;
 	agregar_proceso_a_ready(pcb);
 	inicializarproceso_response_destroy(response);
 	free(response_serializada);
@@ -179,7 +179,7 @@ uint32_t cantidad_procesos_con_estado(estado_proceso estado)
 
 void finalizar_proceso(t_kernel_pcb *pcb)
 {
-	pcb->estado = EXIT;
+	pcb->estado = S_EXIT;
 	finalizar_proceso_en_memoria(pcb);
 	finalizar_proceso_en_consola(pcb);
 	sacar_proceso_de_lista(lista_procesos, pcb);
@@ -220,7 +220,7 @@ void sacar_proceso_de_lista(t_list *lista, t_kernel_pcb *pcb)
 
 void agregar_proceso_a_ready(t_kernel_pcb *pcb)
 {
-	pcb->estado = READY;
+	pcb->estado = S_READY;
 	list_add(lista_ready, pcb);
 
 	if (algoritmo_es_con_desalojo())
@@ -235,7 +235,7 @@ void replanificar()
 
 	t_kernel_pcb *pcb_a_ejecutar = obtener_proximo_para_ejecutar();
 	sacar_proceso_de_lista(lista_ready, pcb_a_ejecutar);
-	// pcb_a_ejecutar->estado = RUNNING;
+	// pcb_a_ejecutar->estado = S_RUNNING;
 
 	enviar_nuevo_proceso_a_cpu(pcb_a_ejecutar);
 }
@@ -263,7 +263,7 @@ void bloquear_o_suspender_proceso(t_kernel_pcb *pcb, uint32_t tiempo_bloqueo)
 
 void bloquear_proceso(t_kernel_pcb *pcb)
 {
-	pcb->estado = BLOCKED;
+	pcb->estado = S_BLOCKED;
 	pthread_t thread_id;
 	pthread_create(&thread_id, NULL, (void *)thread_proceso_blocked, pcb);
 	pthread_detach(thread_id);
@@ -271,7 +271,7 @@ void bloquear_proceso(t_kernel_pcb *pcb)
 
 void suspender_proceso(t_kernel_pcb *pcb)
 {
-	pcb->estado = SUSPENDED_BLOCKED;
+	pcb->estado = S_SUSPENDED_BLOCKED;
 
 	int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, logger);
 
@@ -396,6 +396,6 @@ static void thread_proceso_suspended_blocked(void *args)
 
 	log_info_if_logger_not_null(logger, "Proceso %d saliendo de suspension", pcb->id);
 	pcb->bloqueo_pendiente = 0;
-	pcb->estado = SUSPENDED_READY;
+	pcb->estado = S_SUSPENDED_READY;
 	list_add(lista_suspended_ready, pcb);
 }

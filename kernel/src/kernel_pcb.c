@@ -6,7 +6,7 @@ t_kernel_pcb *pcb_new(uint32_t pid, uint32_t socket_consola, t_programa *program
     pcb->id = pid;
     pcb->tamanio = programa->tamanio;
     pcb->lista_instrucciones = pcb_duplicar_instrucciones(programa);
-    pcb->estado = NEW;
+    pcb->estado = S_NEW;
     pcb->estimacion_rafaga = config->estimacion_inicial; // Apenas se crea el PCB, la estimacion se inicializa con el valor inicial
     pcb->program_counter = 0;
     pcb->tabla_paginas_primer_nivel = 9999;
