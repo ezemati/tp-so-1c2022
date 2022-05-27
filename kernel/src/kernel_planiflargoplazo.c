@@ -29,7 +29,11 @@ void finalizar_proceso(t_kernel_pcb *pcb)
     pcb->estado = S_EXIT;
     finalizar_proceso_en_memoria(pcb);
     finalizar_proceso_en_consola(pcb);
+
+    pthread_mutex_lock(&mutex_lista_procesos);
     sacar_proceso_de_lista(lista_procesos, pcb);
+    pthread_mutex_unlock(&mutex_lista_procesos);
+
     pcb_destroy(pcb);
 
     intentar_pasar_proceso_a_memoria();

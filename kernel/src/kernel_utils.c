@@ -8,6 +8,9 @@ void inicializar_kernel(char **argv)
 	lista_suspended_ready = list_create();
 	lista_new = list_create();
 
+	pthread_mutex_init(&mutex_lista_procesos, NULL);
+	pthread_mutex_init(&mutex_lista_ready, NULL);
+	pthread_mutex_init(&mutex_lista_suspended_ready, NULL);
 	pthread_mutex_init(&mutex_lista_new, NULL);
 }
 
@@ -24,6 +27,9 @@ void terminar_kernel()
 
 	list_destroy_and_destroy_elements(lista_procesos, (void *)pcb_destroy);
 
+	pthread_mutex_destroy(&mutex_lista_procesos);
+	pthread_mutex_destroy(&mutex_lista_ready);
+	pthread_mutex_destroy(&mutex_lista_suspended_ready);
 	pthread_mutex_destroy(&mutex_lista_new);
 }
 
@@ -71,10 +77,13 @@ void *procesar_cliente(uint32_t *args)
 
 uint32_t obtener_proximo_pid()
 {
-	t_kernel_pcb *ultimo_proceso = (t_kernel_pcb *)list_get_last_element(lista_procesos);
-	return ultimo_proceso == NULL
-			   ? 0 // Si no hay ningun proceso cargado, el primer PID es 0
-			   : ultimo_proceso->id + 1;
+	pthread_mutex_lock(&mutex_lista_procesos);
+	t_kernel_pcb *ultimo_proceso = list_get_last_element(lista_procesos);
+	uint32_t proximo_pid = ultimo_proceso == NULL
+							   ? 0 // Si no hay ningun proceso cargado, el primer PID es 0
+							   : ultimo_proceso->id + 1;
+	pthread_mutex_unlock(&mutex_lista_procesos);
+	return proximo_pid;
 }
 
 bool puedo_pasar_proceso_a_memoria()

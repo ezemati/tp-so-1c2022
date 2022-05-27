@@ -11,7 +11,9 @@ void crear_proceso(int socket_cliente)
 	uint32_t proximo_pid = obtener_proximo_pid();
 	t_kernel_pcb *nuevo_pcb = pcb_new(proximo_pid, socket_cliente, programa);
 
+	pthread_mutex_lock(&mutex_lista_procesos);
 	list_add(lista_procesos, nuevo_pcb);
+	pthread_mutex_unlock(&mutex_lista_procesos);
 
 	pthread_mutex_lock(&mutex_lista_new);
 	list_add(lista_new, nuevo_pcb);

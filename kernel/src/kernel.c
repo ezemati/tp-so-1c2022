@@ -7,6 +7,9 @@ t_list *lista_ready = NULL;
 t_list *lista_suspended_ready = NULL;
 t_list *lista_new = NULL;
 
+pthread_mutex_t mutex_lista_procesos;
+pthread_mutex_t mutex_lista_ready;
+pthread_mutex_t mutex_lista_suspended_ready;
 pthread_mutex_t mutex_lista_new;
 
 int main(int argc, char **argv)

@@ -6,13 +6,19 @@ void mediano_plazo_intentar_pasar_proceso_a_memoria()
 {
     while (calcular_multiprogramacion() <= config->grado_multiprogramacion)
     {
+        pthread_mutex_lock(&mutex_lista_suspended_ready);
         t_kernel_pcb *pcb_suspended_ready = list_get_first_element(lista_suspended_ready);
+        pthread_mutex_unlock(&mutex_lista_suspended_ready);
+
         if (pcb_suspended_ready == NULL)
         {
             break;
         }
 
+        pthread_mutex_lock(&mutex_lista_suspended_ready);
         sacar_proceso_de_lista(lista_suspended_ready, pcb_suspended_ready);
+        pthread_mutex_unlock(&mutex_lista_suspended_ready);
+
         log_info_if_logger_not_null(logger, "Pasando proceso %d desde SUSPENDED_READY a READY", pcb_suspended_ready->id);
         agregar_proceso_a_ready(pcb_suspended_ready);
     }
@@ -65,6 +71,10 @@ static void thread_proceso_suspended_blocked(void *args)
     log_info_if_logger_not_null(logger, "Proceso %d saliendo de suspension", pcb->id);
     pcb->bloqueo_pendiente = 0;
     pcb->estado = S_SUSPENDED_READY;
+
+    pthread_mutex_lock(&mutex_lista_suspended_ready);
     list_add(lista_suspended_ready, pcb);
+    pthread_mutex_unlock(&mutex_lista_suspended_ready);
+
     intentar_pasar_proceso_a_memoria();
 }

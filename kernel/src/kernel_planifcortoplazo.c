@@ -10,7 +10,10 @@ static void thread_proceso_blocked(void *args);
 void agregar_proceso_a_ready(t_kernel_pcb *pcb)
 {
     pcb->estado = S_READY;
+
+    pthread_mutex_lock(&mutex_lista_ready);
     list_add(lista_ready, pcb);
+    pthread_mutex_unlock(&mutex_lista_ready);
 
     if (algoritmo_es_con_desalojo())
     {
@@ -31,7 +34,11 @@ static void replanificar()
     enviar_interrupcion_a_cpu();
 
     t_kernel_pcb *pcb_a_ejecutar = obtener_proximo_para_ejecutar();
+
+    pthread_mutex_lock(&mutex_lista_ready);
     sacar_proceso_de_lista(lista_ready, pcb_a_ejecutar);
+    pthread_mutex_unlock(&mutex_lista_ready);
+
     // pcb_a_ejecutar->estado = S_RUNNING;
 
     enviar_nuevo_proceso_a_cpu(pcb_a_ejecutar);
@@ -47,7 +54,11 @@ static t_kernel_pcb *obtener_proximo_para_ejecutar()
 
 static t_kernel_pcb *obtener_proximo_para_ejecutar_fifo()
 {
-    return list_get_first_element(lista_ready);
+    pthread_mutex_lock(&mutex_lista_ready);
+    t_kernel_pcb *proximo_fifo = list_get_first_element(lista_ready);
+    pthread_mutex_unlock(&mutex_lista_ready);
+
+    return proximo_fifo;
 }
 
 static t_kernel_pcb *obtener_proximo_para_ejecutar_srt()
