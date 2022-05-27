@@ -26,7 +26,8 @@
 #include <commons/string.h>
 #include <commons/txt.h>
 
-void crear_proceso(int socket_cliente);
+void atender_crear_proceso(int socket_cliente);
 void atender_bloquear_proceso(int socket_cliente);
+void atender_finalizar_proceso(int socket_cliente);
 
 #endif

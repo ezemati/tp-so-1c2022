@@ -54,10 +54,13 @@ void *procesar_cliente(uint32_t *args)
 	switch (id_op)
 	{
 	case CREAR_PROCESO:
-		crear_proceso(socket_cliente);
+		atender_crear_proceso(socket_cliente);
 		break;
 	case BLOQUEAR_PROCESO:
 		atender_bloquear_proceso(socket_cliente);
+		break;
+	case FINALIZAR_PROCESO:
+		atender_finalizar_proceso(socket_cliente);
 		break;
 	default:
 		enviar_string_con_longitud_por_socket(socket_cliente, "TEST: error");
