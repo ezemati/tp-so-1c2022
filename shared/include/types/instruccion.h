@@ -44,6 +44,11 @@ t_instruccion *instruccion_new_with_numeric_params(code_instruccion codigo_instr
 t_instruccion *instruccion_duplicate(t_instruccion *instruccion);
 
 /**
+ * @brief Duplica una lista de instrucciones, duplicando a cada instruccion
+ */
+t_list *instrucciones_duplicate(t_list *lista_instrucciones);
+
+/**
  * @brief Libera los recursos de una t_instruccion
  */
 void instruccion_destroy(t_instruccion *instruccion);

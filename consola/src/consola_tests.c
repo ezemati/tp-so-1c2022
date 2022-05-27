@@ -31,8 +31,6 @@ void serializar_deserializar_instrucciones()
     int bytes_programa_serializado;
     void *serializado = serializar_programa(programa, &bytes_programa_serializado);
 
-    int desplazamiento = 0;
-
     t_programa *programa_deserializado = deserializar_programa(serializado);
 
     CU_ASSERT_EQUAL(programa_deserializado->tamanio, tamanio_programa);

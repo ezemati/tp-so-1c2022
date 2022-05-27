@@ -50,6 +50,20 @@ t_instruccion *instruccion_duplicate(t_instruccion *instruccion)
     return instruccion_new_with_numeric_params(instruccion->codigo_instruccion, instruccion->cantidad_parametros, instruccion->parametros);
 }
 
+t_list *instrucciones_duplicate(t_list *lista_instrucciones)
+{
+    t_list *lista_duplicada = list_create();
+    t_list_iterator *iterator = list_iterator_create(lista_instrucciones);
+    while (list_iterator_has_next(iterator))
+    {
+        t_instruccion *instruccion = list_iterator_next(iterator);
+        t_instruccion *instruccion_duplicada = instruccion_duplicate(instruccion);
+        list_add(lista_duplicada, instruccion_duplicada);
+    }
+    list_iterator_destroy(iterator);
+    return lista_duplicada;
+}
+
 void instruccion_destroy(t_instruccion *instruccion)
 {
     free(instruccion);

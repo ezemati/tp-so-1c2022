@@ -8,3 +8,6 @@ cd ..
 cd memoria
 ./vexec_tests
 cd ..
+cd cpu
+./vexec_tests
+cd ..
