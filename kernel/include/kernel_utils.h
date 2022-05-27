@@ -6,6 +6,10 @@
 #include <kernel_requests.h>
 #include <kernel_variables_globales.h>
 
+#include <kernel_planiflargoplazo.h>
+#include <kernel_planifmedianoplazo.h>
+#include <kernel_planifcortoplazo.h>
+
 #include <utils/list.h>
 #include <utils/sockets.h>
 #include <types/identificador_operacion.h>
@@ -45,9 +49,9 @@ uint32_t obtener_proximo_pid();
 bool puedo_pasar_proceso_a_memoria();
 
 /**
- * @brief Mueve un proceso de estado NEW a READY
+ * @brief Devuelve la cantidad de procesos en memoria (READY, RUNNING y BLOCKED)
  */
-void pasar_proceso_new_a_ready(t_kernel_pcb *pcb);
+int calcular_multiprogramacion();
 
 /**
  * @brief Intenta pasar un proceso desde SUSPENDED_READY o NEW a READY
@@ -57,18 +61,11 @@ void intentar_pasar_proceso_a_memoria();
 t_list *obtener_procesos_con_estado(estado_proceso estado);
 t_kernel_pcb *obtener_proceso_por_pid(uint32_t pid);
 uint32_t cantidad_procesos_con_estado(estado_proceso estado);
-void finalizar_proceso(t_kernel_pcb *pcb);
-void finalizar_proceso_en_memoria(t_kernel_pcb *pcb);
-void finalizar_proceso_en_consola(t_kernel_pcb *pcb);
 void sacar_proceso_de_lista(t_list *lista, t_kernel_pcb *pcb);
-void agregar_proceso_a_ready(t_kernel_pcb *pcb);
-void replanificar();
-t_kernel_pcb *obtener_proximo_para_ejecutar();
 void bloquear_o_suspender_proceso(t_kernel_pcb *pcb, uint32_t tiempo_bloqueo);
-void bloquear_proceso(t_kernel_pcb *pcb);
-void suspender_proceso(t_kernel_pcb *pcb);
 void recalcular_estimacion(t_kernel_pcb *pcb);
-void cargar_tiempo_ejecucion_en_cpu(t_kernel_pcb *pcb, time_t time_inicio_running, time_t time_fin_running);
+void enviar_interrupcion_a_cpu();
+void enviar_nuevo_proceso_a_cpu(t_kernel_pcb *pcb_a_ejecutar);
 void print_instrucciones(t_kernel_pcb *pcb);
 void print_instrucciones_de_todos_los_procesos(t_list *pcbs);
 

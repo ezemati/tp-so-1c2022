@@ -3,6 +3,8 @@
 
 struct t_kernel_config;
 
+#include <semaphore.h>
+
 #include <commons/log.h>
 #include <commons/collections/list.h>
 
