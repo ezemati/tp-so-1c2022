@@ -363,12 +363,47 @@ static bool algoritmo_es_con_desalojo()
 
 static void enviar_interrupcion_a_cpu()
 {
-	// TODO: tener en cuenta que CPU tiene que mandar el PCB actualizado, y Kernel tiene que actualizar los datos
+	int socket_interrupt_cpu = crear_conexion(config->ip_cpu, config->puerto_cpu_interrupt, logger);
+
+	uint32_t interrumpir_ejecucion = 1;
+	enviar_uint32_por_socket(socket_interrupt_cpu, interrumpir_ejecucion);
+
+	void *response_serializada = NULL;
+	recibir_buffer_con_bytes_por_socket(socket_interrupt_cpu, &response_serializada);
+	t_kernel_actualizarpcb_request *pcb_actualizado = deserializar_actualizarpcb_request(response_serializada);
+
+	t_kernel_pcb *pcb = obtener_proceso_por_pid(pcb_actualizado->pid);
+	pcb->program_counter = pcb_actualizado->program_counter;
+	cargar_tiempo_ejecucion_en_cpu(pcb, pcb_actualizado->time_inicio_running, pcb_actualizado->time_fin_running);
+
+	actualizarpcb_request_destroy(pcb_actualizado);
+	free(response_serializada);
 }
 
 static void enviar_nuevo_proceso_a_cpu(t_kernel_pcb *pcb_a_ejecutar)
 {
-	// TODO
+	int socket_dispatch_cpu = crear_conexion(config->ip_cpu, config->puerto_cpu_dispatch, logger);
+
+	t_cpu_ejecutarproceso_request *request = ejecutarproceso_request_new(pcb_a_ejecutar->id, pcb_a_ejecutar->program_counter, pcb_a_ejecutar->lista_instrucciones);
+	int bytes_request_serializada;
+	void *request_serializada = serializar_ejecutarproceso_request(request, &bytes_request_serializada);
+	enviar_buffer_serializado_con_instruccion_y_bytes_por_socket(socket_dispatch_cpu, EJECUTAR_PROCESO, request_serializada, bytes_request_serializada);
+	free(request_serializada);
+	ejecutarproceso_request_destroy(request);
+
+	void *response_serializada = NULL;
+	recibir_buffer_con_bytes_por_socket(socket_dispatch_cpu, &response_serializada);
+	t_cpu_ejecutarproceso_response *response = deserializar_ejecutarproceso_response(response_serializada);
+	bool ok = response->ok;
+	ejecutarproceso_response_destroy(response);
+	free(response_serializada);
+
+	liberar_conexion(socket_dispatch_cpu);
+
+	if (!ok)
+	{
+		log_error_if_logger_not_null(logger, "Error al enviar nuevo proceso para ejecucion (PID %d) a CPU", pcb_a_ejecutar->id);
+	}
 }
 
 static void thread_proceso_blocked(void *args)

@@ -10,6 +10,8 @@
 #include <utils/sockets.h>
 #include <types/identificador_operacion.h>
 
+#include <cpu/ejecutar_proceso.h>
+
 #include <memoria/inicializar_proceso.h>
 #include <memoria/finalizar_proceso.h>
 #include <memoria/suspender_proceso.h>
