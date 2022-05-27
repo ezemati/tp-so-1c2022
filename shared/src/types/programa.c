@@ -89,20 +89,7 @@ void *serializar_programa(t_programa *programa, int *bytes)
 
     escribir_uint32_en_buffer(buffer, &desplazamiento, programa->tamanio);
 
-    uint32_t cant_instrucciones = programa_cantidad_instrucciones(programa);
-    escribir_uint32_en_buffer(buffer, &desplazamiento, cant_instrucciones);
-
-    t_list_iterator *iterator = list_iterator_create(programa->instrucciones);
-    while (list_iterator_has_next(iterator))
-    {
-        t_instruccion *instruccion = (t_instruccion *)list_iterator_next(iterator);
-        int bytes_instruccion = 0;
-        void *buffer_instruccion = serializar_instruccion(instruccion, &bytes_instruccion);
-        escribir_en_buffer(buffer, &desplazamiento, buffer_instruccion, bytes_instruccion);
-        free(buffer_instruccion);
-    }
-
-    list_iterator_destroy(iterator);
+    serializar_lista_instrucciones_en_buffer(programa->instrucciones, buffer, &desplazamiento);
 
     return buffer;
 }
@@ -112,15 +99,7 @@ t_programa *deserializar_programa(void *buffer)
     int desplazamiento = 0;
 
     uint32_t tamanio_programa = leer_uint32_de_buffer(buffer, &desplazamiento);
-
-    uint32_t cantidad_instrucciones = leer_uint32_de_buffer(buffer, &desplazamiento);
-
-    t_list *lista_instrucciones = list_create();
-    for (int i = 0; i < cantidad_instrucciones; i++)
-    {
-        t_instruccion *instruccion = deserializar_instruccion(buffer, &desplazamiento);
-        list_add(lista_instrucciones, instruccion);
-    }
+    t_list *lista_instrucciones = deserializar_lista_instrucciones(buffer, &desplazamiento);
 
     t_programa *programa = programa_new_with_instructions(lista_instrucciones, tamanio_programa);
     return programa;
@@ -129,22 +108,12 @@ t_programa *deserializar_programa(void *buffer)
 int bytes_totales_programa_serializado(t_programa *programa)
 {
     /*
-        TAM_PROGRAMA (uint32), CANT_INSTRUCCIONES (uint32), { TAM_CODIGO (uint32), CODIGO (TAM_CODIGO), CANT_PARAM (uint32)[, PARAM1 (uint32)[, PARAM2(uint32)]] }
+        TAM_PROGRAMA (uint32), LISTA_INSTRUCCIONES
     */
     int bytes = 0;
 
     bytes += sizeof(programa->tamanio);
-    bytes += sizeof(programa_cantidad_instrucciones(programa));
-
-    t_list_iterator *iterator = list_iterator_create(programa->instrucciones);
-    while (list_iterator_has_next(iterator))
-    {
-        t_instruccion *instruccion = (t_instruccion *)list_iterator_next(iterator);
-        int bytes_instruccion = bytes_totales_instruccion_serializada(instruccion);
-        bytes += bytes_instruccion;
-    }
-
-    list_iterator_destroy(iterator);
+    bytes += bytes_totales_lista_instrucciones_serializada(programa->instrucciones);
 
     return bytes;
 }

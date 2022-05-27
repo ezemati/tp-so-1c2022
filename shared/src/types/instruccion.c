@@ -160,8 +160,72 @@ int bytes_totales_instruccion_serializada(t_instruccion *instruccion)
     bytes += sizeof(instruccion->codigo_instruccion);
 
     uint32_t cant_parametros = instruccion->cantidad_parametros;
-    bytes += sizeof(cant_parametros);                   // Cantidad de parametros
-    bytes += sizeof(cant_parametros) * cant_parametros; // Cada parametro
+    bytes += sizeof(cant_parametros);            // Cantidad de parametros
+    bytes += sizeof(uint32_t) * cant_parametros; // Cada parametro
+
+    return bytes;
+}
+
+void *serializar_lista_instrucciones(t_list *lista_instrucciones, int *bytes)
+{
+    (*bytes) = bytes_totales_lista_instrucciones_serializada(lista_instrucciones);
+    void *buffer = malloc(*bytes);
+
+    int desplazamiento = 0;
+
+    serializar_lista_instrucciones_en_buffer(lista_instrucciones, buffer, &desplazamiento);
+
+    return buffer;
+}
+
+void serializar_lista_instrucciones_en_buffer(t_list *lista_instrucciones, void *buffer, int *desplazamiento)
+{
+    // CANT_INSTRUCCIONES (uint32), { CODIGO (uint32), CANT_PARAM (uint32)[, PARAM1 (uint32)[, PARAM2(uint32)]] }
+
+    uint32_t cant_instrucciones = list_size(lista_instrucciones);
+    escribir_uint32_en_buffer(buffer, desplazamiento, cant_instrucciones);
+
+    t_list_iterator *iterator = list_iterator_create(lista_instrucciones);
+    while (list_iterator_has_next(iterator))
+    {
+        t_instruccion *instruccion = list_iterator_next(iterator);
+        int bytes_instruccion = 0;
+        void *buffer_instruccion = serializar_instruccion(instruccion, &bytes_instruccion);
+        escribir_en_buffer(buffer, desplazamiento, buffer_instruccion, bytes_instruccion);
+        free(buffer_instruccion);
+    }
+    list_iterator_destroy(iterator);
+}
+
+t_list *deserializar_lista_instrucciones(void *buffer, int *desplazamiento)
+{
+    uint32_t cantidad_instrucciones = leer_uint32_de_buffer(buffer, desplazamiento);
+
+    t_list *lista_instrucciones = list_create();
+    for (int i = 0; i < cantidad_instrucciones; i++)
+    {
+        t_instruccion *instruccion = deserializar_instruccion(buffer, desplazamiento);
+        list_add(lista_instrucciones, instruccion);
+    }
+
+    return lista_instrucciones;
+}
+
+int bytes_totales_lista_instrucciones_serializada(t_list *lista_instrucciones)
+{
+    // CANT_INSTRUCCIONES (uint32), { CODIGO (uint32), CANT_PARAM (uint32)[, PARAM1 (uint32)[, PARAM2(uint32)]] }
+    int bytes = 0;
+
+    bytes += sizeof(uint32_t);
+
+    t_list_iterator *iterator = list_iterator_create(lista_instrucciones);
+    while (list_iterator_has_next(iterator))
+    {
+        t_instruccion *instruccion = list_iterator_next(iterator);
+        int bytes_instruccion = bytes_totales_instruccion_serializada(instruccion);
+        bytes += bytes_instruccion;
+    }
+    list_iterator_destroy(iterator);
 
     return bytes;
 }

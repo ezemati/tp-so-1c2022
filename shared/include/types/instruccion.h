@@ -59,4 +59,9 @@ void *serializar_instruccion(t_instruccion *instruccion, int *bytes);
 t_instruccion *deserializar_instruccion(void *buffer, int *desplazamiento);
 int bytes_totales_instruccion_serializada(t_instruccion *instruccion);
 
+void *serializar_lista_instrucciones(t_list *lista_instrucciones, int *bytes);
+void serializar_lista_instrucciones_en_buffer(t_list *lista_instrucciones, void *buffer, int *desplazamiento);
+t_list *deserializar_lista_instrucciones(void *buffer, int *desplazamiento);
+int bytes_totales_lista_instrucciones_serializada(t_list *lista_instrucciones);
+
 #endif
