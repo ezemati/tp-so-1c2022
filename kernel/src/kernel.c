@@ -7,6 +7,8 @@ t_list *lista_ready = NULL;
 t_list *lista_suspended_ready = NULL;
 t_list *lista_new = NULL;
 
+pthread_mutex_t mutex_lista_new;
+
 int main(int argc, char **argv)
 {
 	if (argc == 2 && string_equals_ignore_case(argv[1], "--test"))

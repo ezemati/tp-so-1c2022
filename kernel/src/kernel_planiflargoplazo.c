@@ -8,11 +8,17 @@ void largo_plazo_intentar_pasar_proceso_a_memoria()
 {
     while (calcular_multiprogramacion() <= config->grado_multiprogramacion)
     {
+        pthread_mutex_lock(&mutex_lista_new);
         t_kernel_pcb *pcb_new = list_get_first_element(lista_new);
+        pthread_mutex_unlock(&mutex_lista_new);
+
         if (pcb_new == NULL)
             break;
 
+        pthread_mutex_lock(&mutex_lista_new);
         sacar_proceso_de_lista(lista_new, pcb_new);
+        pthread_mutex_unlock(&mutex_lista_new);
+
         log_info_if_logger_not_null(logger, "Pasando proceso %d desde NEW a READY", pcb_new->id);
         pasar_proceso_new_a_ready(pcb_new);
     }

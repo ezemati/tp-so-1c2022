@@ -7,6 +7,8 @@ void inicializar_kernel(char **argv)
 	lista_ready = list_create();
 	lista_suspended_ready = list_create();
 	lista_new = list_create();
+
+	pthread_mutex_init(&mutex_lista_new, NULL);
 }
 
 void terminar_kernel()
@@ -21,6 +23,8 @@ void terminar_kernel()
 	list_destroy(lista_new);
 
 	list_destroy_and_destroy_elements(lista_procesos, (void *)pcb_destroy);
+
+	pthread_mutex_destroy(&mutex_lista_new);
 }
 
 void procesar_request(int socket_cliente)
