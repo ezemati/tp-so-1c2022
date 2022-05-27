@@ -1,6 +1,6 @@
 #include <cpu/recibir_instruccion.h>
 
-t_cpu_recibirinstruccion_response *recibirinstruccion_response_new(uint32_t id, uint32_t tamanio, void *instruccion, uint32_t program_counter,uint32_t estimacion_rafaga)
+t_cpu_recibirinstruccion_response *recibirinstruccion_response_new(uint32_t id, uint32_t tamanio, void *instruccion, uint32_t program_counter, uint32_t estimacion_rafaga)
 {
     t_cpu_recibirinstruccion_response *response = malloc(sizeof(t_cpu_recibirinstruccion_response));
     response->id = id;
@@ -28,13 +28,13 @@ void *serializar_recibirinstruccion_response(t_cpu_recibirinstruccion_response *
 
     int desplazamiento = 0;
 
-    escribir_uint32(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, bytes_buffer_sin_tamanio);
 
-    escribir_uint32(buffer, &desplazamiento, response->id);
-    escribir_uint32(buffer, &desplazamiento, response->tamanio);
-    escribir_string_con_longitud(buffer, &desplazamiento, response->instruccion);
-    escribir_uint32(buffer, &desplazamiento, response->program_counter);
-    escribir_uint32(buffer, &desplazamiento, response->estimacion_rafaga);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, response->id);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, response->tamanio);
+    escribir_string_con_longitud_en_buffer(buffer, &desplazamiento, response->instruccion);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, response->program_counter);
+    escribir_uint32_en_buffer(buffer, &desplazamiento, response->estimacion_rafaga);
 
     return buffer;
 }
@@ -43,11 +43,11 @@ t_cpu_recibirinstruccion_response *deserializar_recibirinstruccion_response(void
 {
     int desplazamiento = 0;
 
-    uint32_t id = leer_uint32(buffer, &desplazamiento);
-    uint32_t tamanio = leer_uint32(buffer, &desplazamiento);
-    void *instruccion = leer_string_con_longitud(buffer, &desplazamiento); //esta bien usar string con long?
-    uint32_t program_counter = leer_uint32(buffer, &desplazamiento);
-    uint32_t estimacion_rafaga = leer_uint32(buffer, &desplazamiento);
+    uint32_t id = leer_uint32_de_buffer(buffer, &desplazamiento);
+    uint32_t tamanio = leer_uint32_de_buffer(buffer, &desplazamiento);
+    void *instruccion = leer_string_con_longitud_de_buffer(buffer, &desplazamiento); // esta bien usar string con long?
+    uint32_t program_counter = leer_uint32_de_buffer(buffer, &desplazamiento);
+    uint32_t estimacion_rafaga = leer_uint32_de_buffer(buffer, &desplazamiento);
 
     t_cpu_recibirinstruccion_response *response = recibirinstruccion_response_new(id, tamanio, instruccion, program_counter, estimacion_rafaga);
 
