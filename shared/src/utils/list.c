@@ -1,5 +1,10 @@
 #include <utils/list.h>
 
+void *list_get_first_element(t_list *list)
+{
+    return list_get(list, 0);
+}
+
 void *list_get_last_element(t_list *list)
 {
     void *element = NULL;

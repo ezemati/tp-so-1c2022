@@ -8,6 +8,7 @@
 #include <memoria/leer_dato.h>
 #include <memoria/marco_para_entrada_tabla_2.h>
 #include <memoria/numero_tabla_2_para_entrada_tabla_1.h>
+#include <memoria/suspender_proceso.h>
 
 #include <stdlib.h>
 #include <stdint.h>
@@ -23,5 +24,6 @@ void serializar_deserializar_inicializarproceso_request_response();
 void serializar_deserializar_leerdato_request_response();
 void serializar_deserializar_marcoparaentradatabla2_request_response();
 void serializar_deserializar_numerotabla2paraentradatabla1_request_response();
+void serializar_deserializar_suspenderproceso_request_response();
 
 #endif

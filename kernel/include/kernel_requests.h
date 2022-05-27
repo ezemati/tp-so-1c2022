@@ -6,6 +6,8 @@
 #include <kernel_pcb.h>
 #include <kernel_variables_globales.h>
 
+#include <kernel/actualizar_pcb.h>
+
 #include <types/programa.h>
 
 #include <utils/sockets.h>
@@ -25,5 +27,6 @@
 #include <commons/txt.h>
 
 void crear_proceso(int socket_cliente);
+void atender_bloquear_proceso(int socket_cliente);
 
 #endif

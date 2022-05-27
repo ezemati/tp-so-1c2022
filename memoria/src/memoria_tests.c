@@ -12,6 +12,7 @@ int run_tests()
     CU_add_test(tests, "Serializado/Deserializado leer_dato", serializar_deserializar_leerdato_request_response);
     CU_add_test(tests, "Serializado/Deserializado marco_para_entrada_tabla_2", serializar_deserializar_marcoparaentradatabla2_request_response);
     CU_add_test(tests, "Serializado/Deserializado numero_tabla_2_para_entrada_tabla_1", serializar_deserializar_numerotabla2paraentradatabla1_request_response);
+    CU_add_test(tests, "Serializado/Deserializado suspender_proceso", serializar_deserializar_suspenderproceso_request_response);
 
     CU_basic_set_mode(CU_BRM_VERBOSE);
     CU_basic_run_tests();
@@ -174,4 +175,35 @@ void serializar_deserializar_numerotabla2paraentradatabla1_request_response()
     numerotabla2paraentradatabla1_response_destroy(response_deserializada);
     free(response_serializada);
     numerotabla2paraentradatabla1_response_destroy(response);
+}
+
+void serializar_deserializar_suspenderproceso_request_response()
+{
+    t_memoria_suspenderproceso_request *request = suspenderproceso_request_new(1, 2);
+    int bytes_serializado_request;
+    void *request_serializada = serializar_suspenderproceso_request(request, &bytes_serializado_request);
+    t_memoria_suspenderproceso_request *request_deserializada = deserializar_suspenderproceso_request(request_serializada);
+    CU_ASSERT_EQUAL(request_deserializada->pid, 1);
+    CU_ASSERT_EQUAL(request_deserializada->numero_tablaprimernivel, 2);
+    suspenderproceso_request_destroy(request_deserializada);
+    free(request_serializada);
+    suspenderproceso_request_destroy(request);
+
+    t_memoria_suspenderproceso_response *response = suspenderproceso_response_new(false);
+    int bytes_serializado_response;
+    void *response_serializada = serializar_suspenderproceso_response(response, &bytes_serializado_response);
+    t_memoria_suspenderproceso_response *response_deserializada = deserializar_suspenderproceso_response(response_serializada);
+    CU_ASSERT_EQUAL(response_deserializada->ok, false);
+    suspenderproceso_response_destroy(response_deserializada);
+    free(response_serializada);
+    suspenderproceso_response_destroy(response);
+
+    t_memoria_suspenderproceso_response *response2 = suspenderproceso_response_new(true);
+    int bytes_serializado_response2;
+    void *response_serializada2 = serializar_suspenderproceso_response(response2, &bytes_serializado_response2);
+    t_memoria_suspenderproceso_response *response_deserializada2 = deserializar_suspenderproceso_response(response_serializada2);
+    CU_ASSERT_EQUAL(response_deserializada2->ok, true);
+    suspenderproceso_response_destroy(response_deserializada2);
+    free(response_serializada2);
+    suspenderproceso_response_destroy(response2);
 }
