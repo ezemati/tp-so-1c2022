@@ -39,7 +39,7 @@
 void inicializar_kernel(char **argv);
 void terminar_kernel();
 void procesar_request(int socket_cliente);
-void *procesar_cliente(uint32_t *args);
+void *procesar_cliente(void *args);
 
 uint32_t obtener_proximo_pid();
 

@@ -35,7 +35,7 @@ void terminar_kernel()
 
 void procesar_request(int socket_cliente)
 {
-	uint32_t *socket_cliente_dup = malloc(sizeof(uint32_t));
+	int *socket_cliente_dup = malloc(sizeof(int));
 	*socket_cliente_dup = socket_cliente;
 
 	pthread_t thread_id;
@@ -43,9 +43,9 @@ void procesar_request(int socket_cliente)
 	pthread_detach(thread_id);
 }
 
-void *procesar_cliente(uint32_t *args)
+void *procesar_cliente(void *args)
 {
-	uint32_t socket_cliente = *args;
+	int socket_cliente = *((int *)args);
 	log_debug(logger, "Cliente conectado por socket %d", socket_cliente);
 
 	uint32_t id_op = -1;
