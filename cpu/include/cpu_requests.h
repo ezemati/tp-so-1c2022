@@ -5,6 +5,8 @@
 #include <cpu_utils.h>
 #include <cpu_variables_globales.h>
 
+#include <cpu_info_ejecucion_actual.h>
+
 #include <cpu/ejecutar_proceso.h>
 
 #include <types/programa.h>
