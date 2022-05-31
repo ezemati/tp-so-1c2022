@@ -13,6 +13,41 @@ void terminar_cpu()
 	cpu_config_destroy(config);
 }
 
+void procesar_request(int socket_cliente)
+{
+	int *socket_cliente_dup = malloc(sizeof(int));
+	*socket_cliente_dup = socket_cliente;
+
+	pthread_t thread_id;
+	pthread_create(&thread_id, NULL, (void *)procesar_cliente, socket_cliente_dup);
+	pthread_detach(thread_id);
+}
+
+void *procesar_cliente(void *args)
+{
+	int socket_cliente = *((int *)args);
+	log_debug(logger, "Cliente conectado por socket %d", socket_cliente);
+
+	uint32_t id_op = -1;
+	recibir_uint32_por_socket(socket_cliente, &id_op);
+
+	switch (id_op)
+	{
+	case EJECUTAR_PROCESO:
+		atender_ejecutar_proceso(socket_cliente);
+		break;
+	default:
+		enviar_string_con_longitud_por_socket(socket_cliente, "TEST: error");
+		break;
+	}
+
+	// liberar_conexion(socket_cliente);
+
+	free(args);
+
+	return NULL;
+}
+
 void realizar_handshake_con_memoria(t_cpu_config *config)
 {
 	log_info_if_logger_not_null(logger, "Realizando handshake con Memoria");

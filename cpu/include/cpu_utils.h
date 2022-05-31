@@ -2,6 +2,7 @@
 #define CPU_UTILS_H
 
 #include <cpu_config.h>
+#include <cpu_requests.h>
 #include <cpu_variables_globales.h>
 
 #include <utils/sockets.h>
@@ -25,6 +26,7 @@
 void inicializar_cpu(char **argv);
 void terminar_cpu();
 void procesar_request(int socket_cliente);
+void *procesar_cliente(void *args);
 
 void realizar_handshake_con_memoria(t_cpu_config *config);
 

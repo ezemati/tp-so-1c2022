@@ -73,6 +73,7 @@ void *procesar_cliente(void *args)
 		// hay que avisarle a la Consola cuando el proceso termine la ejecucion
 		liberar_conexion(socket_cliente);
 	}
+
 	free(args);
 
 	return NULL;
