@@ -15,3 +15,9 @@ void infoejecucionactual_destroy(t_cpu_info_ejecucion_actual *info_ejecucion_act
     instrucciones_destroy(info_ejecucion_actual->lista_instrucciones);
     free(info_ejecucion_actual);
 }
+
+bool ejecucion_completada(t_cpu_info_ejecucion_actual *self)
+{
+    // Si tiene 2 instrucciones, entonces termina cuando el ProgramCounter es == 2
+    return self->program_counter >= list_size(self->lista_instrucciones);
+}

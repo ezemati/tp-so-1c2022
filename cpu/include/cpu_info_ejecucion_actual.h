@@ -27,4 +27,6 @@ typedef struct t_cpu_info_ejecucion_actual
 t_cpu_info_ejecucion_actual *infoejecucionactual_new(t_cpu_ejecutarproceso_request *request);
 void infoejecucionactual_destroy(t_cpu_info_ejecucion_actual *info_ejecucion_actual);
 
+bool ejecucion_completada(t_cpu_info_ejecucion_actual *self);
+
 #endif

@@ -13,8 +13,10 @@
 typedef struct t_cpu_ejecutarproceso_request
 {
     uint32_t pid;
+    uint32_t tamanio;
     uint32_t program_counter;
     t_list *lista_instrucciones; // De tipo t_instruccion
+    uint32_t tabla_paginas_primer_nivel;
 } t_cpu_ejecutarproceso_request;
 
 typedef struct t_cpu_ejecutarproceso_response
@@ -22,7 +24,7 @@ typedef struct t_cpu_ejecutarproceso_response
     bool ok;
 } t_cpu_ejecutarproceso_response;
 
-t_cpu_ejecutarproceso_request *ejecutarproceso_request_new(uint32_t pid, uint32_t program_counter, t_list *lista_instrucciones);
+t_cpu_ejecutarproceso_request *ejecutarproceso_request_new(uint32_t pid, uint32_t tamanio, uint32_t program_counter, uint32_t tabla_paginas_primer_nivel, t_list *lista_instrucciones);
 void ejecutarproceso_request_destroy(t_cpu_ejecutarproceso_request *request);
 
 t_cpu_ejecutarproceso_response *ejecutarproceso_response_new(bool ok);

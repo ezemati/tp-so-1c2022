@@ -5,6 +5,8 @@
 #include <cpu_requests.h>
 #include <cpu_variables_globales.h>
 
+#include <cpu_ejecucion_instrucciones.h>
+
 #include <utils/sockets.h>
 #include <types/identificador_operacion.h>
 
@@ -29,5 +31,6 @@ void procesar_request(int socket_cliente);
 void *procesar_cliente(void *args);
 
 void realizar_handshake_con_memoria(t_cpu_config *config);
+void realizar_ejecucion();
 
 #endif

@@ -2,6 +2,9 @@
 
 void atender_ejecutar_proceso(int socket_cliente)
 {
+    // Reinicio el flag, por si quedo algun valor perdido
+    hay_interrupcion = false;
+
     void *buffer_request = NULL;
     recibir_buffer_con_bytes_por_socket(socket_cliente, &buffer_request);
 
@@ -10,6 +13,9 @@ void atender_ejecutar_proceso(int socket_cliente)
     info_ejecucion_actual = infoejecucionactual_new(request);
 
     log_debug(logger, "Empezando a ejecutar PID %d, con Program Counter %d", request->pid, request->program_counter);
+    pthread_t thread_ejecucion_id;
+    pthread_create(&thread_ejecucion_id, NULL, (void *)realizar_ejecucion, NULL);
+    pthread_detach(thread_ejecucion_id);
 
     bool ok = true;
     t_cpu_ejecutarproceso_response *response = ejecutarproceso_response_new(ok);
