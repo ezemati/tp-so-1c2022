@@ -83,7 +83,7 @@ static void thread_proceso_blocked(void *args)
 {
     t_kernel_pcb *pcb = args;
     int tiempo_bloqueo = pcb->bloqueo_pendiente;
-    int microsegundos = tiempo_bloqueo * 1000; // tiempo_bloqueo esta en milisegundos
+    int microsegundos = milisegundos_a_microsegundos(tiempo_bloqueo); // tiempo_bloqueo esta en milisegundos
     log_info_if_logger_not_null(logger, "Proceso %d entrando en bloqueo por %dms", pcb->id, tiempo_bloqueo);
 
     usleep(microsegundos);

@@ -7,6 +7,7 @@
 #include <kernel_variables_globales.h>
 
 #include <utils/sockets.h>
+#include <utils/converter.h>
 #include <types/identificador_operacion.h>
 
 #include <netdb.h>

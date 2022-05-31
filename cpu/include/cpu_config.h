@@ -12,7 +12,7 @@ typedef struct t_cpu_config
 {
     uint32_t entradas_tlb;
     char *reemplazo_tlb;
-    uint32_t retardo_noop;
+    double retardo_noop;
     char *ip_memoria;
     uint32_t puerto_memoria;
     uint32_t puerto_escucha_dispatch;

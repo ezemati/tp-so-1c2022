@@ -3,14 +3,21 @@
 
 #include <types/instruccion.h>
 
+#include <cpu_config.h>
+#include <cpu_variables_globales.h>
+#include <cpu_info_ejecucion_actual.h>
+
+#include <utils/converter.h>
+
 #include <stdint.h>
+#include <unistd.h>
 
 void ejecutar_instruccion(t_instruccion *instruccion, uint32_t valor_para_copy);
-void ejecutar_noop();
-void ejecutar_io(uint32_t duracion_io);
-void ejecutar_read(uint32_t direccion_logica_lectura);
-void ejecutar_write(uint32_t direccion_logica_escritura, uint32_t valor_a_escribir);
-void ejecutar_copy(uint32_t direccion_logica_destino, uint32_t direccion_logica_origen, uint32_t valor_a_copiar);
-void ejecutar_exit();
+void ejecutar_noop(t_instruccion *instruccion);
+void ejecutar_io(t_instruccion *instruccion);
+void ejecutar_read(t_instruccion *instruccion);
+void ejecutar_write(t_instruccion *instruccion);
+void ejecutar_copy(t_instruccion *instruccion, uint32_t valor_a_copiar);
+void ejecutar_exit(t_instruccion *instruccion);
 
 #endif

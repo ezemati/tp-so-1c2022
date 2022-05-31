@@ -44,6 +44,6 @@ double tiempo_restante_segun_estimacion(t_kernel_pcb *self)
 void cargar_tiempo_ejecucion_en_cpu(t_kernel_pcb *pcb, time_t time_inicio_running, time_t time_fin_running)
 {
     double segundos_running = difftime(time_fin_running, time_inicio_running);
-    double milisegundos_running = segundos_running * 1000;
+    double milisegundos_running = segundos_a_milisegundos(segundos_running);
     pcb->milisegundos_en_running += milisegundos_running;
 }
