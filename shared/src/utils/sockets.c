@@ -86,9 +86,7 @@ int iniciar_servidor(uint32_t puerto, t_log *logger)
 
 int esperar_cliente(int socket_servidor)
 {
-    struct sockaddr_in direccion_cliente;
-    unsigned int tamanio_direccion;
-    int socket_cliente = accept(socket_servidor, (void *)&direccion_cliente, &tamanio_direccion);
+    int socket_cliente = accept(socket_servidor, NULL, NULL);
     return socket_cliente;
 }
 

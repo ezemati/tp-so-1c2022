@@ -2,7 +2,9 @@
 
 void *list_get_first_element(t_list *list)
 {
-    return list_get(list, 0);
+    return list_size(list) > 0
+               ? list_get(list, 0)
+               : NULL;
 }
 
 void *list_get_last_element(t_list *list)
