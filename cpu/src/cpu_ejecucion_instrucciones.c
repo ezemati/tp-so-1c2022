@@ -30,7 +30,7 @@ void ejecutar_noop(t_instruccion *instruccion)
     double milisegundos_noop = config->retardo_noop;
     log_info_if_logger_not_null(logger, "PID %d: empezando NO-OP por %f milisegundos", info_ejecucion_actual->pid, milisegundos_noop);
 
-    double microsegundos_noop = milisegundos_a_microsegundos(config->retardo_noop);
+    double microsegundos_noop = milisegundos_a_microsegundos(milisegundos_noop);
     usleep(microsegundos_noop);
 
     log_info_if_logger_not_null(logger, "PID %d: NO-OP finalizado", info_ejecucion_actual->pid);
