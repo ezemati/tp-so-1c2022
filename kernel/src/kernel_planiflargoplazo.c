@@ -41,8 +41,6 @@ void finalizar_proceso(t_kernel_pcb *pcb)
 
 static void pasar_proceso_new_a_ready(t_kernel_pcb *pcb)
 {
-    int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, logger);
-
     t_memoria_inicializarproceso_request *request = inicializarproceso_request_new(pcb->id, pcb->tamanio);
     int bytes_request_serializada = 0;
     void *request_serializada = serializar_inicializarproceso_request(request, &bytes_request_serializada);
@@ -57,8 +55,6 @@ static void pasar_proceso_new_a_ready(t_kernel_pcb *pcb)
     inicializarproceso_response_destroy(response);
     free(response_serializada);
 
-    liberar_conexion(socket_memoria);
-
     pcb->estado = S_READY;
     agregar_proceso_a_ready(pcb);
     log_info_if_logger_not_null(logger, "Proceso %d pasado a READY, con numero de tabla de primer nivel %d", pcb->id, pcb->tabla_paginas_primer_nivel);
@@ -66,8 +62,6 @@ static void pasar_proceso_new_a_ready(t_kernel_pcb *pcb)
 
 static void finalizar_proceso_en_memoria(t_kernel_pcb *pcb)
 {
-    int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, logger);
-
     t_memoria_finalizarproceso_request *request = finalizarproceso_request_new(pcb->id, pcb->tabla_paginas_primer_nivel);
     int bytes_request_serializada = 0;
     void *request_serializada = serializar_finalizarproceso_request(request, &bytes_request_serializada);

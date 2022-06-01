@@ -15,6 +15,10 @@ extern t_list *lista_ready;           // De tipo t_kernel_pcb (sus elementos per
 extern t_list *lista_suspended_ready; // De tipo t_kernel_pcb (sus elementos pertenecen a lista_procesos)
 extern t_list *lista_new;             // De tipo t_kernel_pcb (sus elementos pertenecen a lista_procesos)
 
+extern int socket_memoria;
+extern int socket_cpu_dispatch;
+extern int socket_cpu_interrupt;
+
 extern pthread_mutex_t mutex_lista_procesos;
 extern pthread_mutex_t mutex_lista_ready;
 extern pthread_mutex_t mutex_lista_suspended_ready;

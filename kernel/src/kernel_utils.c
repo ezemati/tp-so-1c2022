@@ -8,6 +8,10 @@ void inicializar_kernel(char **argv)
 	lista_suspended_ready = list_create();
 	lista_new = list_create();
 
+	socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, logger);
+	socket_cpu_dispatch = crear_conexion(config->ip_cpu, config->puerto_cpu_dispatch, logger);
+	socket_cpu_interrupt = crear_conexion(config->ip_cpu, config->puerto_cpu_interrupt, logger);
+
 	pthread_mutex_init(&mutex_lista_procesos, NULL);
 	pthread_mutex_init(&mutex_lista_ready, NULL);
 	pthread_mutex_init(&mutex_lista_suspended_ready, NULL);
@@ -31,6 +35,10 @@ void terminar_kernel()
 	pthread_mutex_destroy(&mutex_lista_ready);
 	pthread_mutex_destroy(&mutex_lista_suspended_ready);
 	pthread_mutex_destroy(&mutex_lista_new);
+
+	liberar_conexion(socket_memoria);
+	liberar_conexion(socket_cpu_dispatch);
+	liberar_conexion(socket_cpu_interrupt);
 }
 
 void procesar_request(int socket_cliente)
@@ -211,13 +219,11 @@ void print_instrucciones_de_todos_los_procesos(t_list *pcbs)
 
 void enviar_interrupcion_a_cpu()
 {
-	int socket_interrupt_cpu = crear_conexion(config->ip_cpu, config->puerto_cpu_interrupt, logger);
-
 	uint32_t interrumpir_ejecucion = 1;
-	enviar_uint32_por_socket(socket_interrupt_cpu, interrumpir_ejecucion);
+	enviar_uint32_por_socket(socket_cpu_interrupt, interrumpir_ejecucion);
 
 	void *response_serializada = NULL;
-	recibir_buffer_con_bytes_por_socket(socket_interrupt_cpu, &response_serializada);
+	recibir_buffer_con_bytes_por_socket(socket_cpu_interrupt, &response_serializada);
 	t_kernel_actualizarpcb_request *pcb_actualizado = deserializar_actualizarpcb_request(response_serializada);
 
 	t_kernel_pcb *pcb = obtener_proceso_por_pid(pcb_actualizado->pid);
@@ -230,23 +236,19 @@ void enviar_interrupcion_a_cpu()
 
 void enviar_nuevo_proceso_a_cpu(t_kernel_pcb *pcb_a_ejecutar)
 {
-	int socket_dispatch_cpu = crear_conexion(config->ip_cpu, config->puerto_cpu_dispatch, logger);
-
 	t_cpu_ejecutarproceso_request *request = ejecutarproceso_request_new(pcb_a_ejecutar->id, pcb_a_ejecutar->tamanio, pcb_a_ejecutar->program_counter, pcb_a_ejecutar->tabla_paginas_primer_nivel, pcb_a_ejecutar->lista_instrucciones);
 	int bytes_request_serializada;
 	void *request_serializada = serializar_ejecutarproceso_request(request, &bytes_request_serializada);
-	enviar_buffer_serializado_con_instruccion_y_bytes_por_socket(socket_dispatch_cpu, EJECUTAR_PROCESO, request_serializada, bytes_request_serializada);
+	enviar_buffer_serializado_con_instruccion_y_bytes_por_socket(socket_cpu_dispatch, EJECUTAR_PROCESO, request_serializada, bytes_request_serializada);
 	free(request_serializada);
 	ejecutarproceso_request_destroy(request);
 
 	void *response_serializada = NULL;
-	recibir_buffer_con_bytes_por_socket(socket_dispatch_cpu, &response_serializada);
+	recibir_buffer_con_bytes_por_socket(socket_cpu_dispatch, &response_serializada);
 	t_cpu_ejecutarproceso_response *response = deserializar_ejecutarproceso_response(response_serializada);
 	bool ok = response->ok;
 	ejecutarproceso_response_destroy(response);
 	free(response_serializada);
-
-	liberar_conexion(socket_dispatch_cpu);
 
 	if (!ok)
 	{

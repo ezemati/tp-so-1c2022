@@ -11,6 +11,9 @@ struct t_cpu_info_ejecucion_actual;
 extern struct t_cpu_config *config;
 extern t_log *logger;
 extern struct t_cpu_info_ejecucion_actual *info_ejecucion_actual;
+
 extern bool hay_interrupcion;
+
+extern int socket_memoria;
 
 #endif
