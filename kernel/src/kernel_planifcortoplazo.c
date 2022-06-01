@@ -1,6 +1,5 @@
 #include <kernel_planifcortoplazo.h>
 
-static void replanificar();
 static t_kernel_pcb *obtener_proximo_para_ejecutar();
 static t_kernel_pcb *obtener_proximo_para_ejecutar_fifo();
 static t_kernel_pcb *obtener_proximo_para_ejecutar_srt();
@@ -15,7 +14,7 @@ void agregar_proceso_a_ready(t_kernel_pcb *pcb)
     list_add(lista_ready, pcb);
     pthread_mutex_unlock(&mutex_lista_ready);
 
-    if (algoritmo_es_con_desalojo())
+    if (algoritmo_es_con_desalojo() || !hay_proceso_en_ejecucion)
     {
         replanificar();
     }
@@ -29,9 +28,13 @@ void bloquear_proceso(t_kernel_pcb *pcb)
     pthread_detach(thread_id);
 }
 
-static void replanificar()
+void replanificar()
 {
-    enviar_interrupcion_a_cpu();
+    if (hay_proceso_en_ejecucion)
+    {
+        enviar_interrupcion_a_cpu();
+        hay_proceso_en_ejecucion = false;
+    }
 
     t_kernel_pcb *pcb_a_ejecutar = obtener_proximo_para_ejecutar();
 
@@ -39,9 +42,8 @@ static void replanificar()
     sacar_proceso_de_lista(lista_ready, pcb_a_ejecutar);
     pthread_mutex_unlock(&mutex_lista_ready);
 
-    // pcb_a_ejecutar->estado = S_RUNNING;
-
-    enviar_nuevo_proceso_a_cpu(pcb_a_ejecutar);
+    enviar_proceso_a_cpu_para_ejecucion(pcb_a_ejecutar);
+    hay_proceso_en_ejecucion = true;
 }
 
 static t_kernel_pcb *obtener_proximo_para_ejecutar()

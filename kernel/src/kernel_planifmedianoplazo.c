@@ -2,8 +2,10 @@
 
 static void thread_proceso_suspended_blocked(void *args);
 
-void mediano_plazo_intentar_pasar_proceso_a_memoria()
+bool mediano_plazo_intentar_pasar_proceso_a_memoria()
 {
+    bool se_agrego_proceso_a_memoria = false;
+
     while (calcular_multiprogramacion() <= config->grado_multiprogramacion)
     {
         pthread_mutex_lock(&mutex_lista_suspended_ready);
@@ -21,10 +23,14 @@ void mediano_plazo_intentar_pasar_proceso_a_memoria()
 
         log_info_if_logger_not_null(logger, "Pasando proceso %d desde SUSPENDED_READY a READY", pcb_suspended_ready->id);
         agregar_proceso_a_ready(pcb_suspended_ready);
+
+        se_agrego_proceso_a_memoria = true;
     }
+
+    return se_agrego_proceso_a_memoria;
 }
 
-void suspender_proceso(t_kernel_pcb *pcb)
+void suspender_proceso(t_kernel_pcb *pcb, bool *se_paso_proceso_a_memoria)
 {
     pcb->estado = S_SUSPENDED_BLOCKED;
 
@@ -52,7 +58,7 @@ void suspender_proceso(t_kernel_pcb *pcb)
         return;
     }
 
-    intentar_pasar_proceso_a_memoria(); // Este proceso paso a SUSPENDED_BLOCKED asi que dejo un espacio de multiprogramacion libre
+    (*se_paso_proceso_a_memoria) = intentar_pasar_proceso_a_memoria(); // Este proceso paso a SUSPENDED_BLOCKED asi que dejo un espacio de multiprogramacion libre
 
     pthread_t thread_id;
     pthread_create(&thread_id, NULL, (void *)thread_proceso_suspended_blocked, pcb);

@@ -4,8 +4,10 @@ static void pasar_proceso_new_a_ready(t_kernel_pcb *pcb);
 static void finalizar_proceso_en_memoria(t_kernel_pcb *pcb);
 static void finalizar_proceso_en_consola(t_kernel_pcb *pcb);
 
-void largo_plazo_intentar_pasar_proceso_a_memoria()
+bool largo_plazo_intentar_pasar_proceso_a_memoria()
 {
+    bool se_agrego_proceso_a_memoria = false;
+
     while (calcular_multiprogramacion() <= config->grado_multiprogramacion)
     {
         pthread_mutex_lock(&mutex_lista_new);
@@ -21,7 +23,11 @@ void largo_plazo_intentar_pasar_proceso_a_memoria()
 
         log_info_if_logger_not_null(logger, "Pasando proceso %d desde NEW a READY", pcb_new->id);
         pasar_proceso_new_a_ready(pcb_new);
+
+        se_agrego_proceso_a_memoria = true;
     }
+
+    return se_agrego_proceso_a_memoria;
 }
 
 void finalizar_proceso(t_kernel_pcb *pcb)
@@ -60,8 +66,8 @@ static void pasar_proceso_new_a_ready(t_kernel_pcb *pcb)
     liberar_conexion(socket_memoria);
 
     pcb->estado = S_READY;
-    agregar_proceso_a_ready(pcb);
     log_info_if_logger_not_null(logger, "Proceso %d pasado a READY, con numero de tabla de primer nivel %d", pcb->id, pcb->tabla_paginas_primer_nivel);
+    agregar_proceso_a_ready(pcb);
 }
 
 static void finalizar_proceso_en_memoria(t_kernel_pcb *pcb)

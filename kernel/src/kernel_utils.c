@@ -31,6 +31,8 @@ void terminar_kernel()
 	pthread_mutex_destroy(&mutex_lista_ready);
 	pthread_mutex_destroy(&mutex_lista_suspended_ready);
 	pthread_mutex_destroy(&mutex_lista_new);
+
+	liberar_conexion(socket_conexion_cpu_dispatch);
 }
 
 void procesar_request(int socket_cliente)
@@ -56,23 +58,12 @@ void *procesar_cliente(void *args)
 	case CREAR_PROCESO:
 		atender_crear_proceso(socket_cliente);
 		break;
-	case BLOQUEAR_PROCESO:
-		atender_bloquear_proceso(socket_cliente);
-		break;
-	case FINALIZAR_PROCESO:
-		atender_finalizar_proceso(socket_cliente);
-		break;
 	default:
 		enviar_string_con_longitud_por_socket(socket_cliente, "TEST: error");
 		break;
 	}
 
-	if (id_op != CREAR_PROCESO)
-	{
-		// Si la operacion es CREAR_PROCESO, hay que dejar la conexion viva porque despues
-		// hay que avisarle a la Consola cuando el proceso termine la ejecucion
-		liberar_conexion(socket_cliente);
-	}
+	// liberar_conexion(socket_cliente);
 
 	free(args);
 
@@ -102,7 +93,7 @@ int calcular_multiprogramacion()
 	return cantidad_procesos_con_estado(S_READY) + cantidad_procesos_con_estado(S_RUNNING) + cantidad_procesos_con_estado(S_BLOCKED);
 }
 
-void intentar_pasar_proceso_a_memoria()
+bool intentar_pasar_proceso_a_memoria()
 {
 	/**
 	 * Hay que llamar a esta funcion cada vez que:
@@ -113,8 +104,9 @@ void intentar_pasar_proceso_a_memoria()
 	 */
 
 	// El PlanifMedianoPlazo tiene mas prioridad que el PlanifLargoPlazo
-	mediano_plazo_intentar_pasar_proceso_a_memoria();
-	largo_plazo_intentar_pasar_proceso_a_memoria();
+	bool mediano_plazo_pudo_pasar_proceso_a_memoria = mediano_plazo_intentar_pasar_proceso_a_memoria();
+	bool largo_plazo_pudo_pasar_proceso_a_memoria = largo_plazo_intentar_pasar_proceso_a_memoria();
+	return mediano_plazo_pudo_pasar_proceso_a_memoria || largo_plazo_pudo_pasar_proceso_a_memoria;
 }
 
 t_list *obtener_procesos_con_estado(estado_proceso estado)
@@ -166,11 +158,21 @@ void bloquear_o_suspender_proceso(t_kernel_pcb *pcb, uint32_t tiempo_bloqueo)
 
 	if (tiempo_bloqueo > config->tiempo_maximo_bloqueado)
 	{
-		suspender_proceso(pcb);
+		bool se_paso_proceso_a_memoria = false;
+		suspender_proceso(pcb, &se_paso_proceso_a_memoria);
+		if (!se_paso_proceso_a_memoria)
+		{
+			// Si se pudo pasar un proceso a memoria, entonces se replanifica automaticamente,
+			// asi que hay que replanificar aca a mano unicamente si no se pudo pasar ningun proceso
+			replanificar();
+		}
 	}
 	else
 	{
 		bloquear_proceso(pcb);
+		// Al bloquear un proceso no se intenta pasar un proceso a memoria,
+		// asi que hay que replanificar a mano
+		replanificar();
 	}
 }
 
@@ -224,11 +226,13 @@ void enviar_interrupcion_a_cpu()
 	pcb->program_counter = pcb_actualizado->program_counter;
 	cargar_tiempo_ejecucion_en_cpu(pcb, pcb_actualizado->time_inicio_running, pcb_actualizado->time_fin_running);
 
+	hay_proceso_en_ejecucion = false;
+
 	actualizarpcb_request_destroy(pcb_actualizado);
 	free(response_serializada);
 }
 
-void enviar_nuevo_proceso_a_cpu(t_kernel_pcb *pcb_a_ejecutar)
+void enviar_proceso_a_cpu_para_ejecucion(t_kernel_pcb *pcb_a_ejecutar)
 {
 	int socket_dispatch_cpu = crear_conexion(config->ip_cpu, config->puerto_cpu_dispatch, logger);
 
@@ -252,4 +256,7 @@ void enviar_nuevo_proceso_a_cpu(t_kernel_pcb *pcb_a_ejecutar)
 	{
 		log_error_if_logger_not_null(logger, "Error al enviar nuevo proceso para ejecucion (PID %d) a CPU", pcb_a_ejecutar->id);
 	}
+
+	pcb_a_ejecutar->estado = S_RUNNING;
+	hay_proceso_en_ejecucion = true;
 }

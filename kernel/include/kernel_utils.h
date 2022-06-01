@@ -54,9 +54,9 @@ bool puedo_pasar_proceso_a_memoria();
 int calcular_multiprogramacion();
 
 /**
- * @brief Intenta pasar un proceso desde SUSPENDED_READY o NEW a READY
+ * @brief Intenta pasar un proceso desde SUSPENDED_READY o NEW a READY, y devuelve un bool indicando si pudo
  */
-void intentar_pasar_proceso_a_memoria();
+bool intentar_pasar_proceso_a_memoria();
 
 t_list *obtener_procesos_con_estado(estado_proceso estado);
 t_kernel_pcb *obtener_proceso_por_pid(uint32_t pid);
@@ -65,7 +65,7 @@ void sacar_proceso_de_lista(t_list *lista, t_kernel_pcb *pcb);
 void bloquear_o_suspender_proceso(t_kernel_pcb *pcb, uint32_t tiempo_bloqueo);
 void recalcular_estimacion(t_kernel_pcb *pcb);
 void enviar_interrupcion_a_cpu();
-void enviar_nuevo_proceso_a_cpu(t_kernel_pcb *pcb_a_ejecutar);
+void enviar_proceso_a_cpu_para_ejecucion(t_kernel_pcb *pcb_a_ejecutar);
 void print_instrucciones(t_kernel_pcb *pcb);
 void print_instrucciones_de_todos_los_procesos(t_list *pcbs);
 

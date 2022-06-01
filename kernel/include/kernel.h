@@ -5,4 +5,6 @@
 #include <kernel_variables_globales.h>
 #include <kernel_tests.h>
 
+void handler_escucha_cpu_dispatch();
+
 #endif

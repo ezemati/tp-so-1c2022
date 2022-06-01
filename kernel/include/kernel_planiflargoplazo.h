@@ -22,7 +22,7 @@
 #include <commons/string.h>
 #include <commons/txt.h>
 
-void largo_plazo_intentar_pasar_proceso_a_memoria();
+bool largo_plazo_intentar_pasar_proceso_a_memoria();
 void finalizar_proceso(t_kernel_pcb *pcb);
 
 #endif

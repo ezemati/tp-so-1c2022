@@ -25,5 +25,6 @@
 
 void agregar_proceso_a_ready(t_kernel_pcb *pcb);
 void bloquear_proceso(t_kernel_pcb *pcb);
+void replanificar();
 
 #endif

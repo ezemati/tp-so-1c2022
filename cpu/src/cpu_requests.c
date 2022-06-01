@@ -1,5 +1,19 @@
 #include <cpu_requests.h>
 
+void atender_handshake_con_kernel(int socket_cliente)
+{
+    socket_conexion_kernel = socket_cliente;
+
+    uint32_t ok_recibido = 0, ok_enviado = 1;
+    recibir_uint32_por_socket(socket_conexion_kernel, &ok_recibido);
+    if (ok_recibido != 1)
+    {
+        log_error_if_logger_not_null(logger, "Fallo handshake con Kernel");
+        exit(EXIT_FAILURE);
+    }
+    enviar_uint32_por_socket(socket_conexion_kernel, ok_enviado);
+}
+
 void atender_ejecutar_proceso(int socket_cliente)
 {
     // Reinicio el flag, por si quedo algun valor perdido

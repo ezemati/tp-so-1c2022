@@ -13,7 +13,10 @@ typedef enum identificador_operacion
     LEER_DATO,
     ESCRIBIR_DATO,
     OBTENER_NUMERO_TABLA_2_PARA_ENTRADA_TABLA_1,
-    OBTENER_MARCO_PARA_ENTRADA_TABLA_2
+    OBTENER_MARCO_PARA_ENTRADA_TABLA_2,
+    HANDSHAKE_SOY_KERNEL
 } identificador_operacion;
+
+char *identificador_operacion_to_string(identificador_operacion id_op);
 
 #endif

@@ -27,6 +27,7 @@
 #include <commons/string.h>
 #include <commons/txt.h>
 
+void atender_handshake_con_kernel(int socket_cliente);
 void atender_ejecutar_proceso(int socket_cliente);
 
 #endif

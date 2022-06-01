@@ -29,6 +29,8 @@ void atender_crear_proceso(int socket_cliente)
 
 void atender_bloquear_proceso(int socket_cliente)
 {
+	hay_proceso_en_ejecucion = false;
+
 	void *buffer_request = NULL;
 	recibir_buffer_con_bytes_por_socket(socket_cliente, &buffer_request);
 
@@ -47,6 +49,8 @@ void atender_bloquear_proceso(int socket_cliente)
 
 void atender_finalizar_proceso(int socket_cliente)
 {
+	hay_proceso_en_ejecucion = false;
+
 	void *buffer_request = NULL;
 	recibir_buffer_con_bytes_por_socket(socket_cliente, &buffer_request);
 

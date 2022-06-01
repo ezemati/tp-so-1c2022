@@ -23,7 +23,7 @@
 #include <commons/string.h>
 #include <commons/txt.h>
 
-void mediano_plazo_intentar_pasar_proceso_a_memoria();
-void suspender_proceso(t_kernel_pcb *pcb);
+bool mediano_plazo_intentar_pasar_proceso_a_memoria();
+void suspender_proceso(t_kernel_pcb *pcb, bool *se_paso_proceso_a_memoria);
 
 #endif
