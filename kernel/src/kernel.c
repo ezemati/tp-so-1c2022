@@ -30,6 +30,7 @@ int main(int argc, char **argv)
 
 	socket_conexion_cpu_dispatch = crear_conexion(config->ip_cpu, config->puerto_cpu_dispatch, logger);
 	uint32_t ok_enviado = 1, ok_recibido = 0;
+	enviar_uint32_por_socket(socket_conexion_cpu_dispatch, HANDSHAKE_SOY_KERNEL);
 	enviar_uint32_por_socket(socket_conexion_cpu_dispatch, ok_enviado);
 	recibir_uint32_por_socket(socket_conexion_cpu_dispatch, &ok_recibido);
 	if (ok_recibido != 1)

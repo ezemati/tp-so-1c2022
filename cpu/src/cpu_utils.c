@@ -38,6 +38,8 @@ void *procesar_cliente(void *args)
 	uint32_t id_op = -1;
 	recibir_uint32_por_socket(socket_cliente, &id_op);
 
+	log_info_if_logger_not_null(logger, "Operacion recibida en CPU: %s", identificador_operacion_to_string(id_op));
+
 	switch (id_op)
 	{
 	case HANDSHAKE_SOY_KERNEL:
@@ -72,7 +74,7 @@ void realizar_handshake_con_memoria(t_cpu_config *config)
 	config->memoria_entradas_por_tabla = response->entradas_por_tabla;
 	config->memoria_tamanio_pagina = response->tamanio_pagina;
 
-	log_info_if_logger_not_null(logger, "Handshake finalizado:- entradas_por_tabla = %d, tamanio_pagina = %d", config->memoria_entradas_por_tabla, config->memoria_tamanio_pagina);
+	log_info_if_logger_not_null(logger, "Handshake finalizado - {entradas_por_tabla=%d, tamanio_pagina=%d}", config->memoria_entradas_por_tabla, config->memoria_tamanio_pagina);
 
 	handshakeconfiguraciones_memoria_response_destroy(response);
 	free(buffer_response);

@@ -12,7 +12,7 @@
 
 typedef enum algoritmo_reemplazo
 {
-    CLOCK,
+    CLOCK = 1,
     CLOCK_M
 } algoritmo_reemplazo;
 

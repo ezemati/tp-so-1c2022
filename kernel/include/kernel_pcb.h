@@ -13,7 +13,7 @@
 
 typedef enum estado_proceso
 {
-    S_NEW,
+    S_NEW = 1,
     S_READY,
     S_RUNNING,
     S_BLOCKED,

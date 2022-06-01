@@ -13,7 +13,7 @@
 
 typedef enum code_instruccion
 {
-    NO_OP,
+    NO_OP = 1,
     IO,
     READ,
     WRITE,
