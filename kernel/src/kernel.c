@@ -25,7 +25,7 @@ int main(int argc, char **argv)
 
 	inicializar_kernel(argv);
 
-	socket_servidor = iniciar_servidor(config->puerto_escucha, logger);
+	int socket_servidor = iniciar_servidor(config->puerto_escucha, logger);
 
 	while (true)
 	{
