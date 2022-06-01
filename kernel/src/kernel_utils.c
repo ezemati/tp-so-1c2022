@@ -36,6 +36,7 @@ void terminar_kernel()
 	pthread_mutex_destroy(&mutex_lista_suspended_ready);
 	pthread_mutex_destroy(&mutex_lista_new);
 
+	liberar_conexion(socket_servidor);
 	liberar_conexion(socket_memoria);
 	liberar_conexion(socket_cpu_dispatch);
 	liberar_conexion(socket_cpu_interrupt);

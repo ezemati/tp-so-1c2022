@@ -83,7 +83,6 @@ void realizar_ejecucion()
 	// Ejecuta infinitamente hasta que llegue una interrupcion del Kernel,
 	// ejecute una instruccion de IO o finalice (instruccion EXIT)
 	info_ejecucion_actual->time_inicio_running = current_time();
-	code_instruccion ultima_instruccion_ejecutada;
 	do
 	{
 		// FETCH
@@ -102,10 +101,10 @@ void realizar_ejecucion()
 		// Incrementar el Program Counter
 		info_ejecucion_actual->program_counter++;
 
-		ultima_instruccion_ejecutada = instruccion_a_ejecutar->codigo_instruccion;
+		info_ejecucion_actual->ultima_instruccion_ejecutada = instruccion_a_ejecutar->codigo_instruccion;
 
 		// CHECK INTERRUPT (se chequea automaticamente por la condicion del while)
-	} while (!ejecucion_completada(info_ejecucion_actual) && !hay_interrupcion && ultima_instruccion_ejecutada != IO && ultima_instruccion_ejecutada != EXIT);
+	} while (!ejecucion_completada(info_ejecucion_actual) && !hay_interrupcion && info_ejecucion_actual->ultima_instruccion_ejecutada != IO && info_ejecucion_actual->ultima_instruccion_ejecutada != EXIT);
 
 	info_ejecucion_actual->time_fin_running = current_time();
 
@@ -113,11 +112,11 @@ void realizar_ejecucion()
 	{
 		desalojar_proceso();
 	}
-	else if (ultima_instruccion_ejecutada == IO)
+	else if (info_ejecucion_actual->ultima_instruccion_ejecutada == IO)
 	{
 		bloquear_proceso();
 	}
-	else if (ejecucion_completada(info_ejecucion_actual) || ultima_instruccion_ejecutada == EXIT)
+	else if (ejecucion_completada(info_ejecucion_actual) || info_ejecucion_actual->ultima_instruccion_ejecutada == EXIT)
 	{
 		finalizar_proceso();
 	}

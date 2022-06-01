@@ -7,6 +7,7 @@ t_list *lista_ready = NULL;
 t_list *lista_suspended_ready = NULL;
 t_list *lista_new = NULL;
 
+int socket_servidor = -1;
 int socket_memoria = -1;
 int socket_cpu_dispatch = -1;
 int socket_cpu_interrupt = -1;
@@ -29,7 +30,7 @@ int main(int argc, char **argv)
 
 	inicializar_kernel(argv);
 
-	int socket_servidor = iniciar_servidor(config->puerto_escucha, logger);
+	socket_servidor = iniciar_servidor(config->puerto_escucha, logger);
 
 	while (true)
 	{

@@ -24,6 +24,7 @@ typedef struct t_cpu_info_ejecucion_actual
     // uint32_t bloqueo_pendiente;
     time_t time_inicio_running;
     time_t time_fin_running;
+    code_instruccion ultima_instruccion_ejecutada;
 } t_cpu_info_ejecucion_actual;
 
 t_cpu_info_ejecucion_actual *infoejecucionactual_new(t_cpu_ejecutarproceso_request *request);
