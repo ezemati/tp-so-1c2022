@@ -3,10 +3,7 @@
 t_log *logger = NULL;
 t_cpu_config *config = NULL;
 t_cpu_info_ejecucion_actual *info_ejecucion_actual = NULL;
-
 bool hay_interrupcion = false;
-
-int socket_memoria = -1;
 
 int main(int argc, char **argv)
 {

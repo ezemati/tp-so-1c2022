@@ -28,6 +28,8 @@ void suspender_proceso(t_kernel_pcb *pcb)
 {
     pcb->estado = S_SUSPENDED_BLOCKED;
 
+    int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, logger);
+
     t_memoria_suspenderproceso_request *request = suspenderproceso_request_new(pcb->id, pcb->tabla_paginas_primer_nivel);
     int bytes = 0;
     void *request_serializada = serializar_suspenderproceso_request(request, &bytes);
@@ -41,6 +43,8 @@ void suspender_proceso(t_kernel_pcb *pcb)
     bool ok = response->ok;
     suspenderproceso_response_destroy(response);
     free(response_serializada);
+
+    liberar_conexion(socket_memoria);
 
     if (!ok)
     {

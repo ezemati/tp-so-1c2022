@@ -7,11 +7,6 @@ t_list *lista_ready = NULL;
 t_list *lista_suspended_ready = NULL;
 t_list *lista_new = NULL;
 
-int socket_servidor = -1;
-int socket_memoria = -1;
-int socket_cpu_dispatch = -1;
-int socket_cpu_interrupt = -1;
-
 pthread_mutex_t mutex_lista_procesos;
 pthread_mutex_t mutex_lista_ready;
 pthread_mutex_t mutex_lista_suspended_ready;

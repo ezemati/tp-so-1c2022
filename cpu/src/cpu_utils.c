@@ -10,8 +10,6 @@ static void finalizar_proceso();
 void inicializar_cpu(char **argv)
 {
 	config = cpu_config_new("cfg/cpu.config", logger);
-
-	socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, logger);
 }
 
 void terminar_cpu()
@@ -20,8 +18,6 @@ void terminar_cpu()
 	log_destroy(logger);
 
 	cpu_config_destroy(config);
-
-	liberar_conexion(socket_memoria);
 }
 
 void procesar_request(int socket_cliente)
@@ -63,6 +59,8 @@ void realizar_handshake_con_memoria(t_cpu_config *config)
 {
 	log_info_if_logger_not_null(logger, "Realizando handshake con Memoria");
 
+	int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, logger);
+
 	enviar_uint32_por_socket(socket_memoria, HANDSHAKE_INFO_TRADUCCION);
 
 	void *buffer_response = NULL;
@@ -76,6 +74,7 @@ void realizar_handshake_con_memoria(t_cpu_config *config)
 
 	handshakeconfiguraciones_memoria_response_destroy(response);
 	free(buffer_response);
+	liberar_conexion(socket_memoria);
 }
 
 void realizar_ejecucion()
@@ -133,10 +132,14 @@ uint32_t traducir_direccion_logica_a_fisica(uint32_t direccion_logica)
 	uint32_t entrada_tablasegundonivel = numero_pagina % config->memoria_entradas_por_tabla;
 	uint32_t desplazamiento = direccion_logica - (numero_pagina * config->memoria_tamanio_pagina);
 
+	int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, logger);
+
 	uint32_t numero_tablasegundonivel = obtener_numero_tabla_2_para_entrada_tabla_1(socket_memoria, info_ejecucion_actual->tabla_paginas_primer_nivel, entrada_tablaprimernivel);
 	uint32_t numero_marco = obtener_numero_marco_para_entrada_tabla_2(socket_memoria, info_ejecucion_actual->tabla_paginas_primer_nivel, numero_tablasegundonivel, entrada_tablasegundonivel);
 
 	uint32_t direccion_fisica = (numero_marco * config->memoria_tamanio_pagina) + desplazamiento;
+
+	liberar_conexion(socket_memoria);
 
 	log_info_if_logger_not_null(logger, "Traduccion -- Logica=%d -- Fisica=%d", direccion_logica, direccion_fisica);
 
