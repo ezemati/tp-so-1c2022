@@ -82,6 +82,7 @@ void realizar_ejecucion()
 {
 	// Ejecuta infinitamente hasta que llegue una interrupcion del Kernel,
 	// ejecute una instruccion de IO o finalice (instruccion EXIT)
+	info_ejecucion_actual->time_inicio_running = current_time();
 	code_instruccion ultima_instruccion_ejecutada;
 	do
 	{
@@ -105,6 +106,8 @@ void realizar_ejecucion()
 
 		// CHECK INTERRUPT (se chequea automaticamente por la condicion del while)
 	} while (!ejecucion_completada(info_ejecucion_actual) && !hay_interrupcion && ultima_instruccion_ejecutada != IO && ultima_instruccion_ejecutada != EXIT);
+
+	info_ejecucion_actual->time_fin_running = current_time();
 
 	if (hay_interrupcion)
 	{

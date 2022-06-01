@@ -8,7 +8,7 @@ t_cpu_info_ejecucion_actual *infoejecucionactual_new(t_cpu_ejecutarproceso_reque
     info_ejecucion_actual->program_counter = request->program_counter;
     info_ejecucion_actual->tabla_paginas_primer_nivel = request->tabla_paginas_primer_nivel;
     info_ejecucion_actual->lista_instrucciones = instrucciones_duplicate(request->lista_instrucciones);
-    info_ejecucion_actual->time_inicio_running = current_time();
+    // info_ejecucion_actual->time_inicio_running = current_time();
     return info_ejecucion_actual;
 }
 
