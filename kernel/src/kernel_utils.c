@@ -73,6 +73,7 @@ void *procesar_cliente(void *args)
 		// hay que avisarle a la Consola cuando el proceso termine la ejecucion
 		liberar_conexion(socket_cliente);
 	}
+
 	free(args);
 
 	return NULL;
@@ -231,7 +232,7 @@ void enviar_nuevo_proceso_a_cpu(t_kernel_pcb *pcb_a_ejecutar)
 {
 	int socket_dispatch_cpu = crear_conexion(config->ip_cpu, config->puerto_cpu_dispatch, logger);
 
-	t_cpu_ejecutarproceso_request *request = ejecutarproceso_request_new(pcb_a_ejecutar->id, pcb_a_ejecutar->program_counter, pcb_a_ejecutar->lista_instrucciones);
+	t_cpu_ejecutarproceso_request *request = ejecutarproceso_request_new(pcb_a_ejecutar->id, pcb_a_ejecutar->tamanio, pcb_a_ejecutar->program_counter, pcb_a_ejecutar->tabla_paginas_primer_nivel, pcb_a_ejecutar->lista_instrucciones);
 	int bytes_request_serializada;
 	void *request_serializada = serializar_ejecutarproceso_request(request, &bytes_request_serializada);
 	enviar_buffer_serializado_con_instruccion_y_bytes_por_socket(socket_dispatch_cpu, EJECUTAR_PROCESO, request_serializada, bytes_request_serializada);

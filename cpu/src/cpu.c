@@ -1,7 +1,9 @@
-#include "cpu.h"
+#include <cpu.h>
 
-t_log *logger;
+t_log *logger = NULL;
 t_cpu_config *config = NULL;
+t_cpu_info_ejecucion_actual *info_ejecucion_actual = NULL;
+bool hay_interrupcion = false;
 
 int main(int argc, char **argv)
 {
@@ -18,11 +20,40 @@ int main(int argc, char **argv)
 
 	realizar_handshake_con_memoria(config);
 
+	pthread_t thread_interrupt_id;
+	pthread_create(&thread_interrupt_id, NULL, (void *)interrupt_listener, NULL);
+	pthread_detach(thread_interrupt_id);
+
+	int socket_servidor_dispatch = iniciar_servidor(config->puerto_escucha_dispatch, logger);
+
 	while (true)
 	{
-		// TODO: ver aca como deberia ser (la CPU tiene que escuchar por dos puertos a la vez)
-		break;
+		int socket_cliente_dispatch = esperar_cliente(socket_servidor_dispatch);
+		procesar_request(socket_cliente_dispatch);
 	}
 
 	terminar_cpu();
+
+	return 0;
+}
+
+void *interrupt_listener(void *args)
+{
+	int socket_servidor_interrupt = iniciar_servidor(config->puerto_escucha_interrupt, logger);
+
+	while (true)
+	{
+		int socket_cliente_interrupt = esperar_cliente(socket_servidor_interrupt);
+
+		uint32_t recibido;
+		recibir_uint32_por_socket(socket_cliente_interrupt, &recibido);
+		if (recibido == 1)
+		{
+			hay_interrupcion = true;
+		}
+
+		liberar_conexion(socket_cliente_interrupt);
+	}
+
+	return NULL;
 }

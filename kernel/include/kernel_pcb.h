@@ -5,6 +5,8 @@
 #include <kernel_variables_globales.h>
 #include <types/programa.h>
 
+#include <utils/converter.h>
+
 #include <stdint.h>
 #include <stdlib.h>
 #include <time.h>

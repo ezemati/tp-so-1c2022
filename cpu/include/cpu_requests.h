@@ -1,13 +1,17 @@
-#ifndef KERNEL_PLANIFICADOR_MEDIANO_PLAZO_H
-#define KERNEL_PLANIFICADOR_MEDIANO_PLAZO_H
+#ifndef CPU_REQUESTS_H
+#define CPU_REQUESTS_H
 
-#include <kernel_config.h>
-#include <kernel_utils.h>
-#include <kernel_pcb.h>
-#include <kernel_variables_globales.h>
+#include <cpu_config.h>
+#include <cpu_utils.h>
+#include <cpu_variables_globales.h>
+
+#include <cpu_info_ejecucion_actual.h>
+
+#include <cpu/ejecutar_proceso.h>
+
+#include <types/programa.h>
 
 #include <utils/sockets.h>
-#include <utils/converter.h>
 #include <types/identificador_operacion.h>
 
 #include <netdb.h>
@@ -23,7 +27,6 @@
 #include <commons/string.h>
 #include <commons/txt.h>
 
-void mediano_plazo_intentar_pasar_proceso_a_memoria();
-void suspender_proceso(t_kernel_pcb *pcb);
+void atender_ejecutar_proceso(int socket_cliente);
 
 #endif
