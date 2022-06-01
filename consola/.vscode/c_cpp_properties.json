@@ -4,6 +4,8 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}",
+                "${workspaceFolder}/include",
+                "${workspaceFolder}/../shared/include",
                 "/usr/include/c++/5",
                 "/usr/include/i386-linux-gnu/c++/5",
                 "/usr/include/c++/5/backward",
@@ -12,13 +14,14 @@
                 "/usr/lib/gcc/i686-linux-gnu/5/include-fixed",
                 "/usr/include/i386-linux-gnu",
                 "/usr/include",
-                "${workspaceFolder}/include",
-                "${workspaceFolder}/../shared/include",
                 "/usr/include/c++/10",
                 "/usr/include/x86_64-linux-gnu/c++/10",
                 "/usr/include/c++/10/backward",
                 "/usr/lib/gcc/x86_64-linux-gnu/10/include",
-                "/usr/lib/gcc/x86_64-linux-gnu/10/include",
+                "/usr/include/c++/11",
+                "/usr/include/x86_64-linux-gnu/c++/11",
+                "/usr/include/c++/11/backward",
+                "/usr/lib/gcc/x86_64-linux-gnu/11/include",
                 "/usr/include/x86_64-linux-gnu"
             ],
             "defines": [
@@ -42,7 +45,10 @@
                     "/usr/include/x86_64-linux-gnu/c++/10",
                     "/usr/include/c++/10/backward",
                     "/usr/lib/gcc/x86_64-linux-gnu/10/include",
-                    "/usr/lib/gcc/x86_64-linux-gnu/10/include",
+                    "/usr/include/c++/11",
+                    "/usr/include/x86_64-linux-gnu/c++/11",
+                    "/usr/include/c++/11/backward",
+                    "/usr/lib/gcc/x86_64-linux-gnu/11/include",
                     "/usr/include/x86_64-linux-gnu"
                 ],
                 "limitSymbolsToIncludedHeaders": true,
