@@ -108,7 +108,12 @@ int enviar_buffer_serializado_con_bytes_por_socket(int socket, void *buffer_seri
 
 int enviar_buffer_por_socket(int socket, void *buffer_serializado, int bytes)
 {
-    return send(socket, buffer_serializado, bytes, 0);
+    int bytes_enviados = 0;
+    while (bytes_enviados < bytes)
+    {
+        bytes_enviados += send(socket, buffer_serializado, bytes, 0);
+    }
+    return bytes_enviados;
 }
 
 int enviar_buffer_serializado_con_instruccion_y_bytes_por_socket(int socket, identificador_operacion operacion, void *buffer_serializado, int bytes)
@@ -162,7 +167,12 @@ int enviar_uint32_por_socket(int socket, uint32_t numero)
 
 int recibir_buffer_por_socket(int socket, void *buffer, int bytes)
 {
-    return recv(socket, buffer, bytes, MSG_WAITALL);
+    int bytes_recibidos = 0;
+    while (bytes_recibidos < bytes)
+    {
+        bytes_recibidos += recv(socket, buffer, bytes, MSG_WAITALL);
+    }
+    return bytes_recibidos;
 }
 
 int recibir_buffer_con_bytes_por_socket(int socket, void **buffer)
