@@ -15,8 +15,8 @@ typedef struct t_cpu_ejecutarproceso_request
     uint32_t pid;
     uint32_t tamanio;
     uint32_t program_counter;
-    t_list *lista_instrucciones; // De tipo t_instruccion
     uint32_t tabla_paginas_primer_nivel;
+    t_list *lista_instrucciones; // De tipo t_instruccion
 } t_cpu_ejecutarproceso_request;
 
 typedef struct t_cpu_ejecutarproceso_response
