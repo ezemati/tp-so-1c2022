@@ -17,6 +17,7 @@ typedef struct t_cpu_config
     uint32_t puerto_memoria;
     uint32_t puerto_escucha_dispatch;
     uint32_t puerto_escucha_interrupt;
+
     uint32_t memoria_entradas_por_tabla;
     uint32_t memoria_tamanio_pagina;
 } t_cpu_config;
