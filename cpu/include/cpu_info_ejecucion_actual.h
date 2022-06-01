@@ -20,8 +20,8 @@ typedef struct t_cpu_info_ejecucion_actual
     uint32_t tamanio;
     uint32_t program_counter;
     uint32_t tabla_paginas_primer_nivel;
+    uint32_t bloqueo_pendiente;
     t_list *lista_instrucciones; // De tipo t_instruccion
-    // uint32_t bloqueo_pendiente;
     time_t time_inicio_running;
     time_t time_fin_running;
     code_instruccion ultima_instruccion_ejecutada;

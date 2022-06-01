@@ -38,8 +38,8 @@ void ejecutar_noop(t_instruccion *instruccion)
 
 void ejecutar_io(t_instruccion *instruccion)
 {
-    // TODO
     uint32_t duracion_io = instruccion->parametros[0];
+    info_ejecucion_actual->bloqueo_pendiente = duracion_io;
     log_info_if_logger_not_null(logger, "PID %d: IO por %d milisegundos", info_ejecucion_actual->pid, duracion_io);
 }
 

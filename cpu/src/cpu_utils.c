@@ -150,6 +150,11 @@ uint32_t traducir_direccion_logica_a_fisica(uint32_t direccion_logica)
 	return direccion_fisica;
 }
 
+void proceso_desalojado_de_cpu()
+{
+	infoejecucionactual_destroy(info_ejecucion_actual);
+}
+
 static uint32_t obtener_numero_tabla_2_para_entrada_tabla_1(int socket_memoria, uint32_t numero_tablaprimernivel, uint32_t entrada_tablaprimernivel)
 {
 	t_memoria_numerotabla2paraentradatabla1_request *request_numerotabla2paraentradatabla1 = numerotabla2paraentradatabla1_request_new(info_ejecucion_actual->tabla_paginas_primer_nivel, entrada_tablaprimernivel);
@@ -199,6 +204,14 @@ static void desalojar_proceso()
 
 static void bloquear_proceso()
 {
+	t_kernel_actualizarpcb_request *request = actualizarpcb_request_new(info_ejecucion_actual->pid, info_ejecucion_actual->program_counter, info_ejecucion_actual->bloqueo_pendiente, info_ejecucion_actual->time_inicio_running, info_ejecucion_actual->time_fin_running);
+	int bytes_request_serializada;
+	void *request_serializada = serializar_actualizarpcb_request(request, &bytes_request_serializada);
+	enviar_buffer_serializado_con_instruccion_y_bytes_por_socket(socket_conexion_kernel, BLOQUEAR_PROCESO, request_serializada, bytes_request_serializada);
+	free(request_serializada);
+	actualizarpcb_request_destroy(request);
+
+	proceso_desalojado_de_cpu();
 }
 
 static void finalizar_proceso()
