@@ -37,6 +37,13 @@ void replanificar()
     }
 
     t_kernel_pcb *pcb_a_ejecutar = obtener_proximo_para_ejecutar();
+    if (pcb_a_ejecutar == NULL)
+    {
+    	log_info_if_logger_not_null(logger, "No hay ningun proceso para ejecutar...");
+    	return;
+    }
+
+    log_info_if_logger_not_null(logger, "Proceso %d seleccionado para ejecutar", pcb_a_ejecutar->id);
 
     pthread_mutex_lock(&mutex_lista_ready);
     sacar_proceso_de_lista(lista_ready, pcb_a_ejecutar);
