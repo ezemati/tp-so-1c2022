@@ -18,6 +18,11 @@ int main(int argc, char **argv)
 	inicializar_memoria(argv);
 
 	int socket_servidor = iniciar_servidor(config->puerto_escucha, logger);
+	if (socket_servidor == -1)
+	{
+		log_error_if_logger_not_null(logger, "Memoria no pudo crear el socket de servidor");
+		exit(EXIT_FAILURE);
+	}
 
 	while (true)
 	{

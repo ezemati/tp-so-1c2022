@@ -44,6 +44,11 @@ int main(int argc, char **argv)
 	pthread_detach(thread_escucha_cpu_dispatch_id);
 
 	int socket_servidor = iniciar_servidor(config->puerto_escucha, logger);
+	if (socket_servidor == -1)
+	{
+		log_error_if_logger_not_null(logger, "Kernel no pudo crear el socket de servidor");
+		exit(EXIT_FAILURE);
+	}
 
 	while (true)
 	{

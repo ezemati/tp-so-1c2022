@@ -27,6 +27,11 @@ int main(int argc, char **argv)
 	pthread_detach(thread_interrupt_id);
 
 	int socket_servidor_dispatch = iniciar_servidor(config->puerto_escucha_dispatch, logger);
+	if (socket_servidor_dispatch == -1)
+	{
+		log_error_if_logger_not_null(logger, "CPU no pudo crear el socket de servidor de dispatch");
+		exit(EXIT_FAILURE);
+	}
 
 	while (true)
 	{
@@ -42,6 +47,11 @@ int main(int argc, char **argv)
 void *interrupt_listener(void *args)
 {
 	int socket_servidor_interrupt = iniciar_servidor(config->puerto_escucha_interrupt, logger);
+	if (socket_servidor_interrupt == -1)
+	{
+		log_error_if_logger_not_null(logger, "CPU no pudo crear el socket de servidor de interrupt");
+		exit(EXIT_FAILURE);
+	}
 
 	while (true)
 	{
