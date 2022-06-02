@@ -183,7 +183,7 @@ void recalcular_estimacion(t_kernel_pcb *pcb)
 	double real_anterior = pcb->milisegundos_en_running;
 	double nueva_estimacion = alfa * real_anterior + (1 - alfa) * estimacion_anterior;
 	pcb->estimacion_rafaga = nueva_estimacion;
-	log_info_if_logger_not_null(logger, "Nueva estimacion para el proceso %d: %d", pcb->id, nueva_estimacion);
+	log_info_if_logger_not_null(logger, "Nueva estimacion para el proceso %d: %f", pcb->id, nueva_estimacion);
 }
 
 void print_instrucciones(t_kernel_pcb *pcb)

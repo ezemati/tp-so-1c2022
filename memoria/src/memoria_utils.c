@@ -58,7 +58,6 @@ void *procesar_cliente(uint32_t *args)
 	case OBTENER_MARCO_PARA_ENTRADA_TABLA_2:
 		obtener_marco_para_entrada_tabla_2(socket_cliente);
 		break;
-
 	default:
 		enviar_string_con_longitud_por_socket(socket_cliente, "TEST: error");
 		break;

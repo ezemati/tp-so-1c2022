@@ -44,6 +44,7 @@ void *procesar_cliente(void *args)
 	{
 	case HANDSHAKE_SOY_KERNEL:
 		atender_handshake_con_kernel(socket_cliente);
+		break;
 	case EJECUTAR_PROCESO:
 		atender_ejecutar_proceso(socket_cliente);
 		break;

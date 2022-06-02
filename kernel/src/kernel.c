@@ -77,6 +77,7 @@ void handler_escucha_cpu_dispatch()
 			break;
 		case FINALIZAR_PROCESO:
 			atender_finalizar_proceso(socket_conexion_cpu_dispatch);
+			break;
 		default:
 			break;
 		}

@@ -1,4 +1,4 @@
-#include "consola.h"
+#include <consola.h>
 
 t_log *logger = NULL;
 t_consola_config *config = NULL;

@@ -12,7 +12,7 @@ t_programa *programa_new(char *ruta, uint32_t tamanio)
 
 t_programa *programa_new_with_instructions(t_list *instrucciones, uint32_t tamanio)
 {
-    t_programa *programa = malloc(sizeof(programa));
+    t_programa *programa = malloc(sizeof(t_programa));
     programa->ruta = NULL;
     programa->tamanio = tamanio;
     programa->instrucciones = instrucciones;
