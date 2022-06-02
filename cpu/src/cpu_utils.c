@@ -6,6 +6,8 @@ static uint32_t fetch_valor_para_copy(uint32_t direccion_logica_origen);
 static void desalojar_proceso();
 static void bloquear_proceso();
 static void finalizar_proceso();
+static void enviar_pcb_actualizado_a_kernel_con_instruccion(code_instruccion codigo_instruccion);
+static t_kernel_actualizarpcb_request *crear_actualizarpcbrequest_para_infoejecucionactual();
 
 void inicializar_cpu(char **argv)
 {
@@ -108,7 +110,7 @@ void realizar_ejecucion()
 		info_ejecucion_actual->ultima_instruccion_ejecutada = instruccion_a_ejecutar->codigo_instruccion;
 
 		// CHECK INTERRUPT (se chequea automaticamente por la condicion del while)
-	} while (!ejecucion_completada(info_ejecucion_actual) && !hay_interrupcion && info_ejecucion_actual->ultima_instruccion_ejecutada != IO && info_ejecucion_actual->ultima_instruccion_ejecutada != EXIT);
+	} while (!hay_interrupcion && info_ejecucion_actual->ultima_instruccion_ejecutada != IO && !ejecucion_completada(info_ejecucion_actual) && info_ejecucion_actual->ultima_instruccion_ejecutada != EXIT);
 
 	info_ejecucion_actual->time_fin_running = current_time();
 
@@ -196,25 +198,50 @@ static uint32_t obtener_numero_marco_para_entrada_tabla_2(int socket_memoria, ui
 
 static uint32_t fetch_valor_para_copy(uint32_t direccion_logica_origen)
 {
+	// TODO
 	return 0;
 }
 
 static void desalojar_proceso()
 {
-}
-
-static void bloquear_proceso()
-{
-	t_kernel_actualizarpcb_request *request = actualizarpcb_request_new(info_ejecucion_actual->pid, info_ejecucion_actual->program_counter, info_ejecucion_actual->bloqueo_pendiente, info_ejecucion_actual->time_inicio_running, info_ejecucion_actual->time_fin_running);
+	t_kernel_actualizarpcb_request *request = crear_actualizarpcbrequest_para_infoejecucionactual();
 	int bytes_request_serializada;
 	void *request_serializada = serializar_actualizarpcb_request(request, &bytes_request_serializada);
-	enviar_buffer_serializado_con_instruccion_y_bytes_por_socket(socket_conexion_kernel, BLOQUEAR_PROCESO, request_serializada, bytes_request_serializada);
+	enviar_buffer_serializado_con_bytes_por_socket(socket_conexion_kernel_interrupt, request_serializada, bytes_request_serializada);
+
+	liberar_conexion(socket_conexion_kernel_interrupt);
 	free(request_serializada);
 	actualizarpcb_request_destroy(request);
 
 	proceso_desalojado_de_cpu();
 }
 
+static void bloquear_proceso()
+{
+	enviar_pcb_actualizado_a_kernel_con_instruccion(BLOQUEAR_PROCESO);
+
+	proceso_desalojado_de_cpu();
+}
+
 static void finalizar_proceso()
 {
+	enviar_pcb_actualizado_a_kernel_con_instruccion(FINALIZAR_PROCESO);
+
+	proceso_desalojado_de_cpu();
+}
+
+static void enviar_pcb_actualizado_a_kernel_con_instruccion(code_instruccion codigo_instruccion)
+{
+	t_kernel_actualizarpcb_request *request = crear_actualizarpcbrequest_para_infoejecucionactual();
+	int bytes_request_serializada;
+	void *request_serializada = serializar_actualizarpcb_request(request, &bytes_request_serializada);
+	enviar_buffer_serializado_con_instruccion_y_bytes_por_socket(socket_conexion_kernel_dispatch, codigo_instruccion, request_serializada, bytes_request_serializada);
+	free(request_serializada);
+	actualizarpcb_request_destroy(request);
+}
+
+static t_kernel_actualizarpcb_request *crear_actualizarpcbrequest_para_infoejecucionactual()
+{
+	t_kernel_actualizarpcb_request *request = actualizarpcb_request_new(info_ejecucion_actual->pid, info_ejecucion_actual->program_counter, info_ejecucion_actual->bloqueo_pendiente, info_ejecucion_actual->time_inicio_running, info_ejecucion_actual->time_fin_running);
+	return request;
 }

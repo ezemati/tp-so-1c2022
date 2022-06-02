@@ -68,6 +68,5 @@ void ejecutar_copy(t_instruccion *instruccion, uint32_t valor_a_copiar)
 
 void ejecutar_exit(t_instruccion *instruccion)
 {
-    // TODO
     log_info_if_logger_not_null(logger, "PID %d: EXIT", info_ejecucion_actual->pid);
 }

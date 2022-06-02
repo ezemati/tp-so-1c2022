@@ -5,7 +5,8 @@ t_cpu_config *config = NULL;
 t_cpu_info_ejecucion_actual *info_ejecucion_actual = NULL;
 
 bool hay_interrupcion = false;
-int socket_conexion_kernel = -1;
+int socket_conexion_kernel_dispatch = -1;
+int socket_conexion_kernel_interrupt = -1;
 
 int main(int argc, char **argv)
 {
@@ -55,17 +56,18 @@ void *interrupt_listener(void *args)
 
 	while (true)
 	{
-		int socket_cliente_interrupt = esperar_cliente(socket_servidor_interrupt);
+		socket_conexion_kernel_interrupt = esperar_cliente(socket_servidor_interrupt);
 
 		uint32_t recibido;
-		recibir_uint32_por_socket(socket_cliente_interrupt, &recibido);
+		recibir_uint32_por_socket(socket_conexion_kernel_interrupt, &recibido);
 		if (recibido == 1)
 		{
 			log_info_if_logger_not_null(logger, "Interrupcion recibida en CPU");
 			hay_interrupcion = true;
+			// El PCB actualizado se manda al chequear interrupciones en el ciclo de ejecucion
 		}
 
-		liberar_conexion(socket_cliente_interrupt);
+		// liberar_conexion(socket_cliente_interrupt);
 	}
 
 	return NULL;

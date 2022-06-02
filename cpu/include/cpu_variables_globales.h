@@ -13,6 +13,7 @@ extern t_log *logger;
 extern struct t_cpu_info_ejecucion_actual *info_ejecucion_actual;
 
 extern bool hay_interrupcion;
-extern int socket_conexion_kernel;
+extern int socket_conexion_kernel_dispatch;
+extern int socket_conexion_kernel_interrupt;
 
 #endif
