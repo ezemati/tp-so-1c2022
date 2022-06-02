@@ -32,6 +32,8 @@ void *procesar_cliente(uint32_t *args)
 	uint32_t id_op = -1;
 	recibir_uint32_por_socket(socket_cliente, &id_op);
 
+	log_info_if_logger_not_null(logger, "Operacion recibida en Memoria: %s", identificador_operacion_to_string(id_op));
+
 	switch (id_op)
 	{
 	case INICIALIZAR_PROCESO:

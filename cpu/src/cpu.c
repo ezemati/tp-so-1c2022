@@ -61,6 +61,7 @@ void *interrupt_listener(void *args)
 		recibir_uint32_por_socket(socket_cliente_interrupt, &recibido);
 		if (recibido == 1)
 		{
+			log_info_if_logger_not_null(logger, "Interrupcion recibida en CPU");
 			hay_interrupcion = true;
 		}
 

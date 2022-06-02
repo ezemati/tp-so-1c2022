@@ -53,6 +53,8 @@ void *procesar_cliente(void *args)
 	uint32_t id_op = -1;
 	recibir_uint32_por_socket(socket_cliente, &id_op);
 
+	log_info_if_logger_not_null(logger, "Operacion recibida en Kernel: %s", identificador_operacion_to_string(id_op));
+
 	switch (id_op)
 	{
 	case CREAR_PROCESO:
