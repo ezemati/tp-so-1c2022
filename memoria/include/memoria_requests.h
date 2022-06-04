@@ -6,13 +6,14 @@
 #include <utils/sockets.h>
 #include <types/identificador_operacion.h>
 
-#include <memoria/inicializar_proceso.h>
-#include <memoria/finalizar_proceso.h>
-#include <memoria/leer_dato.h>
 #include <memoria/escribir_dato.h>
+#include <memoria/finalizar_proceso.h>
 #include <memoria/handshake_configuraciones.h>
-#include <memoria/numero_tabla_2_para_entrada_tabla_1.h>
+#include <memoria/inicializar_proceso.h>
+#include <memoria/leer_dato.h>
 #include <memoria/marco_para_entrada_tabla_2.h>
+#include <memoria/numero_tabla_2_para_entrada_tabla_1.h>
+#include <memoria/suspender_proceso.h>
 
 #include <netdb.h>
 #include <stdio.h>

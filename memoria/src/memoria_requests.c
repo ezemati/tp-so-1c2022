@@ -24,7 +24,24 @@ void inicializar_proceso(int socket_cliente)
 void suspender_proceso(int socket_cliente)
 {
 	// TODO
-	enviar_string_con_longitud_por_socket(socket_cliente, "TEST: suspendiendo proceso...");
+	void *buffer_request = NULL;
+	recibir_buffer_con_bytes_por_socket(socket_cliente, &buffer_request);
+
+	t_memoria_suspenderproceso_request *request = deserializar_suspenderproceso_request(buffer_request);
+
+	log_debug(logger, "Suspendiendo proceso %d cuya tabla 1N es %d", request->pid, request->numero_tablaprimernivel);
+	// memoria_ram_suspender_proceso(memoria_ram, request->numero_tablaprimernivel);
+
+	bool ok = true;
+	t_memoria_suspenderproceso_response *response = suspenderproceso_response_new(ok);
+	int bytes;
+	void *buffer_response = serializar_suspenderproceso_response(response, &bytes);
+	enviar_buffer_serializado_con_bytes_por_socket(socket_cliente, buffer_response, bytes);
+
+	free(buffer_response);
+	suspenderproceso_response_destroy(response);
+	suspenderproceso_request_destroy(request);
+	free(buffer_request);
 }
 
 void finalizar_proceso(int socket_cliente)
