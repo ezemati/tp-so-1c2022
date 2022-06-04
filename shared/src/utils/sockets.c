@@ -19,10 +19,35 @@ int crear_conexion(char *ip, uint32_t puerto, t_log *logger)
         log_error_if_logger_not_null(logger, "Error al crear el socket con IP %s, PUERTO %s", ip, strPuerto);
         error = true;
     }
-    else if (connect(socket_fd, servinfo->ai_addr, servinfo->ai_addrlen) == -1)
+    else
     {
-        log_error_if_logger_not_null(logger, "Fallo la conexion con el socket con IP %s, PUERTO %s", ip, strPuerto);
-        error = true;
+        bool connect_exitoso = false;
+        int maximo_intentos = 10;
+        double milisegundos_sleep = 1000;
+        for (int intento_actual = 1; intento_actual <= maximo_intentos; intento_actual++)
+        {
+            log_trace_if_logger_not_null(logger, "Intento %d/%d de conexion con IP %s, PUERTO %s", intento_actual, maximo_intentos, ip, strPuerto);
+
+            if (connect(socket_fd, servinfo->ai_addr, servinfo->ai_addrlen) != -1)
+            {
+                log_trace_if_logger_not_null(logger, "Intento %d/%d exitoso", intento_actual, maximo_intentos);
+                connect_exitoso = true;
+                break;
+            }
+
+            log_error_if_logger_not_null(logger, "Intento %d/%d fallido", intento_actual, maximo_intentos);
+            usleep(milisegundos_a_microsegundos(milisegundos_sleep)); // Sleep para darle tiempo al servidor de levantar
+        }
+
+        if (connect_exitoso)
+        {
+            log_trace_if_logger_not_null(logger, "Conexion con IP %s, PUERTO %s establecida correctamente", ip, strPuerto);
+        }
+        else
+        {
+            log_trace_if_logger_not_null(logger, "No se pudo establecer la conexion con IP %s, PUERTO %s", ip, strPuerto);
+            error = true;
+        }
     }
 
     freeaddrinfo(servinfo);

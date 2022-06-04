@@ -1,6 +1,7 @@
 #ifndef UTILS_SOCKETS_H
 #define UTILS_SOCKETS_H
 
+#include <utils/converter.h>
 #include <utils/logs.h>
 #include <utils/string.h>
 #include <serialization/serialization_utils.h>

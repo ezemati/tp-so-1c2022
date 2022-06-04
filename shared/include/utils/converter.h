@@ -7,6 +7,7 @@
 #include <stdio.h>
 
 double milisegundos_a_microsegundos(double milisegundos);
+double milisegundos_a_nanosegundos(double milisegundos);
 double segundos_a_milisegundos(double segundos);
 
 #endif

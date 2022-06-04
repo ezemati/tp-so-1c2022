@@ -5,6 +5,11 @@ double milisegundos_a_microsegundos(double milisegundos)
     return milisegundos * 1000;
 }
 
+double milisegundos_a_nanosegundos(double milisegundos)
+{
+    return milisegundos * 1000000;
+}
+
 double segundos_a_milisegundos(double segundos)
 {
     return segundos * 1000;
