@@ -2,5 +2,5 @@
 FILE=memoria.out
 make
 if test -f "./bin/$FILE"; then
-    ./bin/$FILE cfg/PLANI_CONFIG
+    ./bin/$FILE cfg/SUSPE_CONFIG
 fi
