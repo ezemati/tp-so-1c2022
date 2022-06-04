@@ -12,3 +12,8 @@ time_t current_time()
     return localtime;
     */
 }
+
+double milisegundos_entre_times(time_t t1, time_t t2)
+{
+    return segundos_a_milisegundos(fabs(difftime(t1, t2)));
+}
