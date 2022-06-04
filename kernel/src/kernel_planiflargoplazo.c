@@ -42,7 +42,13 @@ void finalizar_proceso(t_kernel_pcb *pcb)
 
     pcb_destroy(pcb);
 
-    intentar_pasar_proceso_a_memoria();
+    bool se_paso_proceso_a_memoria = intentar_pasar_proceso_a_memoria();
+    if (!se_paso_proceso_a_memoria)
+    {
+        // Si se pudo pasar un proceso a memoria, entonces se replanifica automaticamente,
+        // asi que hay que replanificar aca a mano unicamente si no se pudo pasar ningun proceso
+        replanificar();
+    }
 }
 
 static void pasar_proceso_new_a_ready(t_kernel_pcb *pcb)
