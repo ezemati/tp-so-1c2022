@@ -4,7 +4,7 @@ t_memoria_config *memoria_config_new(char *config_path, t_log *logger)
 {
     t_memoria_config *mem_config = malloc(sizeof(t_memoria_config));
 
-    t_config *config = config_create("cfg/memoria.config");
+    t_config *config = config_create(config_path);
 
     mem_config->puerto_escucha = config_get_int_value(config, "PUERTO_ESCUCHA");
     mem_config->tamanio_memoria = config_get_int_value(config, "TAM_MEMORIA");

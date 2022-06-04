@@ -1,8 +1,11 @@
 #include <memoria_utils.h>
 
-void inicializar_memoria(char **argv)
+void inicializar_memoria(int argc, char **argv)
 {
-	config = memoria_config_new("cfg/memoria.config", logger);
+	char *ruta_config = argc > 1
+							? argv[1]
+							: "cfg/memoria.config";
+	config = memoria_config_new(ruta_config, logger);
 	memoria_ram = memoria_ram_new();
 }
 

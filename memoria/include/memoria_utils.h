@@ -22,7 +22,7 @@
 #include <commons/string.h>
 #include <commons/txt.h>
 
-void inicializar_memoria(char **argv);
+void inicializar_memoria(int argc, char **argv);
 void terminar_memoria();
 void procesar_request(int socket_cliente);
 void *procesar_cliente(uint32_t *args);

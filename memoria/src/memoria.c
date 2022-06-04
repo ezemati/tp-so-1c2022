@@ -15,7 +15,7 @@ int main(int argc, char **argv)
 	logger = log_create("cfg/memoria.log", "Memoria", true, LOG_LEVEL_TRACE);
 	log_debug(logger, "Inicializando memoria...");
 
-	inicializar_memoria(argv);
+	inicializar_memoria(argc, argv);
 
 	int socket_servidor = iniciar_servidor(config->puerto_escucha, logger);
 	if (socket_servidor == -1)
