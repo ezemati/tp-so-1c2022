@@ -22,6 +22,8 @@ void agregar_proceso_a_ready(t_kernel_pcb *pcb)
 
 void bloquear_proceso(t_kernel_pcb *pcb)
 {
+    log_info_if_logger_not_null(logger, "Pasando proceso %d a BLOCKED", pcb->id);
+
     pcb->estado = S_BLOCKED;
     pthread_t thread_id;
     pthread_create(&thread_id, NULL, (void *)thread_proceso_blocked, pcb);
@@ -93,11 +95,11 @@ static void thread_proceso_blocked(void *args)
     t_kernel_pcb *pcb = args;
     int tiempo_bloqueo = pcb->bloqueo_pendiente;
     int microsegundos = milisegundos_a_microsegundos(tiempo_bloqueo); // tiempo_bloqueo esta en milisegundos
-    log_info_if_logger_not_null(logger, "Proceso %d entrando en bloqueo por %dms", pcb->id, tiempo_bloqueo);
+    log_info_if_logger_not_null(logger, "Proceso %d entrando en BLOCKED por %dms", pcb->id, tiempo_bloqueo);
 
     usleep(microsegundos);
 
-    log_info_if_logger_not_null(logger, "Proceso %d saliendo de bloqueo y pasando a READY", pcb->id);
+    log_info_if_logger_not_null(logger, "Proceso %d saliendo de BLOCKED y pasando a READY", pcb->id);
     pcb->bloqueo_pendiente = 0;
     agregar_proceso_a_ready(pcb);
 }

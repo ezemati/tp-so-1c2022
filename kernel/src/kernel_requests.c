@@ -10,6 +10,7 @@ void atender_crear_proceso(int socket_cliente)
 	log_debug(logger, "Recibi proceso con tamanio %d y %d instrucciones", programa->tamanio, programa_cantidad_instrucciones(programa));
 	uint32_t proximo_pid = obtener_proximo_pid();
 	t_kernel_pcb *nuevo_pcb = pcb_new(proximo_pid, socket_cliente, programa);
+	log_info_if_logger_not_null(logger, "Proceso %d en NEW", nuevo_pcb->id);
 
 	pthread_mutex_lock(&mutex_lista_procesos);
 	list_add(lista_procesos, nuevo_pcb);

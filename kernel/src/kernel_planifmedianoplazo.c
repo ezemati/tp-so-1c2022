@@ -32,6 +32,8 @@ bool mediano_plazo_intentar_pasar_proceso_a_memoria()
 
 void suspender_proceso(t_kernel_pcb *pcb, bool *se_paso_proceso_a_memoria)
 {
+    log_info_if_logger_not_null(logger, "Pasando proceso %d a SUSPENDED_BLOCKED", pcb->id);
+
     pcb->estado = S_SUSPENDED_BLOCKED;
 
     int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, NULL);
@@ -58,8 +60,6 @@ void suspender_proceso(t_kernel_pcb *pcb, bool *se_paso_proceso_a_memoria)
         return;
     }
 
-    log_info_if_logger_not_null(logger, "Proceso %d suspendido", pcb->id);
-
     (*se_paso_proceso_a_memoria) = intentar_pasar_proceso_a_memoria(); // Este proceso paso a SUSPENDED_BLOCKED asi que dejo un espacio de multiprogramacion libre
 
     pthread_t thread_id;
@@ -72,11 +72,11 @@ static void thread_proceso_suspended_blocked(void *args)
     t_kernel_pcb *pcb = args;
     int tiempo_bloqueo = pcb->bloqueo_pendiente;
     int microsegundos = milisegundos_a_microsegundos(tiempo_bloqueo); // tiempo_bloqueo esta en milisegundos
-    log_info_if_logger_not_null(logger, "Proceso %d entrando en suspension por %dms", pcb->id, tiempo_bloqueo);
+    log_info_if_logger_not_null(logger, "Proceso %d entrando en SUSPENDED_BLOCKED por %dms", pcb->id, tiempo_bloqueo);
 
     usleep(microsegundos);
 
-    log_info_if_logger_not_null(logger, "Proceso %d saliendo de suspension", pcb->id);
+    log_info_if_logger_not_null(logger, "Proceso %d saliendo de SUSPENDED_BLOCKED", pcb->id);
     pcb->bloqueo_pendiente = 0;
     pcb->estado = S_SUSPENDED_READY;
 

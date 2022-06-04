@@ -51,7 +51,7 @@ void procesar_request(int socket_cliente)
 void *procesar_cliente(void *args)
 {
 	int socket_cliente = *((int *)args);
-	log_debug(logger, "Cliente conectado por socket %d", socket_cliente);
+	// log_debug(logger, "Cliente conectado por socket %d", socket_cliente);
 
 	uint32_t id_op = -1;
 	recibir_uint32_por_socket(socket_cliente, &id_op);
@@ -188,6 +188,9 @@ void recalcular_estimacion(t_kernel_pcb *pcb)
 	double real_anterior = pcb->milisegundos_en_running;
 	double nueva_estimacion = alfa * real_anterior + (1 - alfa) * estimacion_anterior;
 	pcb->estimacion_rafaga = nueva_estimacion;
+
+	log_trace_if_logger_not_null(logger, "Recalculando estimacion para proceso %d", pcb->id);
+	log_trace_if_logger_not_null(logger, "{ EstimacionAnterior=%f, RealAnterior=%f }", estimacion_anterior, real_anterior);
 	log_info_if_logger_not_null(logger, "Nueva estimacion para el proceso %d: %f", pcb->id, nueva_estimacion);
 }
 
@@ -218,6 +221,8 @@ void print_instrucciones_de_todos_los_procesos(t_list *pcbs)
 
 void enviar_interrupcion_a_cpu()
 {
+	log_info_if_logger_not_null(logger, "Enviando interrupcion a CPU para desalojar proceso");
+
 	int socket_interrupt_cpu = crear_conexion(config->ip_cpu, config->puerto_cpu_interrupt, NULL);
 
 	uint32_t interrumpir_ejecucion = 1;
@@ -243,6 +248,8 @@ void enviar_interrupcion_a_cpu()
 
 void enviar_proceso_a_cpu_para_ejecucion(t_kernel_pcb *pcb_a_ejecutar)
 {
+	log_info_if_logger_not_null(logger, "Enviado proceso %d a CPU para ejecutar", pcb_a_ejecutar->id);
+
 	int socket_dispatch_cpu = crear_conexion(config->ip_cpu, config->puerto_cpu_dispatch, NULL);
 
 	t_cpu_ejecutarproceso_request *request = ejecutarproceso_request_new(pcb_a_ejecutar->id, pcb_a_ejecutar->tamanio, pcb_a_ejecutar->program_counter, pcb_a_ejecutar->tabla_paginas_primer_nivel, pcb_a_ejecutar->lista_instrucciones);

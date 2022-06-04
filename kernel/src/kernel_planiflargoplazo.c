@@ -32,6 +32,8 @@ bool largo_plazo_intentar_pasar_proceso_a_memoria()
 
 void finalizar_proceso(t_kernel_pcb *pcb)
 {
+    log_info_if_logger_not_null(logger, "Pasando proceso %d a EXIT", pcb->id);
+
     pcb->estado = S_EXIT;
     finalizar_proceso_en_memoria(pcb);
     finalizar_proceso_en_consola(pcb);

@@ -38,7 +38,7 @@ void procesar_request(int socket_cliente)
 void *procesar_cliente(void *args)
 {
 	int socket_cliente = *((int *)args);
-	log_debug(logger, "Cliente conectado por socket %d", socket_cliente);
+	// log_debug(logger, "Cliente conectado por socket %d", socket_cliente);
 
 	uint32_t id_op = -1;
 	recibir_uint32_por_socket(socket_cliente, &id_op);
