@@ -2,5 +2,5 @@
 FILE=cpu.out
 make
 if test -f "./bin/$FILE"; then
-    ./bin/$FILE
+    ./bin/$FILE cfg/PLANI_CONFIG
 fi

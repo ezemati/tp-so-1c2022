@@ -39,8 +39,8 @@ void replanificar()
     t_kernel_pcb *pcb_a_ejecutar = obtener_proximo_para_ejecutar();
     if (pcb_a_ejecutar == NULL)
     {
-    	log_info_if_logger_not_null(logger, "No hay ningun proceso para ejecutar...");
-    	return;
+        log_info_if_logger_not_null(logger, "No hay ningun proceso para ejecutar...");
+        return;
     }
 
     log_info_if_logger_not_null(logger, "Proceso %d seleccionado para ejecutar", pcb_a_ejecutar->id);
@@ -80,7 +80,7 @@ static t_kernel_pcb *obtener_proximo_para_ejecutar_srt()
                    ? elementPcb1
                    : elementPcb2;
     }
-    return list_get_minimum(lista_ready, pcb_con_estimacion_minima);
+    return list_get_minimum_or_null_if_empty(lista_ready, pcb_con_estimacion_minima);
 }
 
 static bool algoritmo_es_con_desalojo()

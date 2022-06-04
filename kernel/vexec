@@ -2,5 +2,5 @@
 FILE=kernel.out
 make
 if test -f "./bin/$FILE"; then
-    valgrind --tool=memcheck --leak-check=yes --show-possibly-lost=no --show-reachable=no --num-callers=20 ./bin/$FILE
+    valgrind --tool=memcheck --leak-check=yes --show-possibly-lost=no --show-reachable=no --num-callers=20 ./bin/$FILE cfg/PLANI_CONFIG
 fi

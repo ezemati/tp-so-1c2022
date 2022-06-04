@@ -19,3 +19,10 @@ void *list_get_last_element(t_list *list)
 
     return element;
 }
+
+void *list_get_minimum_or_null_if_empty(t_list *list, void *(*minimum)(void *, void *))
+{
+    return list_size(list) > 0
+               ? list_get_minimum(list, minimum)
+               : NULL;
+}

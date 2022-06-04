@@ -11,7 +11,7 @@
             "preLaunchTask": "Kernel - Make",
             "program": "${workspaceFolder}/bin/kernel.out",
             "args": [
-                // "--test"
+                "cfg/PLANI_CONFIG"
             ],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",

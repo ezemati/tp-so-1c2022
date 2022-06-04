@@ -227,11 +227,15 @@ void enviar_interrupcion_a_cpu()
 	recibir_buffer_con_bytes_por_socket(socket_interrupt_cpu, &response_serializada);
 	t_kernel_actualizarpcb_request *pcb_actualizado = deserializar_actualizarpcb_request(response_serializada);
 
+	hay_proceso_en_ejecucion = false;
+
 	t_kernel_pcb *pcb = obtener_proceso_por_pid(pcb_actualizado->pid);
 	pcb->program_counter = pcb_actualizado->program_counter;
 	cargar_tiempo_ejecucion_en_cpu(pcb, pcb_actualizado->time_inicio_running, pcb_actualizado->time_fin_running);
-
-	hay_proceso_en_ejecucion = false;
+	pcb->estado = S_READY;
+	pthread_mutex_lock(&mutex_lista_ready);
+    list_add(lista_ready, pcb);
+    pthread_mutex_unlock(&mutex_lista_ready);
 
 	actualizarpcb_request_destroy(pcb_actualizado);
 	free(response_serializada);
