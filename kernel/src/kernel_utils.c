@@ -1,8 +1,11 @@
 #include <kernel_utils.h>
 
-void inicializar_kernel(char **argv)
+void inicializar_kernel(int argc, char **argv)
 {
-	config = kernel_config_new("cfg/kernel.config", logger);
+	char *ruta_config = argc > 1
+							? argv[1]
+							: "cfg/kernel.config";
+	config = kernel_config_new(ruta_config, logger);
 	lista_procesos = list_create();
 	lista_ready = list_create();
 	lista_suspended_ready = list_create();

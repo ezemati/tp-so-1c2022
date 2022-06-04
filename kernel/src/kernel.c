@@ -26,7 +26,7 @@ int main(int argc, char **argv)
 	logger = log_create("cfg/kernel.log", "Kernel", true, LOG_LEVEL_TRACE);
 	log_debug(logger, "Inicializando Kernel...");
 
-	inicializar_kernel(argv);
+	inicializar_kernel(argc, argv);
 
 	log_info_if_logger_not_null(logger, "Realizando handshake con CPU dispatch");
 	socket_conexion_cpu_dispatch = crear_conexion(config->ip_cpu, config->puerto_cpu_dispatch, logger);

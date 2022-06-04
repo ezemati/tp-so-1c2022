@@ -4,7 +4,7 @@ t_kernel_config *kernel_config_new(char *config_path, t_log *logger)
 {
     t_kernel_config *kernel_config = malloc(sizeof(t_kernel_config));
 
-    t_config *config = config_create("cfg/kernel.config");
+    t_config *config = config_create(config_path);
 
     kernel_config->ip_memoria = string_duplicate(config_get_string_value(config, "IP_MEMORIA"));
     kernel_config->puerto_memoria = config_get_int_value(config, "PUERTO_MEMORIA");

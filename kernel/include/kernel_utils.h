@@ -35,8 +35,7 @@
 #include <commons/string.h>
 #include <commons/txt.h>
 
-// Funciones del Kernel como servidor
-void inicializar_kernel(char **argv);
+void inicializar_kernel(int argc, char **argv);
 void terminar_kernel();
 void procesar_request(int socket_cliente);
 void *procesar_cliente(void *args);
