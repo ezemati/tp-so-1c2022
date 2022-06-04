@@ -34,7 +34,7 @@ void suspender_proceso(t_kernel_pcb *pcb, bool *se_paso_proceso_a_memoria)
 {
     pcb->estado = S_SUSPENDED_BLOCKED;
 
-    int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, logger);
+    int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, NULL);
 
     t_memoria_suspenderproceso_request *request = suspenderproceso_request_new(pcb->id, pcb->tabla_paginas_primer_nivel);
     int bytes = 0;

@@ -142,7 +142,7 @@ uint32_t traducir_direccion_logica_a_fisica(uint32_t direccion_logica)
 	uint32_t entrada_tablasegundonivel = numero_pagina % config->memoria_entradas_por_tabla;
 	uint32_t desplazamiento = direccion_logica - (numero_pagina * config->memoria_tamanio_pagina);
 
-	int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, logger);
+	int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, NULL);
 
 	uint32_t numero_tablasegundonivel = obtener_numero_tabla_2_para_entrada_tabla_1(socket_memoria, info_ejecucion_actual->tabla_paginas_primer_nivel, entrada_tablaprimernivel);
 	uint32_t numero_marco = obtener_numero_marco_para_entrada_tabla_2(socket_memoria, info_ejecucion_actual->tabla_paginas_primer_nivel, numero_tablasegundonivel, entrada_tablasegundonivel);

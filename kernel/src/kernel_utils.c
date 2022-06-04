@@ -218,7 +218,7 @@ void print_instrucciones_de_todos_los_procesos(t_list *pcbs)
 
 void enviar_interrupcion_a_cpu()
 {
-	int socket_interrupt_cpu = crear_conexion(config->ip_cpu, config->puerto_cpu_interrupt, logger);
+	int socket_interrupt_cpu = crear_conexion(config->ip_cpu, config->puerto_cpu_interrupt, NULL);
 
 	uint32_t interrumpir_ejecucion = 1;
 	enviar_uint32_por_socket(socket_interrupt_cpu, interrumpir_ejecucion);
@@ -243,7 +243,7 @@ void enviar_interrupcion_a_cpu()
 
 void enviar_proceso_a_cpu_para_ejecucion(t_kernel_pcb *pcb_a_ejecutar)
 {
-	int socket_dispatch_cpu = crear_conexion(config->ip_cpu, config->puerto_cpu_dispatch, logger);
+	int socket_dispatch_cpu = crear_conexion(config->ip_cpu, config->puerto_cpu_dispatch, NULL);
 
 	t_cpu_ejecutarproceso_request *request = ejecutarproceso_request_new(pcb_a_ejecutar->id, pcb_a_ejecutar->tamanio, pcb_a_ejecutar->program_counter, pcb_a_ejecutar->tabla_paginas_primer_nivel, pcb_a_ejecutar->lista_instrucciones);
 	int bytes_request_serializada;

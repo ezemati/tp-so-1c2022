@@ -53,7 +53,7 @@ void finalizar_proceso(t_kernel_pcb *pcb)
 
 static void pasar_proceso_new_a_ready(t_kernel_pcb *pcb)
 {
-    int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, logger);
+    int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, NULL);
 
     t_memoria_inicializarproceso_request *request = inicializarproceso_request_new(pcb->id, pcb->tamanio);
     int bytes_request_serializada = 0;
@@ -78,7 +78,7 @@ static void pasar_proceso_new_a_ready(t_kernel_pcb *pcb)
 
 static void finalizar_proceso_en_memoria(t_kernel_pcb *pcb)
 {
-    int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, logger);
+    int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, NULL);
 
     t_memoria_finalizarproceso_request *request = finalizarproceso_request_new(pcb->id, pcb->tabla_paginas_primer_nivel);
     int bytes_request_serializada = 0;
