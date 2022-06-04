@@ -19,7 +19,7 @@ int main(int argc, char **argv)
 	logger = log_create("cfg/cpu.log", "CPU", true, LOG_LEVEL_TRACE);
 	log_debug(logger, "Inicializando CPU...");
 
-	inicializar_cpu(argv);
+	inicializar_cpu(argc, argv);
 
 	realizar_handshake_con_memoria(config);
 

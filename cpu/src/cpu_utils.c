@@ -9,9 +9,12 @@ static void finalizar_proceso();
 static void enviar_pcb_actualizado_a_kernel_con_instruccion(code_instruccion codigo_instruccion);
 static t_kernel_actualizarpcb_request *crear_actualizarpcbrequest_para_infoejecucionactual();
 
-void inicializar_cpu(char **argv)
+void inicializar_cpu(int argc, char **argv)
 {
-	config = cpu_config_new("cfg/cpu.config", logger);
+	char *ruta_config = argc > 1
+							? argv[1]
+							: "cfg/cpu.config";
+	config = cpu_config_new(ruta_config, logger);
 }
 
 void terminar_cpu()

@@ -30,7 +30,7 @@
 #include <commons/log.h>
 #include <commons/string.h>
 
-void inicializar_cpu(char **argv);
+void inicializar_cpu(int argc, char **argv);
 void terminar_cpu();
 void procesar_request(int socket_cliente);
 void *procesar_cliente(void *args);
