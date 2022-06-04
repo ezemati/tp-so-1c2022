@@ -4,7 +4,7 @@ t_consola_config *consola_config_new(char *config_path, t_log *logger)
 {
     t_consola_config *cons_config = malloc(sizeof(t_consola_config));
 
-    t_config *config = config_create("cfg/consola.config");
+    t_config *config = config_create(config_path);
 
     cons_config->ip_kernel = string_duplicate(config_get_string_value(config, "IP_KERNEL"));
     cons_config->puerto_kernel = config_get_int_value(config, "PUERTO_KERNEL");

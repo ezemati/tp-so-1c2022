@@ -15,14 +15,15 @@ int main(int argc, char **argv)
 	logger = log_create("cfg/consola.log", "Consola", true, LOG_LEVEL_TRACE);
 	log_debug(logger, "Inicializando consola");
 
-	if (argc != 3)
+	if (argc < 3)
 	{
 		log_error(logger, "Cantidad de parametros incorrecta (%d)", argc);
+		log_error(logger, "Formato: ./bin/consola.out PATH_PROGRAMA TAMANIO [PATH_CONFIG]");
 		log_destroy(logger);
 		return EXIT_FAILURE;
 	}
 
-	inicializar_consola(argv);
+	inicializar_consola(argc, argv);
 
 	int bytes;
 	void *programa_serializado = serializar_programa(programa, &bytes);
