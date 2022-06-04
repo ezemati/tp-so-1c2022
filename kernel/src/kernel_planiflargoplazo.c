@@ -8,7 +8,7 @@ bool largo_plazo_intentar_pasar_proceso_a_memoria()
 {
     bool se_agrego_proceso_a_memoria = false;
 
-    while (calcular_multiprogramacion() <= config->grado_multiprogramacion)
+    while (calcular_multiprogramacion() < config->grado_multiprogramacion)
     {
         pthread_mutex_lock(&mutex_lista_new);
         t_kernel_pcb *pcb_new = list_get_first_element(lista_new);

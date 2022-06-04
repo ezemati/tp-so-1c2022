@@ -58,6 +58,8 @@ void suspender_proceso(t_kernel_pcb *pcb, bool *se_paso_proceso_a_memoria)
         return;
     }
 
+    log_info_if_logger_not_null(logger, "Proceso %d suspendido", pcb->id);
+
     (*se_paso_proceso_a_memoria) = intentar_pasar_proceso_a_memoria(); // Este proceso paso a SUSPENDED_BLOCKED asi que dejo un espacio de multiprogramacion libre
 
     pthread_t thread_id;
