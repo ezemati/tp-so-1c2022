@@ -78,7 +78,7 @@ static t_kernel_pcb *obtener_proximo_para_ejecutar_srt()
     {
         t_kernel_pcb *elementPcb1 = element1;
         t_kernel_pcb *elementPcb2 = element2;
-        return elementPcb1->estimacion_rafaga <= elementPcb2->estimacion_rafaga
+        return elementPcb1->estimacion_rafaga < elementPcb2->estimacion_rafaga
                    ? elementPcb1
                    : elementPcb2;
     }
