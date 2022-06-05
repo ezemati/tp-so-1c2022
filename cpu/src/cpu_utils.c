@@ -1,7 +1,7 @@
 #include <cpu_utils.h>
 
-static uint32_t obtener_numero_tabla_2_para_entrada_tabla_1(int socket_memoria, uint32_t numero_tablaprimernivel, uint32_t entrada_tablaprimernivel);
-static uint32_t obtener_numero_marco_para_entrada_tabla_2(int socket_memoria, uint32_t numero_tablaprimernivel, uint32_t numero_tablasegundonivel, uint32_t entrada_tablasegundonivel);
+static uint32_t obtener_numero_tabla_2_para_entrada_tabla_1(uint32_t numero_tablaprimernivel, uint32_t entrada_tablaprimernivel);
+static uint32_t obtener_numero_marco_para_entrada_tabla_2(uint32_t numero_tablaprimernivel, uint32_t numero_tablasegundonivel, uint32_t entrada_tablasegundonivel);
 static uint32_t fetch_valor_para_copy(uint32_t direccion_logica_origen);
 static void desalojar_proceso();
 static void bloquear_proceso();
@@ -135,25 +135,71 @@ void realizar_ejecucion()
 	}
 }
 
-uint32_t traducir_direccion_logica_a_fisica(uint32_t direccion_logica)
+uint32_t traducir_direccion_logica_a_fisica(uint32_t direccion_logica, uint32_t *numero_tablasegundonivel, uint32_t *entrada_tablasegundonivel)
 {
 	uint32_t numero_pagina = floor(direccion_logica / config->memoria_tamanio_pagina);
 	uint32_t entrada_tablaprimernivel = floor(numero_pagina / config->memoria_entradas_por_tabla);
-	uint32_t entrada_tablasegundonivel = numero_pagina % config->memoria_entradas_por_tabla;
+	(*entrada_tablasegundonivel) = numero_pagina % config->memoria_entradas_por_tabla;
 	uint32_t desplazamiento = direccion_logica - (numero_pagina * config->memoria_tamanio_pagina);
 
-	int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, NULL);
-
-	uint32_t numero_tablasegundonivel = obtener_numero_tabla_2_para_entrada_tabla_1(socket_memoria, info_ejecucion_actual->tabla_paginas_primer_nivel, entrada_tablaprimernivel);
-	uint32_t numero_marco = obtener_numero_marco_para_entrada_tabla_2(socket_memoria, info_ejecucion_actual->tabla_paginas_primer_nivel, numero_tablasegundonivel, entrada_tablasegundonivel);
+	(*numero_tablasegundonivel) = obtener_numero_tabla_2_para_entrada_tabla_1(info_ejecucion_actual->tabla_paginas_primer_nivel, entrada_tablaprimernivel);
+	uint32_t numero_marco = obtener_numero_marco_para_entrada_tabla_2(info_ejecucion_actual->tabla_paginas_primer_nivel, *numero_tablasegundonivel, *entrada_tablasegundonivel);
 
 	uint32_t direccion_fisica = (numero_marco * config->memoria_tamanio_pagina) + desplazamiento;
-
-	liberar_conexion(socket_memoria);
 
 	log_info_if_logger_not_null(logger, "Traduccion -- Logica=%d -- Fisica=%d", direccion_logica, direccion_fisica);
 
 	return direccion_fisica;
+}
+
+uint32_t leer_dato(uint32_t direccion_logica_lectura)
+{
+	uint32_t numero_tablasegundonivel, entrada_tablasegundonivel;
+	uint32_t direccion_fisica_lectura = traducir_direccion_logica_a_fisica(direccion_logica_lectura, &numero_tablasegundonivel, &entrada_tablasegundonivel);
+
+	int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, NULL);
+
+	// ? Ver si implementamos lo de leer de multiples paginas
+	uint32_t cantidad_bytes_lectura = sizeof(uint32_t);
+	t_memoria_leerdato_request *request = leerdato_request_new(numero_tablasegundonivel, entrada_tablasegundonivel, direccion_fisica_lectura, cantidad_bytes_lectura);
+	int bytes_request_serializada;
+	void *request_serializada = serializar_leerdato_request(request, &bytes_request_serializada);
+	enviar_buffer_serializado_con_instruccion_y_bytes_por_socket(socket_memoria, LEER_DATO, request_serializada, bytes_request_serializada);
+	free(request_serializada);
+	leerdato_request_destroy(request);
+
+	void *response_serializada = NULL;
+	recibir_buffer_con_bytes_por_socket(socket_memoria, &response_serializada);
+	t_memoria_leerdato_response *response = deserializar_leerdato_response(response_serializada);
+	uint32_t dato_leido = *((uint32_t *)response->dato);
+	leerdato_response_destroy(response);
+	free(response_serializada);
+
+	return dato_leido;
+}
+
+void escribir_o_copiar_dato(uint32_t direccion_logica_destino, uint32_t valor_a_escribir_o_copiar)
+{
+	uint32_t numero_tablasegundonivel, entrada_tablasegundonivel;
+	uint32_t direccion_fisica_escritura = traducir_direccion_logica_a_fisica(direccion_logica_destino, &numero_tablasegundonivel, &entrada_tablasegundonivel);
+
+	int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, NULL);
+
+	// ? Ver si implementamos lo de escribir en multiples paginas
+	uint32_t cantidad_bytes_escritura = sizeof(uint32_t);
+	t_memoria_escribirdato_request *request = escribirdato_request_new(numero_tablasegundonivel, entrada_tablasegundonivel, direccion_fisica_escritura, cantidad_bytes_escritura, &valor_a_escribir_o_copiar);
+	int bytes_request_serializada;
+	void *request_serializada = serializar_escribirdato_request(request, &bytes_request_serializada);
+	enviar_buffer_serializado_con_instruccion_y_bytes_por_socket(socket_memoria, ESCRIBIR_DATO, request_serializada, bytes_request_serializada);
+	free(request_serializada);
+	escribirdato_request_destroy(request);
+
+	void *response_serializada = NULL;
+	recibir_buffer_con_bytes_por_socket(socket_memoria, &response_serializada);
+	t_memoria_escribirdato_response *response = deserializar_escribirdato_response(response_serializada);
+	// uint32_t cantidad_bytes_escritos = response->cantidad_bytes;
+	escribirdato_response_destroy(response);
+	free(response_serializada);
 }
 
 void proceso_desalojado_de_cpu()
@@ -163,8 +209,10 @@ void proceso_desalojado_de_cpu()
 	infoejecucionactual_destroy(info_ejecucion_actual);
 }
 
-static uint32_t obtener_numero_tabla_2_para_entrada_tabla_1(int socket_memoria, uint32_t numero_tablaprimernivel, uint32_t entrada_tablaprimernivel)
+static uint32_t obtener_numero_tabla_2_para_entrada_tabla_1(uint32_t numero_tablaprimernivel, uint32_t entrada_tablaprimernivel)
 {
+	int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, NULL);
+
 	t_memoria_numerotabla2paraentradatabla1_request *request_numerotabla2paraentradatabla1 = numerotabla2paraentradatabla1_request_new(info_ejecucion_actual->tabla_paginas_primer_nivel, entrada_tablaprimernivel);
 	int bytes_request_numerotabla2paraentradatabla1_serializada;
 	void *request_numerotabla2paraentradatabla1_serializada = serializar_numerotabla2paraentradatabla1_request(request_numerotabla2paraentradatabla1, &bytes_request_numerotabla2paraentradatabla1_serializada);
@@ -179,11 +227,15 @@ static uint32_t obtener_numero_tabla_2_para_entrada_tabla_1(int socket_memoria, 
 	numerotabla2paraentradatabla1_response_destroy(response_numerotabla2paraentradatabla1);
 	free(response_numerotabla2paraentradatabla1_serializada);
 
+	liberar_conexion(socket_memoria);
+
 	return numero_tablasegundonivel;
 }
 
-static uint32_t obtener_numero_marco_para_entrada_tabla_2(int socket_memoria, uint32_t numero_tablaprimernivel, uint32_t numero_tablasegundonivel, uint32_t entrada_tablasegundonivel)
+static uint32_t obtener_numero_marco_para_entrada_tabla_2(uint32_t numero_tablaprimernivel, uint32_t numero_tablasegundonivel, uint32_t entrada_tablasegundonivel)
 {
+	int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, NULL);
+
 	t_memoria_marcoparaentradatabla2_request *request_marcoparaentradatabla2 = marcoparaentradatabla2_request_new(numero_tablaprimernivel, numero_tablasegundonivel, entrada_tablasegundonivel);
 	int bytes_request_marcoparaentradatabla2_serializada;
 	void *request_marcoparaentradatabla2_serializada = serializar_marcoparaentradatabla2_request(request_marcoparaentradatabla2, &bytes_request_marcoparaentradatabla2_serializada);
@@ -198,13 +250,14 @@ static uint32_t obtener_numero_marco_para_entrada_tabla_2(int socket_memoria, ui
 	marcoparaentradatabla2_response_destroy(response_marcoparaentradatabla2);
 	free(response_marcoparaentradatabla2_serializada);
 
+	liberar_conexion(socket_memoria);
+
 	return numero_marco;
 }
 
 static uint32_t fetch_valor_para_copy(uint32_t direccion_logica_origen)
 {
-	// TODO
-	return 0;
+	return leer_dato(direccion_logica_origen);
 }
 
 static void desalojar_proceso()
