@@ -147,6 +147,11 @@ t_kernel_pcb *obtener_proceso_por_pid(uint32_t pid)
 	return list_find(lista_procesos, get_element);
 }
 
+bool existe_proceso_con_pid(uint32_t pid)
+{
+	return obtener_proceso_por_pid(pid) != NULL;
+}
+
 uint32_t cantidad_procesos_con_estado(estado_proceso estado)
 {
 	bool proceso_tiene_estado(void *element)
@@ -314,6 +319,11 @@ static void handler_chequear_suspension_de_proceso_bloqueado(void *args)
 {
 	t_kernel_pcb *pcb = args;
 
+	// Me guardo el pid porque puede pasar que el proceso finalice su IO y EXITee antes
+	// de que este hilo termine el sleep(), asi que uso el pid para validar que el proceso
+	// siga existiendo
+	uint32_t pid = pcb->id;
+
 	// Me guardo el time de bloqueo para este bloqueo particular del proceso, en caso
 	// de que el proceso salga de BLOCKED y vuelva a entrar mientras este hilo esta sleepeado
 	time_t time_inicio_bloqueo = pcb->time_inicio_bloqueo;
@@ -325,7 +335,7 @@ static void handler_chequear_suspension_de_proceso_bloqueado(void *args)
 	// bloqueado, entonces lo suspendo
 	usleep(microsegundos_maximos_de_bloqueo);
 
-	if (pcb->estado == S_BLOCKED && times_son_iguales(pcb->time_inicio_bloqueo, time_inicio_bloqueo))
+	if (existe_proceso_con_pid(pid) && pcb->estado == S_BLOCKED && times_son_iguales(pcb->time_inicio_bloqueo, time_inicio_bloqueo))
 	{
 		bool se_paso_proceso_a_memoria = false;
 		suspender_proceso(pcb, &se_paso_proceso_a_memoria);
