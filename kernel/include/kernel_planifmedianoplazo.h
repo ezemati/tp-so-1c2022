@@ -25,5 +25,6 @@
 
 bool mediano_plazo_intentar_pasar_proceso_a_memoria();
 void suspender_proceso(t_kernel_pcb *pcb, bool *se_paso_proceso_a_memoria);
+void agregar_proceso_a_suspended_ready(t_kernel_pcb *pcb);
 
 #endif

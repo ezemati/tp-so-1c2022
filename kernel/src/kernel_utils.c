@@ -1,5 +1,7 @@
 #include <kernel_utils.h>
 
+static void handler_chequear_suspension_de_proceso_bloqueado(void *args);
+
 void inicializar_kernel(int argc, char **argv)
 {
 	char *ruta_config = argc > 1
@@ -10,12 +12,16 @@ void inicializar_kernel(int argc, char **argv)
 	lista_ready = list_create();
 	lista_suspended_ready = list_create();
 	lista_new = list_create();
+	lista_blocked = list_create();
 
 	pthread_mutex_init(&mutex_proximo_pid, NULL);
 	pthread_mutex_init(&mutex_lista_procesos, NULL);
 	pthread_mutex_init(&mutex_lista_ready, NULL);
 	pthread_mutex_init(&mutex_lista_suspended_ready, NULL);
 	pthread_mutex_init(&mutex_lista_new, NULL);
+	pthread_mutex_init(&mutex_lista_blocked, NULL);
+
+	sem_init(&sem_procesos_bloqueados, 0, 0);
 }
 
 void terminar_kernel()
@@ -28,6 +34,7 @@ void terminar_kernel()
 	list_destroy(lista_ready);
 	list_destroy(lista_suspended_ready);
 	list_destroy(lista_new);
+	list_destroy(lista_blocked);
 
 	list_destroy_and_destroy_elements(lista_procesos, (void *)pcb_destroy);
 
@@ -35,6 +42,9 @@ void terminar_kernel()
 	pthread_mutex_destroy(&mutex_lista_ready);
 	pthread_mutex_destroy(&mutex_lista_suspended_ready);
 	pthread_mutex_destroy(&mutex_lista_new);
+	pthread_mutex_destroy(&mutex_lista_blocked);
+
+	sem_destroy(&sem_procesos_bloqueados);
 
 	liberar_conexion(socket_conexion_cpu_dispatch);
 }
@@ -91,7 +101,7 @@ uint32_t obtener_proximo_pid()
 bool puedo_pasar_proceso_a_memoria()
 {
 	uint32_t cantidad_procesos_en_memoria = calcular_multiprogramacion();
-	log_trace_if_logger_not_null(logger, "Cantidad de procesos en memoria: %d", cantidad_procesos_en_memoria);
+	log_trace_if_logger_not_null(logger, "Cantidad de procesos en memoria: %d/%d", cantidad_procesos_en_memoria, config->grado_multiprogramacion);
 	return cantidad_procesos_en_memoria < config->grado_multiprogramacion;
 }
 
@@ -158,42 +168,30 @@ void sacar_proceso_de_lista(t_list *lista, t_kernel_pcb *pcb)
 	list_remove_by_condition(lista, remove_element);
 }
 
-void bloquear_o_suspender_proceso(t_kernel_pcb *pcb, uint32_t tiempo_bloqueo)
+void bloquear_proceso(t_kernel_pcb *pcb, uint32_t tiempo_bloqueo)
 {
+	log_info_if_logger_not_null(logger, "Pasando proceso %d de %s a BLOCKED", pcb->id, estado_proceso_to_string(pcb->estado));
+
+	pcb->estado = S_BLOCKED;
 	pcb->bloqueo_pendiente = tiempo_bloqueo;
 	pcb->milisegundos_en_running = 0;
+	pcb->time_inicio_bloqueo = current_time();
 
-	if (tiempo_bloqueo > config->tiempo_maximo_bloqueado)
-	{
-		bool se_paso_proceso_a_memoria = false;
-		suspender_proceso(pcb, &se_paso_proceso_a_memoria);
-		if (!se_paso_proceso_a_memoria)
-		{
-			// Si se pudo pasar un proceso a memoria, entonces se replanifica automaticamente,
-			// asi que hay que replanificar aca a mano unicamente si no se pudo pasar ningun proceso
-			replanificar();
-		}
-	}
-	else
-	{
-		bloquear_proceso(pcb);
-		// Al bloquear un proceso no se intenta pasar un proceso a memoria,
-		// asi que hay que replanificar a mano
-		replanificar();
-	}
-}
+	pthread_mutex_lock(&mutex_lista_blocked);
+	list_add(lista_blocked, pcb);
+	pthread_mutex_unlock(&mutex_lista_blocked);
 
-void recalcular_estimacion(t_kernel_pcb *pcb)
-{
-	double alfa = config->alfa;
-	double estimacion_anterior = pcb->estimacion_rafaga;
-	double real_anterior = pcb->milisegundos_en_running;
-	double nueva_estimacion = alfa * real_anterior + (1 - alfa) * estimacion_anterior;
-	pcb->estimacion_rafaga = nueva_estimacion;
+	// Thread que chequea si el proceso estuvo en BLOCKED mas tiempo del permitido
+	// y lo pasa a SUSPENDED_BLOCKED
+	pthread_t thread_chequear_suspension_de_proceso_bloqueado_id;
+	pthread_create(&thread_chequear_suspension_de_proceso_bloqueado_id, NULL, (void *)handler_chequear_suspension_de_proceso_bloqueado, pcb);
+	pthread_detach(thread_chequear_suspension_de_proceso_bloqueado_id);
 
-	log_trace_if_logger_not_null(logger, "Recalculando estimacion para proceso %d", pcb->id);
-	log_trace_if_logger_not_null(logger, "{ EstimacionAnterior=%f, RealAnterior=%f }", estimacion_anterior, real_anterior);
-	log_info_if_logger_not_null(logger, "Nueva estimacion para el proceso %d: %f", pcb->id, nueva_estimacion);
+	sem_post(&sem_procesos_bloqueados);
+
+	// Mandar un nuevo proceso a CPU (no quedo ninguno porque se bloqueo el
+	// que se estaba ejecutando)
+	replanificar();
 }
 
 void print_instrucciones(t_kernel_pcb *pcb)
@@ -237,12 +235,9 @@ void enviar_interrupcion_a_cpu()
 	hay_proceso_en_ejecucion = false;
 
 	t_kernel_pcb *pcb = obtener_proceso_por_pid(pcb_actualizado->pid);
-	pcb->program_counter = pcb_actualizado->program_counter;
-	cargar_tiempo_ejecucion_en_cpu(pcb, pcb_actualizado->time_inicio_running, pcb_actualizado->time_fin_running);
-	pcb->estado = S_READY;
-	pthread_mutex_lock(&mutex_lista_ready);
-	list_add(lista_ready, pcb);
-	pthread_mutex_unlock(&mutex_lista_ready);
+	actualizar_pcb_desalojado(pcb, pcb_actualizado->program_counter, pcb_actualizado->time_inicio_running, pcb_actualizado->time_fin_running);
+
+	agregar_proceso_a_ready_sin_replanificar(pcb);
 
 	actualizarpcb_request_destroy(pcb_actualizado);
 	free(response_serializada);
@@ -250,7 +245,7 @@ void enviar_interrupcion_a_cpu()
 
 void enviar_proceso_a_cpu_para_ejecucion(t_kernel_pcb *pcb_a_ejecutar)
 {
-	log_info_if_logger_not_null(logger, "Enviado proceso %d a CPU para ejecutar", pcb_a_ejecutar->id);
+	log_info_if_logger_not_null(logger, "Pasando proceso %d de %s a RUNNING", pcb_a_ejecutar->id, estado_proceso_to_string(pcb_a_ejecutar->estado));
 
 	int socket_dispatch_cpu = crear_conexion(config->ip_cpu, config->puerto_cpu_dispatch, NULL);
 
@@ -277,4 +272,62 @@ void enviar_proceso_a_cpu_para_ejecucion(t_kernel_pcb *pcb_a_ejecutar)
 
 	pcb_a_ejecutar->estado = S_RUNNING;
 	hay_proceso_en_ejecucion = true;
+}
+
+void handler_atencion_procesos_bloqueados()
+{
+	while (true)
+	{
+		sem_wait(&sem_procesos_bloqueados);
+
+		pthread_mutex_lock(&mutex_lista_blocked);
+		t_kernel_pcb *primer_proceso_en_blocked = list_get_first_element(lista_blocked);
+		pthread_mutex_unlock(&mutex_lista_blocked);
+
+		uint32_t milisegundos_io = primer_proceso_en_blocked->bloqueo_pendiente;
+		uint32_t microsegundos_io = milisegundos_a_microsegundos(milisegundos_io);
+
+		log_info_if_logger_not_null(logger, "Atendiendo I/O de proceso %d por %dms", primer_proceso_en_blocked->id, milisegundos_io);
+
+		usleep(microsegundos_io);
+
+		log_info_if_logger_not_null(logger, "Fin de I/O de proceso %d", primer_proceso_en_blocked->id);
+
+		primer_proceso_en_blocked->bloqueo_pendiente = 0;
+
+		pthread_mutex_lock(&mutex_lista_blocked);
+		sacar_proceso_de_lista(lista_blocked, primer_proceso_en_blocked);
+		pthread_mutex_unlock(&mutex_lista_blocked);
+
+		if (primer_proceso_en_blocked->estado == S_BLOCKED)
+		{
+			agregar_proceso_a_ready(primer_proceso_en_blocked);
+		}
+		else if (primer_proceso_en_blocked->estado == S_SUSPENDED_BLOCKED)
+		{
+			agregar_proceso_a_suspended_ready(primer_proceso_en_blocked);
+		}
+	}
+}
+
+static void handler_chequear_suspension_de_proceso_bloqueado(void *args)
+{
+	t_kernel_pcb *pcb = args;
+
+	// Me guardo el time de bloqueo para este bloqueo particular del proceso, en caso
+	// de que el proceso salga de BLOCKED y vuelva a entrar mientras este hilo esta sleepeado
+	time_t time_inicio_bloqueo = pcb->time_inicio_bloqueo;
+
+	uint32_t milisegundos_maximos_de_bloqueo = config->tiempo_maximo_bloqueado;
+	uint32_t microsegundos_maximos_de_bloqueo = milisegundos_a_microsegundos(milisegundos_maximos_de_bloqueo);
+
+	// Sleepeo por la cantidad maxima de bloqueo, si al terminar el sleep() el proceso sigue
+	// bloqueado, entonces lo suspendo
+	usleep(microsegundos_maximos_de_bloqueo);
+
+	if (pcb->estado == S_BLOCKED && times_son_iguales(pcb->time_inicio_bloqueo, time_inicio_bloqueo))
+	{
+		bool se_paso_proceso_a_memoria = false;
+		suspender_proceso(pcb, &se_paso_proceso_a_memoria);
+	}
 }

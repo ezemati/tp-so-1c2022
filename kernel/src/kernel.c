@@ -6,6 +6,7 @@ t_list *lista_procesos = NULL;
 t_list *lista_ready = NULL;
 t_list *lista_suspended_ready = NULL;
 t_list *lista_new = NULL;
+t_list *lista_blocked = NULL;
 
 uint32_t proximo_pid = 0;
 int socket_conexion_cpu_dispatch = -1;
@@ -16,6 +17,9 @@ pthread_mutex_t mutex_lista_procesos;
 pthread_mutex_t mutex_lista_ready;
 pthread_mutex_t mutex_lista_suspended_ready;
 pthread_mutex_t mutex_lista_new;
+pthread_mutex_t mutex_lista_blocked;
+
+sem_t sem_procesos_bloqueados;
 
 int main(int argc, char **argv)
 {
@@ -45,6 +49,10 @@ int main(int argc, char **argv)
 	pthread_t thread_escucha_cpu_dispatch_id;
 	pthread_create(&thread_escucha_cpu_dispatch_id, NULL, (void *)handler_escucha_cpu_dispatch, NULL);
 	pthread_detach(thread_escucha_cpu_dispatch_id);
+
+	pthread_t thread_atencion_procesos_bloqueados_id;
+	pthread_create(&thread_atencion_procesos_bloqueados_id, NULL, (void *)handler_atencion_procesos_bloqueados, NULL);
+	pthread_detach(thread_atencion_procesos_bloqueados_id);
 
 	int socket_servidor = iniciar_servidor(config->puerto_escucha, logger);
 	if (socket_servidor == -1)

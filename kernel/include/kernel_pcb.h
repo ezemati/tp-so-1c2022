@@ -33,6 +33,7 @@ typedef struct t_kernel_pcb
     double estimacion_rafaga;
     uint32_t socket_consola;
     uint32_t bloqueo_pendiente; // Indica la cantidad de milisegundos restantes que el proceso esta bloqueado
+    time_t time_inicio_bloqueo;
     time_t time_inicio_running;
     time_t time_fin_running;
     double milisegundos_en_running; // En caso de que el proceso sea desalojado y vuelva a ejecutar, esto guarda el acumulado
@@ -42,6 +43,13 @@ t_kernel_pcb *pcb_new(uint32_t pid, uint32_t socket_consola, t_programa *program
 void pcb_destroy(t_kernel_pcb *pcb);
 t_list *pcb_duplicar_instrucciones(t_programa *programa);
 double tiempo_restante_segun_estimacion(t_kernel_pcb *self);
+
+void recalcular_estimacion(t_kernel_pcb *pcb);
+void actualizar_pcb_desalojado(t_kernel_pcb *pcb, uint32_t nuevo_program_counter, time_t time_inicio_running, time_t time_fin_running);
+void actualizar_pcb_bloqueado(t_kernel_pcb *pcb, uint32_t nuevo_program_counter, time_t time_inicio_running, time_t time_fin_running);
+
 void cargar_tiempo_ejecucion_en_cpu(t_kernel_pcb *pcb, time_t time_inicio_running, time_t time_fin_running);
+
+char *estado_proceso_to_string(estado_proceso status);
 
 #endif

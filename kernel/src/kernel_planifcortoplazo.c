@@ -4,15 +4,10 @@ static t_kernel_pcb *obtener_proximo_para_ejecutar();
 static t_kernel_pcb *obtener_proximo_para_ejecutar_fifo();
 static t_kernel_pcb *obtener_proximo_para_ejecutar_srt();
 static bool algoritmo_es_con_desalojo();
-static void thread_proceso_blocked(void *args);
 
 void agregar_proceso_a_ready(t_kernel_pcb *pcb)
 {
-    pcb->estado = S_READY;
-
-    pthread_mutex_lock(&mutex_lista_ready);
-    list_add(lista_ready, pcb);
-    pthread_mutex_unlock(&mutex_lista_ready);
+    agregar_proceso_a_ready_sin_replanificar(pcb);
 
     if (algoritmo_es_con_desalojo() || !hay_proceso_en_ejecucion)
     {
@@ -20,14 +15,15 @@ void agregar_proceso_a_ready(t_kernel_pcb *pcb)
     }
 }
 
-void bloquear_proceso(t_kernel_pcb *pcb)
+void agregar_proceso_a_ready_sin_replanificar(t_kernel_pcb *pcb)
 {
-    log_info_if_logger_not_null(logger, "Pasando proceso %d a BLOCKED", pcb->id);
+    log_info_if_logger_not_null(logger, "Pasando proceso %d de %s a READY", pcb->id, estado_proceso_to_string(pcb->estado));
 
-    pcb->estado = S_BLOCKED;
-    pthread_t thread_id;
-    pthread_create(&thread_id, NULL, (void *)thread_proceso_blocked, pcb);
-    pthread_detach(thread_id);
+    pcb->estado = S_READY;
+
+    pthread_mutex_lock(&mutex_lista_ready);
+    list_add(lista_ready, pcb);
+    pthread_mutex_unlock(&mutex_lista_ready);
 }
 
 void replanificar()
@@ -88,18 +84,4 @@ static t_kernel_pcb *obtener_proximo_para_ejecutar_srt()
 static bool algoritmo_es_con_desalojo()
 {
     return string_equals_ignore_case(config->algoritmo_planificacion, "SRT");
-}
-
-static void thread_proceso_blocked(void *args)
-{
-    t_kernel_pcb *pcb = args;
-    int tiempo_bloqueo = pcb->bloqueo_pendiente;
-    int microsegundos = milisegundos_a_microsegundos(tiempo_bloqueo); // tiempo_bloqueo esta en milisegundos
-    log_info_if_logger_not_null(logger, "Proceso %d entrando en BLOCKED por %dms", pcb->id, tiempo_bloqueo);
-
-    usleep(microsegundos);
-
-    log_info_if_logger_not_null(logger, "Proceso %d saliendo de BLOCKED y pasando a READY", pcb->id);
-    pcb->bloqueo_pendiente = 0;
-    agregar_proceso_a_ready(pcb);
 }

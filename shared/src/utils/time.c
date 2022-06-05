@@ -17,3 +17,8 @@ double milisegundos_entre_times(time_t t1, time_t t2)
 {
     return segundos_a_milisegundos(fabs(difftime(t1, t2)));
 }
+
+bool times_son_iguales(time_t t1, time_t t2)
+{
+    return milisegundos_entre_times(t1, t2) == 0;
+}

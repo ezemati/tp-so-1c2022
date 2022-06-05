@@ -12,6 +12,7 @@
 
 #include <utils/list.h>
 #include <utils/sockets.h>
+#include <utils/time.h>
 #include <types/identificador_operacion.h>
 
 #include <cpu/ejecutar_proceso.h>
@@ -61,11 +62,12 @@ t_list *obtener_procesos_con_estado(estado_proceso estado);
 t_kernel_pcb *obtener_proceso_por_pid(uint32_t pid);
 uint32_t cantidad_procesos_con_estado(estado_proceso estado);
 void sacar_proceso_de_lista(t_list *lista, t_kernel_pcb *pcb);
-void bloquear_o_suspender_proceso(t_kernel_pcb *pcb, uint32_t tiempo_bloqueo);
-void recalcular_estimacion(t_kernel_pcb *pcb);
+void bloquear_proceso(t_kernel_pcb *pcb, uint32_t tiempo_bloqueo);
 void enviar_interrupcion_a_cpu();
 void enviar_proceso_a_cpu_para_ejecucion(t_kernel_pcb *pcb_a_ejecutar);
 void print_instrucciones(t_kernel_pcb *pcb);
 void print_instrucciones_de_todos_los_procesos(t_list *pcbs);
+
+void handler_atencion_procesos_bloqueados();
 
 #endif

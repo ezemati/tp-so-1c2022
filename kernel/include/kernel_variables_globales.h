@@ -14,6 +14,7 @@ extern t_list *lista_procesos;        // De tipo t_kernel_pcb
 extern t_list *lista_ready;           // De tipo t_kernel_pcb (sus elementos pertenecen a lista_procesos)
 extern t_list *lista_suspended_ready; // De tipo t_kernel_pcb (sus elementos pertenecen a lista_procesos)
 extern t_list *lista_new;             // De tipo t_kernel_pcb (sus elementos pertenecen a lista_procesos)
+extern t_list *lista_blocked;         // De tipo t_kernel_pcb (sus elementos pertenecen a lista_procesos), tiene tanto BLOCKED como SUSPENDED_BLOCKED
 
 extern uint32_t proximo_pid;
 extern int socket_conexion_cpu_dispatch;
@@ -24,5 +25,8 @@ extern pthread_mutex_t mutex_lista_procesos;
 extern pthread_mutex_t mutex_lista_ready;
 extern pthread_mutex_t mutex_lista_suspended_ready;
 extern pthread_mutex_t mutex_lista_new;
+extern pthread_mutex_t mutex_lista_blocked;
+
+extern sem_t sem_procesos_bloqueados;
 
 #endif

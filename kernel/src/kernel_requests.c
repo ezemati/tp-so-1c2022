@@ -38,11 +38,9 @@ void atender_bloquear_proceso(int socket_cliente)
 	t_kernel_actualizarpcb_request *request = deserializar_actualizarpcb_request(buffer_request);
 
 	t_kernel_pcb *pcb = obtener_proceso_por_pid(request->pid);
-	pcb->program_counter = request->program_counter;
-	cargar_tiempo_ejecucion_en_cpu(pcb, request->time_inicio_running, request->time_fin_running);
-	recalcular_estimacion(pcb);
+	actualizar_pcb_bloqueado(pcb, request->program_counter, request->time_inicio_running, request->time_fin_running);
 
-	bloquear_o_suspender_proceso(pcb, request->bloqueo_pendiente);
+	bloquear_proceso(pcb, request->bloqueo_pendiente);
 
 	actualizarpcb_request_destroy(request);
 	free(buffer_request);
@@ -58,9 +56,7 @@ void atender_finalizar_proceso(int socket_cliente)
 	t_kernel_actualizarpcb_request *request = deserializar_actualizarpcb_request(buffer_request);
 
 	t_kernel_pcb *pcb = obtener_proceso_por_pid(request->pid);
-	pcb->program_counter = request->program_counter;
-	cargar_tiempo_ejecucion_en_cpu(pcb, request->time_inicio_running, request->time_fin_running);
-	recalcular_estimacion(pcb);
+	actualizar_pcb_bloqueado(pcb, request->program_counter, request->time_inicio_running, request->time_fin_running); // Innecesario, pero por las dudas
 
 	finalizar_proceso(pcb);
 
