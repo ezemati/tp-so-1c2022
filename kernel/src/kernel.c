@@ -7,9 +7,11 @@ t_list *lista_ready = NULL;
 t_list *lista_suspended_ready = NULL;
 t_list *lista_new = NULL;
 
+uint32_t proximo_pid = 0;
 int socket_conexion_cpu_dispatch = -1;
 bool hay_proceso_en_ejecucion = false;
 
+pthread_mutex_t mutex_proximo_pid;
 pthread_mutex_t mutex_lista_procesos;
 pthread_mutex_t mutex_lista_ready;
 pthread_mutex_t mutex_lista_suspended_ready;
