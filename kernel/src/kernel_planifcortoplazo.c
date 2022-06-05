@@ -7,7 +7,11 @@ static bool algoritmo_es_con_desalojo();
 
 void agregar_proceso_a_ready(t_kernel_pcb *pcb)
 {
-    agregar_proceso_a_ready_sin_replanificar(pcb);
+    pthread_mutex_lock(&mutex_lista_ready);
+    int index = list_size(lista_ready);
+    pthread_mutex_unlock(&mutex_lista_ready);
+
+    agregar_proceso_a_ready_en_index_sin_replanificar(pcb, index);
 
     if (algoritmo_es_con_desalojo() || !hay_proceso_en_ejecucion)
     {
@@ -15,14 +19,14 @@ void agregar_proceso_a_ready(t_kernel_pcb *pcb)
     }
 }
 
-void agregar_proceso_a_ready_sin_replanificar(t_kernel_pcb *pcb)
+void agregar_proceso_a_ready_en_index_sin_replanificar(t_kernel_pcb *pcb, int index)
 {
     log_info_if_logger_not_null(logger, "Pasando proceso %d de %s a READY", pcb->id, estado_proceso_to_string(pcb->estado));
 
     pcb->estado = S_READY;
 
     pthread_mutex_lock(&mutex_lista_ready);
-    list_add(lista_ready, pcb);
+    list_add_in_index_custom(lista_ready, index, pcb);
     pthread_mutex_unlock(&mutex_lista_ready);
 }
 
@@ -30,8 +34,16 @@ void replanificar()
 {
     if (hay_proceso_en_ejecucion)
     {
-        enviar_interrupcion_a_cpu();
+        // Este if unicamente se ejecuta para planificacion SRT (porque en FIFO no hay
+        // desalojo de CPU)
+        t_kernel_pcb *pcb_desalojado = enviar_interrupcion_a_cpu();
         hay_proceso_en_ejecucion = false;
+
+        // Para respetar el criterio CPU->IO->NEW, tengo que meter el proceso desalojado
+        // en la actual ultima posicion de la lista_ready, asi el proceso que paso a READY
+        // se desplaza en la lista y queda despues del proceso desalojado
+        int ultimo_index = list_get_last_index(lista_ready);
+        agregar_proceso_a_ready_en_index_sin_replanificar(pcb_desalojado, ultimo_index);
     }
 
     t_kernel_pcb *pcb_a_ejecutar = obtener_proximo_para_ejecutar();
@@ -74,7 +86,7 @@ static t_kernel_pcb *obtener_proximo_para_ejecutar_srt()
     {
         t_kernel_pcb *elementPcb1 = element1;
         t_kernel_pcb *elementPcb2 = element2;
-        return elementPcb1->estimacion_rafaga < elementPcb2->estimacion_rafaga
+        return elementPcb1->estimacion_rafaga <= elementPcb2->estimacion_rafaga
                    ? elementPcb1
                    : elementPcb2;
     }

@@ -224,7 +224,7 @@ void print_instrucciones_de_todos_los_procesos(t_list *pcbs)
 	list_iterator_destroy(iterator);
 }
 
-void enviar_interrupcion_a_cpu()
+t_kernel_pcb *enviar_interrupcion_a_cpu()
 {
 	log_info_if_logger_not_null(logger, "Enviando interrupcion a CPU para desalojar proceso");
 
@@ -242,10 +242,12 @@ void enviar_interrupcion_a_cpu()
 	t_kernel_pcb *pcb = obtener_proceso_por_pid(pcb_actualizado->pid);
 	actualizar_pcb_desalojado(pcb, pcb_actualizado->program_counter, pcb_actualizado->time_inicio_running, pcb_actualizado->time_fin_running);
 
-	agregar_proceso_a_ready_sin_replanificar(pcb);
-
 	actualizarpcb_request_destroy(pcb_actualizado);
 	free(response_serializada);
+
+	// agregar_proceso_a_ready_sin_replanificar(pcb);
+
+	return pcb;
 }
 
 void enviar_proceso_a_cpu_para_ejecucion(t_kernel_pcb *pcb_a_ejecutar)
