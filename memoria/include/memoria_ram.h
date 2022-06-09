@@ -10,6 +10,7 @@
 #include <memoria/numero_tabla_2_para_entrada_tabla_1.h>
 #include <memoria/marco_para_entrada_tabla_2.h>
 
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,7 +20,7 @@
 typedef struct t_memoria_ram
 {
     void *memoria_usuario;
-    bool *bitmap_marcos_libres;   // true significa libre, false significa ocupado
+    bool *bitmap_marcos_libres;   // true significa libre, false significa ocupado (TODO: invertir significado del true y false)
     t_list *tablas_primer_nivel;  // De tipo t_tabla_primernivel, hay una por proceso
     t_list *tablas_segundo_nivel; // De tipo t_tabla_segundonivel
 } t_memoria_ram;

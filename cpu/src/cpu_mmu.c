@@ -9,7 +9,7 @@ bool direccion_logica_valida(uint32_t direccion_logica)
     return direccion_logica < info_ejecucion_actual->tamanio;
 }
 
-uint32_t traducir_direccion_logica_a_fisica(uint32_t direccion_logica, uint32_t *numero_tablasegundonivel, uint32_t *entrada_tablasegundonivel)
+uint32_t traducir_direccion_logica_a_fisica(uint32_t direccion_logica)
 {
     uint32_t numero_pagina = floor(direccion_logica / config->memoria_tamanio_pagina);
 
@@ -26,10 +26,10 @@ uint32_t traducir_direccion_logica_a_fisica(uint32_t direccion_logica, uint32_t 
         log_trace_if_logger_not_null(logger, "TLB MISS: no se encontro una entrada para la pagina %d", numero_pagina);
 
         uint32_t entrada_tablaprimernivel = floor(numero_pagina / config->memoria_entradas_por_tabla);
-        (*entrada_tablasegundonivel) = numero_pagina % config->memoria_entradas_por_tabla;
+        uint32_t entrada_tablasegundonivel = numero_pagina % config->memoria_entradas_por_tabla;
 
-        (*numero_tablasegundonivel) = obtener_numero_tabla_2_para_entrada_tabla_1(info_ejecucion_actual->tabla_paginas_primer_nivel, entrada_tablaprimernivel);
-        numero_marco = obtener_numero_marco_para_entrada_tabla_2(info_ejecucion_actual->tabla_paginas_primer_nivel, *numero_tablasegundonivel, *entrada_tablasegundonivel);
+        uint32_t numero_tablasegundonivel = obtener_numero_tabla_2_para_entrada_tabla_1(info_ejecucion_actual->tabla_paginas_primer_nivel, entrada_tablaprimernivel);
+        numero_marco = obtener_numero_marco_para_entrada_tabla_2(info_ejecucion_actual->tabla_paginas_primer_nivel, numero_tablasegundonivel, entrada_tablasegundonivel);
 
         tlb_add_entry(tlb, numero_pagina, numero_marco);
         log_trace_if_logger_not_null(logger, "Entrada {numero_pagina=%d, numero_marco=%d} agregada a la TLB", numero_pagina, numero_marco);

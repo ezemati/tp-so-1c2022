@@ -5,13 +5,15 @@ static t_tabla_segundonivel *memoria_ram_obtener_tablasegundonivel(t_memoria_ram
 static void memoria_ram_limpiar_marco(t_memoria_ram *self, uint32_t numero_marco);
 static uint32_t memoria_ram_obtener_inicio_del_marco(uint32_t numero_marco);
 
-static void memoria_ram_marcar_pagina_usada(t_memoria_ram *self, uint32_t numero_tablasegundonivel, uint32_t entrada_tablasegundonivel);
-static void memoria_ram_marcar_pagina_modificada(t_memoria_ram *self, uint32_t numero_tablasegundonivel, uint32_t entrada_tablasegundonivel);
+static t_entrada_segundonivel *memoria_ram_obtener_entrada_segundonivel_en_direccion_fisica(t_memoria_ram *self, uint32_t direccion_fisica);
+
+static void memoria_ram_marcar_pagina_usada(t_memoria_ram *self, t_entrada_segundonivel *pagina);
+static void memoria_ram_marcar_pagina_modificada(t_memoria_ram *self, t_entrada_segundonivel *pagina);
 
 t_memoria_ram *memoria_ram_new()
 {
     t_memoria_ram *memoria = malloc(sizeof(t_memoria_ram));
-    memoria->memoria_usuario = malloc(config->tamanio_memoria);
+    memoria->memoria_usuario = calloc(1, config->tamanio_memoria);
 
     uint32_t cantidad_marcos = memoria_ram_obtener_cantidad_marcos_totales();
     memoria->bitmap_marcos_libres = malloc(sizeof(bool) * cantidad_marcos);
@@ -73,19 +75,23 @@ void memoria_ram_finalizar_proceso(t_memoria_ram *self, uint32_t numero_tablapri
 void *memoria_ram_leer_dato(t_memoria_ram *self, t_memoria_leerdato_request *request)
 {
     // TODO: ver si habria que validar que la pagina que se quiere leer este en memoria (en teoria ya se hace al pedir las direcciones para hacer la traduccion logica-fisica)
+    uint32_t direccion_fisica = request->direccion_fisica;
     void *dato = malloc(request->cantidad_bytes);
     memcpy(dato, self->memoria_usuario + request->direccion_fisica, request->cantidad_bytes);
 
-    memoria_ram_marcar_pagina_usada(self, request->numero_tablasegundonivel, request->entrada_tablasegundonivel);
+    t_entrada_segundonivel *pagina = memoria_ram_obtener_entrada_segundonivel_en_direccion_fisica(self, direccion_fisica);
+    memoria_ram_marcar_pagina_usada(self, pagina);
     return dato;
 }
 
 void memoria_ram_escribir_dato(t_memoria_ram *self, t_memoria_escribirdato_request *request)
 {
+    uint32_t direccion_fisica = request->direccion_fisica;
     memcpy(self->memoria_usuario + request->direccion_fisica, request->dato, request->cantidad_bytes);
 
-    memoria_ram_marcar_pagina_usada(self, request->numero_tablasegundonivel, request->entrada_tablasegundonivel);
-    memoria_ram_marcar_pagina_modificada(self, request->numero_tablasegundonivel, request->entrada_tablasegundonivel);
+    t_entrada_segundonivel *pagina = memoria_ram_obtener_entrada_segundonivel_en_direccion_fisica(self, direccion_fisica);
+    memoria_ram_marcar_pagina_usada(self, pagina);
+    memoria_ram_marcar_pagina_modificada(self, pagina);
 }
 
 uint32_t memoria_ram_obtener_numero_tabla_2_para_entrada_tabla_1(t_memoria_ram *self, t_memoria_numerotabla2paraentradatabla1_request *request)
@@ -236,18 +242,19 @@ static uint32_t memoria_ram_obtener_inicio_del_marco(uint32_t numero_marco)
     return numero_marco * config->tamanio_pagina;
 }
 
-static void memoria_ram_marcar_pagina_usada(t_memoria_ram *self, uint32_t numero_tablasegundonivel, uint32_t entrada_tablasegundonivel)
+static t_entrada_segundonivel *memoria_ram_obtener_entrada_segundonivel_en_direccion_fisica(t_memoria_ram *self, uint32_t direccion_fisica)
 {
-    t_tabla_segundonivel *tabla = memoria_ram_obtener_tablasegundonivel(self, numero_tablasegundonivel);
-    t_entrada_segundonivel *entrada = tabla_segundonivel_obtener_entrada_segundo_nivel(tabla, entrada_tablasegundonivel);
-
-    entrada->bit_uso = true;
+    uint32_t numero_marco = floor(direccion_fisica / config->tamanio_pagina);
+    t_entrada_segundonivel *entrada = memoria_ram_obtener_pagina_en_marco(self, numero_marco);
+    return entrada;
 }
 
-static void memoria_ram_marcar_pagina_modificada(t_memoria_ram *self, uint32_t numero_tablasegundonivel, uint32_t entrada_tablasegundonivel)
+static void memoria_ram_marcar_pagina_usada(t_memoria_ram *self, t_entrada_segundonivel *pagina)
 {
-    t_tabla_segundonivel *tabla = memoria_ram_obtener_tablasegundonivel(self, numero_tablasegundonivel);
-    t_entrada_segundonivel *entrada = tabla_segundonivel_obtener_entrada_segundo_nivel(tabla, entrada_tablasegundonivel);
+    pagina->bit_uso = true;
+}
 
-    entrada->bit_modificado = true;
+static void memoria_ram_marcar_pagina_modificada(t_memoria_ram *self, t_entrada_segundonivel *pagina)
+{
+    pagina->bit_modificado = true;
 }

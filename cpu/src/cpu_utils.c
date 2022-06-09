@@ -146,14 +146,13 @@ void realizar_ejecucion()
 
 uint32_t leer_dato(uint32_t direccion_logica_lectura)
 {
-	uint32_t numero_tablasegundonivel, entrada_tablasegundonivel;
-	uint32_t direccion_fisica_lectura = traducir_direccion_logica_a_fisica(direccion_logica_lectura, &numero_tablasegundonivel, &entrada_tablasegundonivel);
+	uint32_t direccion_fisica_lectura = traducir_direccion_logica_a_fisica(direccion_logica_lectura);
 
 	int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, NULL);
 
 	// ? Ver si implementamos lo de leer de multiples paginas
 	uint32_t cantidad_bytes_lectura = sizeof(uint32_t);
-	t_memoria_leerdato_request *request = leerdato_request_new(numero_tablasegundonivel, entrada_tablasegundonivel, direccion_fisica_lectura, cantidad_bytes_lectura);
+	t_memoria_leerdato_request *request = leerdato_request_new(direccion_fisica_lectura, cantidad_bytes_lectura);
 	int bytes_request_serializada;
 	void *request_serializada = serializar_leerdato_request(request, &bytes_request_serializada);
 	enviar_buffer_serializado_con_instruccion_y_bytes_por_socket(socket_memoria, LEER_DATO, request_serializada, bytes_request_serializada);
@@ -172,14 +171,13 @@ uint32_t leer_dato(uint32_t direccion_logica_lectura)
 
 void escribir_o_copiar_dato(uint32_t direccion_logica_destino, uint32_t valor_a_escribir_o_copiar)
 {
-	uint32_t numero_tablasegundonivel, entrada_tablasegundonivel;
-	uint32_t direccion_fisica_escritura = traducir_direccion_logica_a_fisica(direccion_logica_destino, &numero_tablasegundonivel, &entrada_tablasegundonivel);
+	uint32_t direccion_fisica_escritura = traducir_direccion_logica_a_fisica(direccion_logica_destino);
 
 	int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, NULL);
 
 	// ? Ver si implementamos lo de escribir en multiples paginas
 	uint32_t cantidad_bytes_escritura = sizeof(uint32_t);
-	t_memoria_escribirdato_request *request = escribirdato_request_new(numero_tablasegundonivel, entrada_tablasegundonivel, direccion_fisica_escritura, cantidad_bytes_escritura, &valor_a_escribir_o_copiar);
+	t_memoria_escribirdato_request *request = escribirdato_request_new(direccion_fisica_escritura, cantidad_bytes_escritura, &valor_a_escribir_o_copiar);
 	int bytes_request_serializada;
 	void *request_serializada = serializar_escribirdato_request(request, &bytes_request_serializada);
 	enviar_buffer_serializado_con_instruccion_y_bytes_por_socket(socket_memoria, ESCRIBIR_DATO, request_serializada, bytes_request_serializada);
