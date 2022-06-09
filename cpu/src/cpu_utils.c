@@ -101,7 +101,17 @@ void realizar_ejecucion()
 		uint32_t valor_para_copy = 0;
 		if (instruccion_a_ejecutar->codigo_instruccion == COPY)
 		{
-			valor_para_copy = fetch_valor_para_copy(instruccion_a_ejecutar->parametros[1]);
+			uint32_t direccion_logica_origen = instruccion_a_ejecutar->parametros[1];
+			bool direccion_valida = direccion_logica_valida(direccion_logica_origen);
+			if (!direccion_valida)
+			{
+				// TODO: ver si aca desalojamos al proceso por intentar acceder a una direccion no valida
+				log_error_if_logger_not_null(logger, "Direccion %d invalida (el tamanio del proceso es %d)", direccion_logica_origen, info_ejecucion_actual->tamanio);
+			}
+			else
+			{
+				valor_para_copy = fetch_valor_para_copy(direccion_logica_origen);
+			}
 		}
 
 		// EXECUTE
@@ -133,6 +143,12 @@ void realizar_ejecucion()
 	{
 		log_error_if_logger_not_null(logger, "Aca paso algo raro...");
 	}
+}
+
+bool direccion_logica_valida(uint32_t direccion_logica)
+{
+	// Si el tamanio del proceso es 30, entonces puede direccionar desde el byte 0 al 29
+	return direccion_logica < info_ejecucion_actual->tamanio;
 }
 
 uint32_t traducir_direccion_logica_a_fisica(uint32_t direccion_logica, uint32_t *numero_tablasegundonivel, uint32_t *entrada_tablasegundonivel)
