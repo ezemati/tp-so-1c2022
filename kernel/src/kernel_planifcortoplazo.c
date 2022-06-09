@@ -82,15 +82,15 @@ static t_kernel_pcb *obtener_proximo_para_ejecutar_fifo()
 
 static t_kernel_pcb *obtener_proximo_para_ejecutar_srt()
 {
-    void *pcb_con_estimacion_minima(void *element1, void *element2)
+    void *pcb_con_tiempo_restante_minimo(void *element1, void *element2)
     {
         t_kernel_pcb *elementPcb1 = element1;
         t_kernel_pcb *elementPcb2 = element2;
-        return elementPcb1->estimacion_rafaga <= elementPcb2->estimacion_rafaga
+        return tiempo_restante_segun_estimacion(elementPcb1) <= tiempo_restante_segun_estimacion(elementPcb2)
                    ? elementPcb1
                    : elementPcb2;
     }
-    return list_get_minimum_or_null_if_empty(lista_ready, pcb_con_estimacion_minima);
+    return list_get_minimum_or_null_if_empty(lista_ready, pcb_con_tiempo_restante_minimo);
 }
 
 static bool algoritmo_es_con_desalojo()
