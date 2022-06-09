@@ -22,3 +22,8 @@ bool times_son_iguales(time_t t1, time_t t2)
 {
     return milisegundos_entre_times(t1, t2) == 0;
 }
+
+int comparar_times(time_t t1, time_t t2)
+{
+    return difftime(t1, t2);
+}

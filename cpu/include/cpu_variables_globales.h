@@ -3,6 +3,7 @@
 
 struct t_cpu_config;
 struct t_cpu_info_ejecucion_actual;
+struct t_cpu_tlb;
 
 #include <stdbool.h>
 #include <commons/log.h>
@@ -11,6 +12,7 @@ struct t_cpu_info_ejecucion_actual;
 extern struct t_cpu_config *config;
 extern t_log *logger;
 extern struct t_cpu_info_ejecucion_actual *info_ejecucion_actual;
+extern struct t_cpu_tlb *tlb;
 
 extern bool hay_interrupcion;
 extern int socket_conexion_kernel_dispatch;

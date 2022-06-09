@@ -3,6 +3,7 @@
 t_log *logger = NULL;
 t_cpu_config *config = NULL;
 t_cpu_info_ejecucion_actual *info_ejecucion_actual = NULL;
+t_cpu_tlb *tlb = NULL;
 
 bool hay_interrupcion = false;
 int socket_conexion_kernel_dispatch = -1;

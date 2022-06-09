@@ -4,8 +4,9 @@
 #include <cpu_config.h>
 #include <cpu_requests.h>
 #include <cpu_variables_globales.h>
-
 #include <cpu_ejecucion_instrucciones.h>
+#include <cpu_mmu.h>
+#include <cpu_tlb.h>
 
 #include <utils/sockets.h>
 #include <types/identificador_operacion.h>
@@ -37,9 +38,6 @@ void *procesar_cliente(void *args);
 
 void realizar_handshake_con_memoria(t_cpu_config *config);
 void realizar_ejecucion();
-
-bool direccion_logica_valida(uint32_t direccion_logica);
-uint32_t traducir_direccion_logica_a_fisica(uint32_t direccion_logica, uint32_t *numero_tablasegundonivel, uint32_t *entrada_tablasegundonivel);
 
 uint32_t leer_dato(uint32_t direccion_logica_lectura);
 void escribir_o_copiar_dato(uint32_t direccion_logica_destino, uint32_t valor_a_escribir_o_copiar);
