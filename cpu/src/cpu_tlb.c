@@ -44,6 +44,7 @@ void tlb_add_entry(t_cpu_tlb *tlb, uint32_t numero_pagina, uint32_t numero_marco
 {
     if (tlb_tiene_espacios_libres(tlb))
     {
+        log_trace_if_logger_not_null(logger, "TLB: agregando pagina %d en espacio vacio", numero_pagina);
         tlb_add_entry_in_empty_space(tlb, numero_pagina, numero_marco);
         return;
     }
@@ -51,6 +52,8 @@ void tlb_add_entry(t_cpu_tlb *tlb, uint32_t numero_pagina, uint32_t numero_marco
     t_cpu_entradatlb *entrada_a_reemplazar = string_equals_ignore_case(config->reemplazo_tlb, "FIFO")
                                                  ? tlb_get_entry_to_replace_fifo(tlb)
                                                  : tlb_get_entry_to_replace_lru(tlb);
+
+    log_trace_if_logger_not_null(logger, "TLB: haciendo reemplazo, sale pagina %d y entra pagina %d", entrada_a_reemplazar->numero_pagina, numero_pagina);
 
     entradatlb_update(entrada_a_reemplazar, numero_pagina, numero_marco);
 }

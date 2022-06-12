@@ -13,6 +13,8 @@ uint32_t traducir_direccion_logica_a_fisica(uint32_t direccion_logica)
 {
     uint32_t numero_pagina = floor(direccion_logica / config->memoria_tamanio_pagina);
 
+    log_info_if_logger_not_null(logger, "MMU: traduciendo direccion logica %d (numero_pagina=%d)", direccion_logica, numero_pagina);
+
     int numero_marco = tlb_try_read_entry(tlb, numero_pagina);
     if (numero_marco != -1)
     {
@@ -23,7 +25,7 @@ uint32_t traducir_direccion_logica_a_fisica(uint32_t direccion_logica)
     {
         // Si no encontre el numero_pagina en la TLB, hago todo el procedimiento para obtener el numero_marco
         // y al final agrego la entrada a la TLB
-        log_trace_if_logger_not_null(logger, "TLB MISS: no se encontro una entrada para la pagina %d", numero_pagina);
+        log_trace_if_logger_not_null(logger, "TLB MISS: la pagina %d no esta en la TLB", numero_pagina);
 
         uint32_t entrada_tablaprimernivel = floor(numero_pagina / config->memoria_entradas_por_tabla);
         uint32_t entrada_tablasegundonivel = numero_pagina % config->memoria_entradas_por_tabla;
@@ -32,12 +34,12 @@ uint32_t traducir_direccion_logica_a_fisica(uint32_t direccion_logica)
         numero_marco = obtener_numero_marco_para_entrada_tabla_2(info_ejecucion_actual->tabla_paginas_primer_nivel, numero_tablasegundonivel, entrada_tablasegundonivel);
 
         tlb_add_entry(tlb, numero_pagina, numero_marco);
-        log_trace_if_logger_not_null(logger, "Entrada {numero_pagina=%d, numero_marco=%d} agregada a la TLB", numero_pagina, numero_marco);
+        log_trace_if_logger_not_null(logger, "TLB: entrada {numero_pagina=%d, numero_marco=%d} agregada", numero_pagina, numero_marco);
     }
 
     uint32_t desplazamiento = direccion_logica - (numero_pagina * config->memoria_tamanio_pagina);
     uint32_t direccion_fisica = (numero_marco * config->memoria_tamanio_pagina) + desplazamiento;
-    log_info_if_logger_not_null(logger, "Traduccion -- Logica=%d -- Fisica=%d", direccion_logica, direccion_fisica);
+    log_info_if_logger_not_null(logger, "MMU: {direccion_logica=%d, direccion_fisica=%d}", direccion_logica, direccion_fisica);
 
     return direccion_fisica;
 }

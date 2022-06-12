@@ -47,6 +47,8 @@ void ejecutar_read(t_instruccion *instruccion)
 {
     uint32_t direccion_logica_lectura = instruccion->parametros[0];
 
+    log_info_if_logger_not_null(logger, "PID %d: ejecutando READ %d", info_ejecucion_actual->pid, direccion_logica_lectura);
+
     bool direccion_valida = direccion_logica_valida(direccion_logica_lectura);
     if (!direccion_valida)
     {
@@ -64,6 +66,8 @@ void ejecutar_write(t_instruccion *instruccion)
     uint32_t direccion_logica_escritura = instruccion->parametros[0];
     uint32_t valor_a_escribir = instruccion->parametros[1];
 
+    log_info_if_logger_not_null(logger, "PID %d: ejecutando WRITE %d %d", info_ejecucion_actual->pid, direccion_logica_escritura, valor_a_escribir);
+
     bool direccion_valida = direccion_logica_valida(direccion_logica_escritura);
     if (!direccion_valida)
     {
@@ -73,13 +77,15 @@ void ejecutar_write(t_instruccion *instruccion)
 
     escribir_o_copiar_dato(direccion_logica_escritura, valor_a_escribir);
 
-    log_info_if_logger_not_null(logger, "PID %d: WRITE de valor %d a direccion logica %d", info_ejecucion_actual->pid, valor_a_escribir, direccion_logica_escritura);
+    log_info_if_logger_not_null(logger, "PID %d: WRITE %d %d finalizado", info_ejecucion_actual->pid, direccion_logica_escritura, valor_a_escribir);
 }
 
 void ejecutar_copy(t_instruccion *instruccion, uint32_t valor_a_copiar)
 {
     uint32_t direccion_logica_destino = instruccion->parametros[0];
     uint32_t direccion_logica_origen = instruccion->parametros[1];
+
+    log_info_if_logger_not_null(logger, "PID %d: ejecutando COPY %d %d", info_ejecucion_actual->pid, direccion_logica_destino, direccion_logica_origen);
 
     bool direccion_valida = direccion_logica_valida(direccion_logica_destino);
     if (!direccion_valida)
@@ -90,10 +96,10 @@ void ejecutar_copy(t_instruccion *instruccion, uint32_t valor_a_copiar)
 
     escribir_o_copiar_dato(direccion_logica_destino, valor_a_copiar);
 
-    log_info_if_logger_not_null(logger, "PID %d: COPY desde direccion logica %d (valor %d) a direccion logica %d", info_ejecucion_actual->pid, direccion_logica_origen, valor_a_copiar, direccion_logica_destino);
+    log_info_if_logger_not_null(logger, "PID %d: COPY %d %d finalizado (valor_copiado=%d)", info_ejecucion_actual->pid, direccion_logica_destino, direccion_logica_origen, valor_a_copiar);
 }
 
 void ejecutar_exit(t_instruccion *instruccion)
 {
-    log_info_if_logger_not_null(logger, "PID %d: EXIT", info_ejecucion_actual->pid);
+    log_info_if_logger_not_null(logger, "PID %d: ejecutando EXIT", info_ejecucion_actual->pid);
 }
