@@ -8,6 +8,8 @@ void inicializar_memoria(int argc, char **argv)
 	config = memoria_config_new(ruta_config, logger);
 	memoria_ram = memoria_ram_new();
 
+	sem_init(&sem_swap_libre, 0, 1);
+
 	char command_crear_carpeta_swap[1024];
 	sprintf(command_crear_carpeta_swap, "mkdir -p %s", config->path_swap);
 	system(command_crear_carpeta_swap);

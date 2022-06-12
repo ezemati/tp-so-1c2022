@@ -4,11 +4,13 @@
 #include <memoria_utils.h>
 #include <memoria_variables_globales.h>
 
+#include <utils/converter.h>
 #include <utils/files.h>
 
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <commons/txt.h>
 
 void swap_crear_archivo(uint32_t pid, uint32_t tamanio_proceso);

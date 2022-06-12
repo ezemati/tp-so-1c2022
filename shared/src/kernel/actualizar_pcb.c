@@ -1,6 +1,6 @@
 #include <kernel/actualizar_pcb.h>
 
-t_kernel_actualizarpcb_request *actualizarpcb_request_new(uint32_t pid, uint32_t program_counter, uint32_t bloqueo_pendiente, time_t time_inicio_running, time_t time_fin_running)
+t_kernel_actualizarpcb_request *actualizarpcb_request_new(uint32_t pid, uint32_t program_counter, uint32_t bloqueo_pendiente, double time_inicio_running, double time_fin_running)
 {
     t_kernel_actualizarpcb_request *request = malloc(sizeof(t_kernel_actualizarpcb_request));
     request->pid = pid;
@@ -32,7 +32,7 @@ void actualizarpcb_response_destroy(t_kernel_actualizarpcb_response *response)
 
 void *serializar_actualizarpcb_request(t_kernel_actualizarpcb_request *request, int *bytes)
 {
-    // PID (uint32), PROGRAM_COUNTER (uint32), BLOQUEO_PENDIENTE (uint32), TIME_INICIO_RUNNING (time_t), TIME_FIN_RUNNING (time_t)
+    // PID (uint32), PROGRAM_COUNTER (uint32), BLOQUEO_PENDIENTE (uint32), TIME_INICIO_RUNNING (double), TIME_FIN_RUNNING (double)
     (*bytes) = bytes_totales_actualizarpcb_request_serializada(request);
     void *buffer = malloc(*bytes);
 
@@ -41,8 +41,8 @@ void *serializar_actualizarpcb_request(t_kernel_actualizarpcb_request *request, 
     escribir_uint32_en_buffer(buffer, &desplazamiento, request->pid);
     escribir_uint32_en_buffer(buffer, &desplazamiento, request->program_counter);
     escribir_uint32_en_buffer(buffer, &desplazamiento, request->bloqueo_pendiente);
-    escribir_en_buffer(buffer, &desplazamiento, &request->time_inicio_running, sizeof(time_t));
-    escribir_en_buffer(buffer, &desplazamiento, &request->time_fin_running, sizeof(time_t));
+    escribir_en_buffer(buffer, &desplazamiento, &request->time_inicio_running, sizeof(double));
+    escribir_en_buffer(buffer, &desplazamiento, &request->time_fin_running, sizeof(double));
 
     return buffer;
 }
@@ -54,9 +54,9 @@ t_kernel_actualizarpcb_request *deserializar_actualizarpcb_request(void *buffer)
     uint32_t pid = leer_uint32_de_buffer(buffer, &desplazamiento);
     uint32_t program_counter = leer_uint32_de_buffer(buffer, &desplazamiento);
     uint32_t bloqueo_pendiente = leer_uint32_de_buffer(buffer, &desplazamiento);
-    time_t time_inicio_running, time_fin_running;
-    leer_stream_de_buffer_noalloc(buffer, &time_inicio_running, sizeof(time_t), &desplazamiento);
-    leer_stream_de_buffer_noalloc(buffer, &time_fin_running, sizeof(time_t), &desplazamiento);
+    double time_inicio_running, time_fin_running;
+    leer_stream_de_buffer_noalloc(buffer, &time_inicio_running, sizeof(double), &desplazamiento);
+    leer_stream_de_buffer_noalloc(buffer, &time_fin_running, sizeof(double), &desplazamiento);
 
     t_kernel_actualizarpcb_request *request = actualizarpcb_request_new(pid, program_counter, bloqueo_pendiente, time_inicio_running, time_fin_running);
 
@@ -65,7 +65,7 @@ t_kernel_actualizarpcb_request *deserializar_actualizarpcb_request(void *buffer)
 
 int bytes_totales_actualizarpcb_request_serializada(t_kernel_actualizarpcb_request *request)
 {
-    // PID (uint32), PROGRAM_COUNTER (uint32), BLOQUEO_PENDIENTE (uint32), TIME_INICIO_RUNNING (time_t), TIME_FIN_RUNNING (time_t)
+    // PID (uint32), PROGRAM_COUNTER (uint32), BLOQUEO_PENDIENTE (uint32), TIME_INICIO_RUNNING (double), TIME_FIN_RUNNING (double)
     int bytes = 0;
 
     bytes += sizeof(request->pid);

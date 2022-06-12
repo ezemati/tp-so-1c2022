@@ -40,28 +40,28 @@ t_list *pcb_duplicar_instrucciones(t_programa *programa)
 
 void recalcular_estimacion(t_kernel_pcb *pcb)
 {
-	double alfa = config->alfa;
-	double estimacion_anterior = pcb->estimacion_rafaga;
-	double real_anterior = pcb->milisegundos_en_running;
-	double nueva_estimacion = alfa * real_anterior + (1 - alfa) * estimacion_anterior;
-	pcb->estimacion_rafaga = nueva_estimacion;
+    double alfa = config->alfa;
+    double estimacion_anterior = pcb->estimacion_rafaga;
+    double real_anterior = pcb->milisegundos_en_running;
+    double nueva_estimacion = alfa * real_anterior + (1 - alfa) * estimacion_anterior;
+    pcb->estimacion_rafaga = nueva_estimacion;
 
-	log_trace_if_logger_not_null(logger, "Recalculando estimacion para proceso %d", pcb->id);
-	log_trace_if_logger_not_null(logger, "{ EstimacionAnterior=%f, RealAnterior=%f }", estimacion_anterior, real_anterior);
-	log_info_if_logger_not_null(logger, "Nueva estimacion para el proceso %d: %f", pcb->id, nueva_estimacion);
+    log_trace_if_logger_not_null(logger, "Recalculando estimacion para proceso %d", pcb->id);
+    log_trace_if_logger_not_null(logger, "{ EstimacionAnterior=%f, RealAnterior=%f }", estimacion_anterior, real_anterior);
+    log_info_if_logger_not_null(logger, "Nueva estimacion para el proceso %d: %f", pcb->id, nueva_estimacion);
 }
 
-void actualizar_pcb_desalojado(t_kernel_pcb *pcb, uint32_t nuevo_program_counter, time_t time_inicio_running, time_t time_fin_running)
+void actualizar_pcb_desalojado(t_kernel_pcb *pcb, uint32_t nuevo_program_counter, double time_inicio_running, double time_fin_running)
 {
     pcb->program_counter = nuevo_program_counter;
     cargar_tiempo_ejecucion_en_cpu(pcb, time_inicio_running, time_fin_running);
 }
 
-void actualizar_pcb_bloqueado(t_kernel_pcb *pcb, uint32_t nuevo_program_counter, time_t time_inicio_running, time_t time_fin_running)
+void actualizar_pcb_bloqueado(t_kernel_pcb *pcb, uint32_t nuevo_program_counter, double time_inicio_running, double time_fin_running)
 {
     pcb->program_counter = nuevo_program_counter;
-	cargar_tiempo_ejecucion_en_cpu(pcb, time_inicio_running, time_fin_running);
-	recalcular_estimacion(pcb);
+    cargar_tiempo_ejecucion_en_cpu(pcb, time_inicio_running, time_fin_running);
+    recalcular_estimacion(pcb);
 }
 
 double tiempo_restante_segun_estimacion(t_kernel_pcb *self)
@@ -69,7 +69,7 @@ double tiempo_restante_segun_estimacion(t_kernel_pcb *self)
     return self->estimacion_rafaga - self->milisegundos_en_running;
 }
 
-void cargar_tiempo_ejecucion_en_cpu(t_kernel_pcb *pcb, time_t time_inicio_running, time_t time_fin_running)
+void cargar_tiempo_ejecucion_en_cpu(t_kernel_pcb *pcb, double time_inicio_running, double time_fin_running)
 {
     double segundos_running = difftime(time_fin_running, time_inicio_running);
     double milisegundos_running = segundos_a_milisegundos(segundos_running);

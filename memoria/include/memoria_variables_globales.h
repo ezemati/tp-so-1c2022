@@ -5,10 +5,13 @@
 struct t_memoria_config;
 struct t_memoria_ram;
 
+#include <semaphore.h>
 #include <commons/log.h>
 
 extern struct t_memoria_config *config;
 extern struct t_memoria_ram *memoria_ram;
 extern t_log *logger;
+
+extern sem_t sem_swap_libre;
 
 #endif

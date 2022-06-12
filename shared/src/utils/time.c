@@ -1,9 +1,11 @@
 #include <utils/time.h>
 
-time_t current_time()
+double current_time()
 {
-    time_t rawtime = time(NULL);
-    return rawtime;
+    struct timeval time;
+    gettimeofday(&time, NULL);
+
+    return time.tv_usec;
 
     /*
     time_t rawtime = time(NULL);
@@ -13,17 +15,17 @@ time_t current_time()
     */
 }
 
-double milisegundos_entre_times(time_t t1, time_t t2)
+double milisegundos_entre_times(double t1, double t2)
 {
-    return segundos_a_milisegundos(fabs(difftime(t1, t2)));
+    return t2 - t1;
 }
 
-bool times_son_iguales(time_t t1, time_t t2)
+bool times_son_iguales(double t1, double t2)
 {
-    return milisegundos_entre_times(t1, t2) == 0;
+    return comparar_times(t1, t2) == 0;
 }
 
-int comparar_times(time_t t1, time_t t2)
+int comparar_times(double t1, double t2)
 {
-    return difftime(t1, t2);
+    return t1 - t2;
 }

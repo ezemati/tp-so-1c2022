@@ -3,6 +3,7 @@
 t_log *logger = NULL;
 t_memoria_config *config = NULL;
 t_memoria_ram *memoria_ram = NULL;
+sem_t sem_swap_libre;
 
 int main(int argc, char **argv)
 {

@@ -328,7 +328,7 @@ static void handler_chequear_suspension_de_proceso_bloqueado(void *args)
 
 	// Me guardo el time de bloqueo para este bloqueo particular del proceso, en caso
 	// de que el proceso salga de BLOCKED y vuelva a entrar mientras este hilo esta sleepeado
-	time_t time_inicio_bloqueo = pcb->time_inicio_bloqueo;
+	double time_inicio_bloqueo = pcb->time_inicio_bloqueo;
 
 	uint32_t milisegundos_maximos_de_bloqueo = config->tiempo_maximo_bloqueado;
 	uint32_t microsegundos_maximos_de_bloqueo = milisegundos_a_microsegundos(milisegundos_maximos_de_bloqueo);
