@@ -1,15 +1,23 @@
 #include <memoria_tabla_segundonivel.h>
 
-t_tabla_segundonivel *tabla_segundonivel_new(uint32_t numero_tabla_segundonivel)
+t_tabla_segundonivel *tabla_segundonivel_new(uint32_t pid, uint32_t numero_tabla_segundonivel, uint32_t posicion_tabla_segundonivel_en_proceso)
 {
     t_tabla_segundonivel *tabla_segundonivel = malloc(sizeof(t_tabla_segundonivel));
 
+    tabla_segundonivel->pid = pid;
     tabla_segundonivel->numero_tabla_segundonivel = numero_tabla_segundonivel;
 
     tabla_segundonivel->entradas_segundonivel = list_create();
     for (int i = 0; i < config->entradas_por_tabla; i++)
     {
-        t_entrada_segundonivel *entrada_segundonivel = entrada_segundonivel_new(i);
+        uint32_t numero_entrada = i;
+
+        /* Para la primera tabla de 2N la posicion_tabla es 0, asi que las paginas van a estar en [0, entradas_por_tabla - 1].
+         * Para la segunda tabla de 2N la posicion es 1, asi que las paginas van a estar en [entradas_por_tabla, 2*entradas_por_tabla - 1]
+         */
+        uint32_t numero_pagina = posicion_tabla_segundonivel_en_proceso * config->entradas_por_tabla + i;
+
+        t_entrada_segundonivel *entrada_segundonivel = entrada_segundonivel_new(pid, numero_entrada, numero_pagina);
         list_add(tabla_segundonivel->entradas_segundonivel, entrada_segundonivel);
     }
 

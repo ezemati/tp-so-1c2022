@@ -7,6 +7,10 @@ void inicializar_memoria(int argc, char **argv)
 							: "cfg/memoria.config";
 	config = memoria_config_new(ruta_config, logger);
 	memoria_ram = memoria_ram_new();
+
+	char command_crear_carpeta_swap[1024];
+	sprintf(command_crear_carpeta_swap, "mkdir -p %s", config->path_swap);
+	system(command_crear_carpeta_swap);
 }
 
 void terminar_memoria()

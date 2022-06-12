@@ -3,6 +3,7 @@
 
 #include <memoria_tabla_primernivel.h>
 #include <memoria_tabla_segundonivel.h>
+#include <memoria_swap.h>
 #include <memoria_variables_globales.h>
 
 #include <memoria/leer_dato.h>
@@ -35,6 +36,11 @@ void memoria_ram_destroy(t_memoria_ram *memoria);
 uint32_t memoria_ram_agregar_proceso(t_memoria_ram *self, uint32_t pid, uint32_t tamanio_proceso);
 
 /**
+ * @brief Saca todas las paginas del proceso de la RAM y las guarda en el archivo SWAP
+ */
+void memoria_ram_suspender_proceso(t_memoria_ram *self, uint32_t pid, uint32_t numero_tablaprimernivel);
+
+/**
  * @brief Libera todos los recursos del proceso (incluyendo SWAP)
  */
 void memoria_ram_finalizar_proceso(t_memoria_ram *self, uint32_t numero_tablaprimernivel);
@@ -54,10 +60,11 @@ uint32_t memoria_ram_obtener_numero_tabla_2_para_entrada_tabla_1(t_memoria_ram *
 uint32_t memoria_ram_obtener_numero_marco_para_entrada_tabla_2(t_memoria_ram *self, t_memoria_marcoparaentradatabla2_request *request);
 
 void memoria_ram_cargar_pagina(t_memoria_ram *self, t_entrada_segundonivel *entradaNueva, t_clock *clock);
-void memoria_ram_reemplazar_pagina(t_memoria_ram *self, t_entrada_segundonivel *entradaNueva, t_entrada_segundonivel *entradaVieja);
+void memoria_ram_reemplazar_pagina(t_memoria_ram *self, uint32_t pid, t_entrada_segundonivel *entradaNueva, t_entrada_segundonivel *entradaVieja);
 void memoria_ram_vaciar_marco(t_memoria_ram *self, uint32_t numero_marco);
 int32_t memoria_ram_obtener_numero_marco_libre(t_memoria_ram *self);
 void memoria_ram_marcar_marco_ocupado(t_memoria_ram *self, uint32_t numero_marco);
+void memoria_ram_marcar_marco_libre(t_memoria_ram *self, uint32_t numero_marco);
 uint32_t memoria_ram_obtener_cantidad_marcos_totales();
 bool memoria_ram_marco_esta_libre(t_memoria_ram *self, uint32_t numero_marco);
 t_entrada_segundonivel *memoria_ram_obtener_pagina_en_marco(t_memoria_ram *self, uint32_t numero_marco);

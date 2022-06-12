@@ -1,9 +1,11 @@
 #include <memoria_entrada_segundonivel.h>
 
-t_entrada_segundonivel *entrada_segundonivel_new(uint32_t numero_entrada)
+t_entrada_segundonivel *entrada_segundonivel_new(uint32_t pid, uint32_t numero_entrada, uint32_t numero_pagina)
 {
     t_entrada_segundonivel *entrada_segundonivel = malloc(sizeof(t_entrada_segundonivel));
+    entrada_segundonivel->pid = pid;
     entrada_segundonivel->numero_entrada = numero_entrada;
+    entrada_segundonivel->numero_pagina = numero_pagina;
     entrada_segundonivel->numero_marco = -1;
     entrada_segundonivel->bit_presencia = false;
     entrada_segundonivel->bit_modificado = false;
@@ -46,4 +48,19 @@ void entrada_segundonivel_marcar_pagina_descargada(t_entrada_segundonivel *self)
     self->bit_presencia = false;
     self->bit_modificado = false;
     self->bit_uso = false;
+}
+
+bool pagina_esta_modificada(t_entrada_segundonivel *self)
+{
+    return self->bit_modificado;
+}
+
+void marcar_pagina_modificada(t_entrada_segundonivel *self)
+{
+    self->bit_modificado = true;
+}
+
+void marcar_pagina_usada(t_entrada_segundonivel *self)
+{
+    self->bit_uso = true;
 }

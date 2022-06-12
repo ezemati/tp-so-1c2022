@@ -26,6 +26,12 @@ void clock_destroy(t_clock *clock)
     free(clock);
 }
 
+void clock_clear(t_clock *clock)
+{
+    list_clean(clock->entradas_segundonivel);
+    clock->puntero_aguja = 0;
+}
+
 uint32_t clock_obtener_posicion_pagina_a_reemplazar(t_clock *self)
 {
     switch (self->algor_reemplazo)

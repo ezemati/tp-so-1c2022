@@ -26,6 +26,8 @@ typedef struct t_clock
 
 t_clock *clock_new(char *algor_reemplazo);
 void clock_destroy(t_clock *clock);
+void clock_clear(t_clock *clock);
+
 uint32_t clock_obtener_posicion_pagina_a_reemplazar(t_clock *self);
 void clock_agregar_entrada(t_clock *self, t_entrada_segundonivel *entradaNueva);
 void clock_reemplazar_entrada(t_clock *self, t_entrada_segundonivel *entradaNueva, uint32_t posicion);

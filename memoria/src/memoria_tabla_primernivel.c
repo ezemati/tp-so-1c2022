@@ -13,7 +13,7 @@ t_tabla_primernivel *tabla_primernivel_new(uint32_t pid, uint32_t tamanio_proces
     for (int i = 0; i < config->entradas_por_tabla; i++)
     {
         uint32_t index_lista_tablas_segundonivel = total_segundonivel + i;
-        t_tabla_segundonivel *tabla_segundonivel = tabla_segundonivel_new(index_lista_tablas_segundonivel);
+        t_tabla_segundonivel *tabla_segundonivel = tabla_segundonivel_new(pid, index_lista_tablas_segundonivel, i);
         list_add(lista_tablas_segundonivel, tabla_segundonivel);
 
         tabla_primernivel->indices_tablas_segundonivel[i] = index_lista_tablas_segundonivel;

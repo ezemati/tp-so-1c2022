@@ -2,13 +2,12 @@
 
 static t_tabla_primernivel *memoria_ram_obtener_tablaprimernivel(t_memoria_ram *self, uint32_t numero_tablaprimernivel);
 static t_tabla_segundonivel *memoria_ram_obtener_tablasegundonivel(t_memoria_ram *self, uint32_t numero_tablasegundonivel);
-static void memoria_ram_limpiar_marco(t_memoria_ram *self, uint32_t numero_marco);
 static uint32_t memoria_ram_obtener_inicio_del_marco(uint32_t numero_marco);
 
 static t_entrada_segundonivel *memoria_ram_obtener_entrada_segundonivel_en_direccion_fisica(t_memoria_ram *self, uint32_t direccion_fisica);
 
-static void memoria_ram_marcar_pagina_usada(t_memoria_ram *self, t_entrada_segundonivel *pagina);
-static void memoria_ram_marcar_pagina_modificada(t_memoria_ram *self, t_entrada_segundonivel *pagina);
+static void guardar_pagina_en_swap(t_memoria_ram *self, uint32_t pid, uint32_t numero_pagina, uint32_t numero_marco);
+static void leer_pagina_de_swap(t_memoria_ram *self, uint32_t pid, uint32_t numero_pagina, uint32_t numero_marco);
 
 t_memoria_ram *memoria_ram_new()
 {
@@ -46,7 +45,39 @@ uint32_t memoria_ram_agregar_proceso(t_memoria_ram *self, uint32_t pid, uint32_t
     uint32_t numero_tablaprimernivel_nuevoproceso = list_size(self->tablas_primer_nivel);
     t_tabla_primernivel *primernivel_nuevoproceso = tabla_primernivel_new(pid, tamanio_proceso, numero_tablaprimernivel_nuevoproceso, self->tablas_segundo_nivel);
     list_add(self->tablas_primer_nivel, primernivel_nuevoproceso);
+
+    swap_crear_archivo(pid, tamanio_proceso);
+
     return numero_tablaprimernivel_nuevoproceso;
+}
+
+void memoria_ram_suspender_proceso(t_memoria_ram *self, uint32_t pid, uint32_t numero_tablaprimernivel)
+{
+    t_tabla_primernivel *tabla_primernivel = memoria_ram_obtener_tablaprimernivel(self, numero_tablaprimernivel);
+
+    for (int i = 0; i < config->entradas_por_tabla; i++)
+    {
+        uint32_t indice_tabla_segundonivel = tabla_primernivel->indices_tablas_segundonivel[i];
+        t_tabla_segundonivel *tabla_segundonivel = memoria_ram_obtener_tablasegundonivel(self, indice_tabla_segundonivel);
+        t_list_iterator *iterator_tabla_segundonivel = list_iterator_create(tabla_segundonivel->entradas_segundonivel);
+        while (list_iterator_has_next(iterator_tabla_segundonivel))
+        {
+            t_entrada_segundonivel *entrada_segundonivel = list_iterator_next(iterator_tabla_segundonivel);
+            if (entrada_segundonivel_tiene_pagina_presente(entrada_segundonivel))
+            {
+                if (pagina_esta_modificada(entrada_segundonivel))
+                {
+                    guardar_pagina_en_swap(self, pid, entrada_segundonivel->numero_pagina, entrada_segundonivel->numero_marco);
+                }
+
+                memoria_ram_vaciar_marco(self, entrada_segundonivel->numero_marco);
+                entrada_segundonivel_marcar_pagina_descargada(entrada_segundonivel);
+            }
+        }
+        list_iterator_destroy(iterator_tabla_segundonivel);
+    }
+
+    clock_clear(tabla_primernivel->clock);
 }
 
 void memoria_ram_finalizar_proceso(t_memoria_ram *self, uint32_t numero_tablaprimernivel)
@@ -62,14 +93,14 @@ void memoria_ram_finalizar_proceso(t_memoria_ram *self, uint32_t numero_tablapri
             t_entrada_segundonivel *entradaSegundoNivel = list_iterator_next(iteratorEntradasSegundoNivel);
             if (entrada_segundonivel_tiene_pagina_presente(entradaSegundoNivel))
             {
-                memoria_ram_limpiar_marco(self, entradaSegundoNivel->numero_marco);
+                memoria_ram_vaciar_marco(self, entradaSegundoNivel->numero_marco);
+                entrada_segundonivel_marcar_pagina_descargada(entradaSegundoNivel);
             }
-            entrada_segundonivel_marcar_pagina_descargada(entradaSegundoNivel);
         }
         list_iterator_destroy(iteratorEntradasSegundoNivel);
     }
 
-    // TODO: falta liberar lo del SWAP
+    swap_borrar_archivo(tablaPrimerNivel->pid);
 }
 
 void *memoria_ram_leer_dato(t_memoria_ram *self, t_memoria_leerdato_request *request)
@@ -80,7 +111,8 @@ void *memoria_ram_leer_dato(t_memoria_ram *self, t_memoria_leerdato_request *req
     memcpy(dato, self->memoria_usuario + request->direccion_fisica, request->cantidad_bytes);
 
     t_entrada_segundonivel *pagina = memoria_ram_obtener_entrada_segundonivel_en_direccion_fisica(self, direccion_fisica);
-    memoria_ram_marcar_pagina_usada(self, pagina);
+    marcar_pagina_usada(pagina);
+
     return dato;
 }
 
@@ -90,8 +122,8 @@ void memoria_ram_escribir_dato(t_memoria_ram *self, t_memoria_escribirdato_reque
     memcpy(self->memoria_usuario + request->direccion_fisica, request->dato, request->cantidad_bytes);
 
     t_entrada_segundonivel *pagina = memoria_ram_obtener_entrada_segundonivel_en_direccion_fisica(self, direccion_fisica);
-    memoria_ram_marcar_pagina_usada(self, pagina);
-    memoria_ram_marcar_pagina_modificada(self, pagina);
+    marcar_pagina_usada(pagina);
+    marcar_pagina_modificada(pagina);
 }
 
 uint32_t memoria_ram_obtener_numero_tabla_2_para_entrada_tabla_1(t_memoria_ram *self, t_memoria_numerotabla2paraentradatabla1_request *request)
@@ -119,11 +151,15 @@ uint32_t memoria_ram_obtener_numero_marco_para_entrada_tabla_2(t_memoria_ram *se
 
 void memoria_ram_cargar_pagina(t_memoria_ram *self, t_entrada_segundonivel *entradaNueva, t_clock *clock)
 {
+    uint32_t pid = entradaNueva->pid;
+
     if (!clock_esta_lleno(clock))
     {
         // Todavia no se asignaron todos los marcos al proceso, asi que puedo asignarle uno nuevo
         log_info_if_logger_not_null(logger, "Asignando pagina %d a nuevo marco", entradaNueva->numero_entrada);
+
         uint32_t numero_marco_libre = memoria_ram_obtener_numero_marco_libre(self);
+        leer_pagina_de_swap(self, pid, entradaNueva->numero_pagina, numero_marco_libre);
         entrada_segundonivel_marcar_pagina_cargada(entradaNueva, numero_marco_libre);
         memoria_ram_marcar_marco_ocupado(self, numero_marco_libre);
         log_info_if_logger_not_null(logger, "Pagina %d asignada a marco %d", entradaNueva->numero_entrada, entradaNueva->numero_marco);
@@ -134,32 +170,38 @@ void memoria_ram_cargar_pagina(t_memoria_ram *self, t_entrada_segundonivel *entr
         return;
     }
 
-    log_info_if_logger_not_null(logger, "El proceso ya tiene todos los marcos posibles asignados - Usando algoritmo de reemplazo %s", config->algoritmo_reemplazo);
+    log_info_if_logger_not_null(logger, "El proceso %d ya tiene todos los marcos posibles asignados - Usando algoritmo de reemplazo %s", pid, config->algoritmo_reemplazo);
+
     uint32_t posicionEntradaAReemplazar = clock_obtener_posicion_pagina_a_reemplazar(clock);
     t_entrada_segundonivel *entradaVieja = clock_obtener_entrada_en_posicion(clock, posicionEntradaAReemplazar);
     log_info_if_logger_not_null(logger, "Reemplazando marco %d", entradaVieja->numero_marco);
-    memoria_ram_reemplazar_pagina(self, entradaNueva, entradaVieja);
+    memoria_ram_reemplazar_pagina(self, pid, entradaNueva, entradaVieja);
     clock_reemplazar_entrada(clock, entradaNueva, posicionEntradaAReemplazar);
 }
 
-void memoria_ram_reemplazar_pagina(t_memoria_ram *self, t_entrada_segundonivel *entradaNueva, t_entrada_segundonivel *entradaVieja)
+void memoria_ram_reemplazar_pagina(t_memoria_ram *self, uint32_t pid, t_entrada_segundonivel *entradaNueva, t_entrada_segundonivel *entradaVieja)
 {
-    if (entradaVieja->bit_modificado == true)
+    uint32_t numero_marco = entradaVieja->numero_marco;
+
+    if (pagina_esta_modificada(entradaVieja))
     {
-        // TODO: guardar las modificaciones a la pagina que va a ser reemplazada
+        guardar_pagina_en_swap(self, pid, entradaVieja->numero_pagina, numero_marco);
     }
 
-    uint32_t numero_marco = entradaVieja->numero_marco;
     entrada_segundonivel_marcar_pagina_descargada(entradaVieja);
     memoria_ram_vaciar_marco(self, numero_marco);
+
+    leer_pagina_de_swap(self, pid, entradaNueva->numero_pagina, numero_marco);
     entrada_segundonivel_marcar_pagina_cargada(entradaNueva, numero_marco);
     memoria_ram_marcar_marco_ocupado(self, numero_marco);
 }
 
 void memoria_ram_vaciar_marco(t_memoria_ram *self, uint32_t numero_marco)
 {
-    uint32_t bytes_comienzo_marco = numero_marco * config->tamanio_pagina;
-    memset(self->memoria_usuario + bytes_comienzo_marco, 0, config->tamanio_memoria);
+    uint32_t bytes_comienzo_marco = memoria_ram_obtener_inicio_del_marco(numero_marco);
+    memset(self->memoria_usuario + bytes_comienzo_marco, 0, config->tamanio_pagina);
+
+    memoria_ram_marcar_marco_libre(self, numero_marco);
 }
 
 int32_t memoria_ram_obtener_numero_marco_libre(t_memoria_ram *self)
@@ -180,6 +222,11 @@ int32_t memoria_ram_obtener_numero_marco_libre(t_memoria_ram *self)
 void memoria_ram_marcar_marco_ocupado(t_memoria_ram *self, uint32_t numero_marco)
 {
     self->bitmap_marcos_libres[numero_marco] = false;
+}
+
+void memoria_ram_marcar_marco_libre(t_memoria_ram *self, uint32_t numero_marco)
+{
+    self->bitmap_marcos_libres[numero_marco] = true;
 }
 
 uint32_t memoria_ram_obtener_cantidad_marcos_totales()
@@ -231,12 +278,6 @@ static t_tabla_segundonivel *memoria_ram_obtener_tablasegundonivel(t_memoria_ram
     return list_get(self->tablas_segundo_nivel, numero_tablasegundonivel);
 }
 
-static void memoria_ram_limpiar_marco(t_memoria_ram *self, uint32_t numero_marco)
-{
-    uint32_t inicioMarco = memoria_ram_obtener_inicio_del_marco(numero_marco);
-    memset(self->memoria_usuario + inicioMarco, 0, config->tamanio_pagina);
-}
-
 static uint32_t memoria_ram_obtener_inicio_del_marco(uint32_t numero_marco)
 {
     return numero_marco * config->tamanio_pagina;
@@ -249,12 +290,22 @@ static t_entrada_segundonivel *memoria_ram_obtener_entrada_segundonivel_en_direc
     return entrada;
 }
 
-static void memoria_ram_marcar_pagina_usada(t_memoria_ram *self, t_entrada_segundonivel *pagina)
+static void guardar_pagina_en_swap(t_memoria_ram *self, uint32_t pid, uint32_t numero_pagina, uint32_t numero_marco)
 {
-    pagina->bit_uso = true;
+    uint32_t direccion_fisica_inicio_marco = memoria_ram_obtener_inicio_del_marco(numero_marco);
+    void *contenido_pagina = calloc(1, config->tamanio_pagina);
+    memcpy(contenido_pagina, self->memoria_usuario + direccion_fisica_inicio_marco, config->tamanio_pagina);
+
+    swap_escribir_pagina(pid, numero_pagina, contenido_pagina);
+
+    free(contenido_pagina);
 }
 
-static void memoria_ram_marcar_pagina_modificada(t_memoria_ram *self, t_entrada_segundonivel *pagina)
+static void leer_pagina_de_swap(t_memoria_ram *self, uint32_t pid, uint32_t numero_pagina, uint32_t numero_marco)
 {
-    pagina->bit_modificado = true;
+    uint32_t direccion_fisica_inicio_marco = memoria_ram_obtener_inicio_del_marco(numero_marco);
+    void *contenido_pagina = swap_leer_pagina(pid, numero_pagina);
+    memcpy(self->memoria_usuario + direccion_fisica_inicio_marco, contenido_pagina, config->tamanio_pagina);
+
+    free(contenido_pagina);
 }
