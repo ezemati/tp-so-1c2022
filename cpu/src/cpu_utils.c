@@ -152,7 +152,7 @@ uint32_t leer_dato(uint32_t direccion_logica_lectura)
 
 	// ? Ver si implementamos lo de leer de multiples paginas
 	uint32_t cantidad_bytes_lectura = sizeof(uint32_t);
-	t_memoria_leerdato_request *request = leerdato_request_new(direccion_fisica_lectura, cantidad_bytes_lectura);
+	t_memoria_leerdato_request *request = leerdato_request_new(info_ejecucion_actual->pid, direccion_fisica_lectura, cantidad_bytes_lectura);
 	int bytes_request_serializada;
 	void *request_serializada = serializar_leerdato_request(request, &bytes_request_serializada);
 	enviar_buffer_serializado_con_instruccion_y_bytes_por_socket(socket_memoria, LEER_DATO, request_serializada, bytes_request_serializada);
@@ -177,7 +177,7 @@ void escribir_o_copiar_dato(uint32_t direccion_logica_destino, uint32_t valor_a_
 
 	// ? Ver si implementamos lo de escribir en multiples paginas
 	uint32_t cantidad_bytes_escritura = sizeof(uint32_t);
-	t_memoria_escribirdato_request *request = escribirdato_request_new(direccion_fisica_escritura, cantidad_bytes_escritura, &valor_a_escribir_o_copiar);
+	t_memoria_escribirdato_request *request = escribirdato_request_new(info_ejecucion_actual->pid, direccion_fisica_escritura, cantidad_bytes_escritura, &valor_a_escribir_o_copiar);
 	int bytes_request_serializada;
 	void *request_serializada = serializar_escribirdato_request(request, &bytes_request_serializada);
 	enviar_buffer_serializado_con_instruccion_y_bytes_por_socket(socket_memoria, ESCRIBIR_DATO, request_serializada, bytes_request_serializada);

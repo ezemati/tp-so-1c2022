@@ -24,11 +24,12 @@ void serializar_deserializar_escribirdato_request_response()
 {
     char *dato = "12345";
     uint32_t bytes_dato = strlen(dato) + 1;
-    t_memoria_escribirdato_request *request = escribirdato_request_new(1, bytes_dato, dato);
+    t_memoria_escribirdato_request *request = escribirdato_request_new(1, 2, bytes_dato, dato);
     int bytes_serializado_request;
     void *request_serializada = serializar_escribirdato_request(request, &bytes_serializado_request);
     t_memoria_escribirdato_request *request_deserializada = deserializar_escribirdato_request(request_serializada);
-    CU_ASSERT_EQUAL(request_deserializada->direccion_fisica, 1);
+    CU_ASSERT_EQUAL(request_deserializada->pid, 1);
+    CU_ASSERT_EQUAL(request_deserializada->direccion_fisica, 2);
     CU_ASSERT_EQUAL(request_deserializada->cantidad_bytes, bytes_dato);
     CU_ASSERT_EQUAL(0, memcmp(request_deserializada->dato, dato, bytes_dato));
     escribirdato_request_destroy(request_deserializada);
@@ -105,12 +106,13 @@ void serializar_deserializar_inicializarproceso_request_response()
 
 void serializar_deserializar_leerdato_request_response()
 {
-    t_memoria_leerdato_request *request = leerdato_request_new(1, 2);
+    t_memoria_leerdato_request *request = leerdato_request_new(1, 2, 3);
     int bytes_serializado_request;
     void *request_serializada = serializar_leerdato_request(request, &bytes_serializado_request);
     t_memoria_leerdato_request *request_deserializada = deserializar_leerdato_request(request_serializada);
-    CU_ASSERT_EQUAL(request_deserializada->direccion_fisica, 1);
-    CU_ASSERT_EQUAL(request_deserializada->cantidad_bytes, 2);
+    CU_ASSERT_EQUAL(request_deserializada->pid, 1);
+    CU_ASSERT_EQUAL(request_deserializada->direccion_fisica, 2);
+    CU_ASSERT_EQUAL(request_deserializada->cantidad_bytes, 3);
     leerdato_request_destroy(request_deserializada);
     free(request_serializada);
     leerdato_request_destroy(request);

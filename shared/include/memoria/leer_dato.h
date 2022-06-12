@@ -8,6 +8,7 @@
 
 typedef struct t_memoria_leerdato_request
 {
+    uint32_t pid;
     uint32_t direccion_fisica;
     uint32_t cantidad_bytes;
 } t_memoria_leerdato_request;
@@ -18,7 +19,7 @@ typedef struct t_memoria_leerdato_response
     void *dato;
 } t_memoria_leerdato_response;
 
-t_memoria_leerdato_request *leerdato_request_new(uint32_t direccion_fisica, uint32_t cantidad_bytes);
+t_memoria_leerdato_request *leerdato_request_new(uint32_t pid, uint32_t direccion_fisica, uint32_t cantidad_bytes);
 void leerdato_request_destroy(t_memoria_leerdato_request *request);
 
 t_memoria_leerdato_response *leerdato_response_new(void *dato, uint32_t cantidad_bytes);
