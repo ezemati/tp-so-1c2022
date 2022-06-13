@@ -1,5 +1,8 @@
 #include <memoria_utils.h>
 
+static bool request_viene_de_cpu(identificador_operacion id_op);
+static void bloquear_hilo_por_retardo_memoria_con_cpu();
+
 void inicializar_memoria(int argc, char **argv)
 {
 	char *ruta_config = argc > 1
@@ -47,6 +50,11 @@ void *procesar_cliente(uint32_t *args)
 
 	log_info_if_logger_not_null(logger, "Operacion recibida en Memoria: %s", identificador_operacion_to_string(id_op));
 
+	if (request_viene_de_cpu(id_op))
+	{
+		bloquear_hilo_por_retardo_memoria_con_cpu();
+	}
+
 	switch (id_op)
 	{
 	case INICIALIZAR_PROCESO:
@@ -82,4 +90,19 @@ void *procesar_cliente(uint32_t *args)
 	free(args);
 
 	return NULL;
+}
+
+static bool request_viene_de_cpu(identificador_operacion id_op)
+{
+	return id_op == HANDSHAKE_INFO_TRADUCCION || id_op == LEER_DATO || id_op == ESCRIBIR_DATO || id_op == OBTENER_NUMERO_TABLA_2_PARA_ENTRADA_TABLA_1 || id_op == OBTENER_MARCO_PARA_ENTRADA_TABLA_2;
+}
+
+static void bloquear_hilo_por_retardo_memoria_con_cpu()
+{
+	log_trace_if_logger_not_null(logger, "Empezando RETARDO_MEMORIA (%dms)", config->retardo_memoria);
+
+	time_microseg microsegundos_retardo_memoria = milisegundos_a_microsegundos(config->retardo_memoria);
+	usleep(microsegundos_retardo_memoria);
+
+	log_trace_if_logger_not_null(logger, "RETARDO_MEMORIA finalizado");
 }

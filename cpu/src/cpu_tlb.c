@@ -42,6 +42,9 @@ void tlb_clear(t_cpu_tlb *tlb)
 
 void tlb_add_entry(t_cpu_tlb *tlb, uint32_t numero_pagina, uint32_t numero_marco)
 {
+    // TODO: printear en trace todas las entradas de la TLB en forma [pagina, marco]
+    // (similar al print en la planificacion del Kernel)
+
     if (tlb_tiene_espacios_libres(tlb))
     {
         log_trace_if_logger_not_null(logger, "TLB: agregando pagina %d en espacio vacio", numero_pagina);
