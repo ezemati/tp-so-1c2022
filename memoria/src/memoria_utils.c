@@ -21,6 +21,10 @@ void terminar_memoria()
 	log_destroy(logger);
 
 	memoria_config_destroy(config);
+
+	sem_destroy(&sem_swap_libre);
+
+	memoria_ram_destroy(memoria_ram);
 }
 
 void procesar_request(int socket_cliente)
