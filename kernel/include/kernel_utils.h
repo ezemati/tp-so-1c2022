@@ -70,8 +70,11 @@ uint32_t cantidad_procesos_con_estado(estado_proceso estado);
 void sacar_proceso_de_lista(t_list *lista, t_kernel_pcb *pcb);
 void bloquear_proceso(t_kernel_pcb *pcb, uint32_t tiempo_bloqueo);
 void enviar_proceso_a_cpu_para_ejecucion(t_kernel_pcb *pcb_a_ejecutar);
+bool algoritmo_es_con_desalojo();
+
 void print_instrucciones(t_kernel_pcb *pcb);
 void print_instrucciones_de_todos_los_procesos(t_list *pcbs);
+void print_procesos_listaready();
 
 void handler_atencion_procesos_bloqueados();
 

@@ -54,6 +54,8 @@ void finalizar_proceso(t_kernel_pcb *pcb)
 
 static void pasar_proceso_new_a_ready(t_kernel_pcb *pcb)
 {
+    log_info_if_logger_not_null(logger, "Inicializando proceso %d en Memoria", pcb->id);
+
     int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, NULL);
 
     t_memoria_inicializarproceso_request *request = inicializarproceso_request_new(pcb->id, pcb->tamanio);

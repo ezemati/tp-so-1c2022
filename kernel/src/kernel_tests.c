@@ -26,7 +26,7 @@ void serializar_deserializar_actualizarpcb_request_response()
     CU_ASSERT_EQUAL(request_deserializada->program_counter, 2);
     CU_ASSERT_EQUAL(request_deserializada->bloqueo_pendiente, 3);
     CU_ASSERT_EQUAL(0, memcmp(&(request_deserializada->time_inicio_running), &time_inicio, sizeof(time_inicio)));
-    CU_ASSERT_EQUAL(0, memcmp(&(request_deserializada->time_fin_running), &time_fin, sizeof(time_inicio)));
+    CU_ASSERT_EQUAL(0, memcmp(&(request_deserializada->time_fin_running), &time_fin, sizeof(time_fin)));
     actualizarpcb_request_destroy(request_deserializada);
     free(request_serializada);
     actualizarpcb_request_destroy(request);

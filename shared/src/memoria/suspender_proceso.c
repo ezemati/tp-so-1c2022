@@ -91,7 +91,7 @@ int bytes_totales_suspenderproceso_response_serializada(t_memoria_suspenderproce
     // OK (bool)
     int bytes = 0;
 
-    bytes += sizeof(bool);
+    bytes += sizeof(response->ok);
 
     return bytes;
 }

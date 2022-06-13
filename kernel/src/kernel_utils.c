@@ -51,7 +51,7 @@ void terminar_kernel()
 
 void procesar_request(int socket_cliente)
 {
-	int *socket_cliente_dup = malloc(sizeof(int));
+	int *socket_cliente_dup = malloc(sizeof(*socket_cliente_dup));
 	*socket_cliente_dup = socket_cliente;
 
 	pthread_t thread_id;
@@ -199,6 +199,11 @@ void bloquear_proceso(t_kernel_pcb *pcb, uint32_t tiempo_bloqueo)
 	replanificar();
 }
 
+bool algoritmo_es_con_desalojo()
+{
+	return string_equals_ignore_case(config->algoritmo_planificacion, "SRT");
+}
+
 void print_instrucciones(t_kernel_pcb *pcb)
 {
 	t_list_iterator *iterator = list_iterator_create(pcb->lista_instrucciones);
@@ -222,6 +227,37 @@ void print_instrucciones_de_todos_los_procesos(t_list *pcbs)
 		print_instrucciones(pcb);
 	}
 	list_iterator_destroy(iterator);
+}
+
+void print_procesos_listaready()
+{
+	// Si el algoritmo es SRT, muestro las rafagas pendientes (si es FIFO no las muestro porque no interesan)
+	bool mostrar_rafaga_pendiente = algoritmo_es_con_desalojo();
+
+	pthread_mutex_lock(&mutex_lista_ready);
+
+	log_trace_if_logger_not_null(logger, "----- Procesos en READY -----");
+
+	t_list_iterator *iterator_ready = list_iterator_create(lista_ready);
+	uint32_t i = 0;
+	while (list_iterator_has_next(iterator_ready))
+	{
+		t_kernel_pcb *pcb = list_iterator_next(iterator_ready);
+		if (mostrar_rafaga_pendiente)
+		{
+			log_trace_if_logger_not_null(logger, "[%d] - PID %d (pendiente=%dms)", i, pcb->id, tiempo_restante_segun_estimacion(pcb));
+		}
+		else
+		{
+			log_trace_if_logger_not_null(logger, "[%d] - PID %d", i, pcb->id);
+		}
+
+		i++;
+	}
+
+	list_iterator_destroy(iterator_ready);
+
+	pthread_mutex_unlock(&mutex_lista_ready);
 }
 
 t_kernel_pcb *enviar_interrupcion_a_cpu()

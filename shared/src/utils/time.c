@@ -2,10 +2,15 @@
 
 time_miliseg current_time()
 {
-    struct timeval time;
-    gettimeofday(&time, NULL);
+    // https://stackoverflow.com/a/10889489
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
 
-    return microsegundos_a_milisegundos(time.tv_usec);
+    unsigned long long millisecondsSinceEpoch =
+        (unsigned long long)(tv.tv_sec) * 1000 +
+        (unsigned long long)(tv.tv_usec) / 1000;
+
+    return millisecondsSinceEpoch;
 }
 
 time_miliseg milisegundos_entre_times(time_miliseg t1, time_miliseg t2)

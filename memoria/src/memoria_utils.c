@@ -29,7 +29,7 @@ void terminar_memoria()
 
 void procesar_request(int socket_cliente)
 {
-	uint32_t *socket_cliente_dup = malloc(sizeof(uint32_t));
+	uint32_t *socket_cliente_dup = malloc(sizeof(*socket_cliente_dup));
 	*socket_cliente_dup = socket_cliente; // Hay que duplicar el socket_cliente porque si no pasan cosas mamadas en el procesar_cliente
 
 	pthread_t thread_id;

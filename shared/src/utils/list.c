@@ -66,7 +66,7 @@ void list_add_in_index_custom(t_list *list, int index, void *data)
 
 t_link_element *list_create_element(void *data)
 {
-    t_link_element *element = malloc(sizeof(t_link_element));
+    t_link_element *element = malloc(sizeof(*element));
     element->data = data;
     element->next = NULL;
     return element;
