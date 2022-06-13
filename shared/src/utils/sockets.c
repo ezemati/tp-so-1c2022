@@ -23,7 +23,7 @@ int crear_conexion(char *ip, uint32_t puerto, t_log *logger)
     {
         bool connect_exitoso = false;
         int maximo_intentos = 10;
-        double milisegundos_sleep = 1000;
+        time_miliseg milisegundos_sleep = 1000;
         for (int intento_actual = 1; intento_actual <= maximo_intentos; intento_actual++)
         {
             log_trace_if_logger_not_null(logger, "Intento %d/%d de conexion con IP %s, PUERTO %s", intento_actual, maximo_intentos, ip, strPuerto);

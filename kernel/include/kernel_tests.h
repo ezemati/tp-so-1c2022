@@ -3,6 +3,9 @@
 
 #include <kernel/actualizar_pcb.h>
 
+#include <types/time_types.h>
+#include <utils/time.h>
+
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>

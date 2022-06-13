@@ -15,8 +15,8 @@ int run_tests()
 
 void serializar_deserializar_actualizarpcb_request_response()
 {
-    double time_inicio = time(NULL);
-    double time_fin = time(NULL);
+    time_miliseg time_inicio = current_time();
+    time_miliseg time_fin = current_time();
 
     t_kernel_actualizarpcb_request *request = actualizarpcb_request_new(1, 2, 3, time_inicio, time_fin);
     int bytes_serializado_request;
@@ -25,8 +25,8 @@ void serializar_deserializar_actualizarpcb_request_response()
     CU_ASSERT_EQUAL(request_deserializada->pid, 1);
     CU_ASSERT_EQUAL(request_deserializada->program_counter, 2);
     CU_ASSERT_EQUAL(request_deserializada->bloqueo_pendiente, 3);
-    CU_ASSERT_EQUAL(0, memcmp(&(request_deserializada->time_inicio_running), &time_inicio, sizeof(double)));
-    CU_ASSERT_EQUAL(0, memcmp(&(request_deserializada->time_fin_running), &time_fin, sizeof(double)));
+    CU_ASSERT_EQUAL(0, memcmp(&(request_deserializada->time_inicio_running), &time_inicio, sizeof(time_inicio)));
+    CU_ASSERT_EQUAL(0, memcmp(&(request_deserializada->time_fin_running), &time_fin, sizeof(time_inicio)));
     actualizarpcb_request_destroy(request_deserializada);
     free(request_serializada);
     actualizarpcb_request_destroy(request);

@@ -16,7 +16,7 @@ t_kernel_config *kernel_config_new(char *config_path, t_log *logger)
     kernel_config->estimacion_inicial = config_get_double_value(config, "ESTIMACION_INICIAL");
     kernel_config->alfa = config_get_double_value(config, "ALFA");
     kernel_config->grado_multiprogramacion = config_get_int_value(config, "GRADO_MULTIPROGRAMACION");
-    kernel_config->tiempo_maximo_bloqueado = config_get_int_value(config, "TIEMPO_MAXIMO_BLOQUEADO");
+    kernel_config->tiempo_maximo_bloqueado = config_get_double_value(config, "TIEMPO_MAXIMO_BLOQUEADO");
 
     config_destroy(config);
 

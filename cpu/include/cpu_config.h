@@ -1,18 +1,20 @@
 #ifndef CPU_CONFIG_H
 #define CPU_CONFIG_H
 
+#include <types/time_types.h>
+#include <utils/logs.h>
+
 #include <stdint.h>
 #include <stdlib.h>
 #include <commons/config.h>
 #include <commons/log.h>
 #include <commons/string.h>
-#include <utils/logs.h>
 
 typedef struct t_cpu_config
 {
     uint32_t entradas_tlb;
     char *reemplazo_tlb;
-    double retardo_noop;
+    time_miliseg retardo_noop;
     char *ip_memoria;
     uint32_t puerto_memoria;
     uint32_t puerto_escucha_dispatch;

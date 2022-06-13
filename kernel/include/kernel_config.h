@@ -1,12 +1,14 @@
 #ifndef KERNEL_CONFIG_H
 #define KERNEL_CONFIG_H
 
+#include <types/time_types.h>
+#include <utils/logs.h>
+
 #include <stdint.h>
 #include <stdlib.h>
 #include <commons/config.h>
 #include <commons/log.h>
 #include <commons/string.h>
-#include <utils/logs.h>
 
 typedef struct t_kernel_config
 {
@@ -17,10 +19,10 @@ typedef struct t_kernel_config
     uint32_t puerto_cpu_interrupt;
     uint32_t puerto_escucha;
     char *algoritmo_planificacion;
-    double estimacion_inicial;
+    time_miliseg estimacion_inicial;
     double alfa;
     uint32_t grado_multiprogramacion;
-    uint32_t tiempo_maximo_bloqueado;
+    time_miliseg tiempo_maximo_bloqueado;
 } t_kernel_config;
 
 t_kernel_config *kernel_config_new(char *config_path, t_log *logger);

@@ -41,9 +41,9 @@ t_list *pcb_duplicar_instrucciones(t_programa *programa)
 void recalcular_estimacion(t_kernel_pcb *pcb)
 {
     double alfa = config->alfa;
-    double estimacion_anterior = pcb->estimacion_rafaga;
-    double real_anterior = pcb->milisegundos_en_running;
-    double nueva_estimacion = alfa * real_anterior + (1 - alfa) * estimacion_anterior;
+    time_miliseg estimacion_anterior = pcb->estimacion_rafaga;
+    time_miliseg real_anterior = pcb->milisegundos_en_running;
+    time_miliseg nueva_estimacion = alfa * real_anterior + (1 - alfa) * estimacion_anterior;
     pcb->estimacion_rafaga = nueva_estimacion;
 
     log_trace_if_logger_not_null(logger, "Recalculando estimacion para proceso %d", pcb->id);
@@ -51,28 +51,27 @@ void recalcular_estimacion(t_kernel_pcb *pcb)
     log_info_if_logger_not_null(logger, "Nueva estimacion para el proceso %d: %f", pcb->id, nueva_estimacion);
 }
 
-void actualizar_pcb_desalojado(t_kernel_pcb *pcb, uint32_t nuevo_program_counter, double time_inicio_running, double time_fin_running)
+void actualizar_pcb_desalojado(t_kernel_pcb *pcb, uint32_t nuevo_program_counter, time_miliseg time_inicio_running, time_miliseg time_fin_running)
 {
     pcb->program_counter = nuevo_program_counter;
     cargar_tiempo_ejecucion_en_cpu(pcb, time_inicio_running, time_fin_running);
 }
 
-void actualizar_pcb_bloqueado(t_kernel_pcb *pcb, uint32_t nuevo_program_counter, double time_inicio_running, double time_fin_running)
+void actualizar_pcb_bloqueado(t_kernel_pcb *pcb, uint32_t nuevo_program_counter, time_miliseg time_inicio_running, time_miliseg time_fin_running)
 {
     pcb->program_counter = nuevo_program_counter;
     cargar_tiempo_ejecucion_en_cpu(pcb, time_inicio_running, time_fin_running);
     recalcular_estimacion(pcb);
 }
 
-double tiempo_restante_segun_estimacion(t_kernel_pcb *self)
+time_miliseg tiempo_restante_segun_estimacion(t_kernel_pcb *self)
 {
     return self->estimacion_rafaga - self->milisegundos_en_running;
 }
 
-void cargar_tiempo_ejecucion_en_cpu(t_kernel_pcb *pcb, double time_inicio_running, double time_fin_running)
+void cargar_tiempo_ejecucion_en_cpu(t_kernel_pcb *pcb, time_miliseg time_inicio_running, time_miliseg time_fin_running)
 {
-    double segundos_running = difftime(time_fin_running, time_inicio_running);
-    double milisegundos_running = segundos_a_milisegundos(segundos_running);
+    time_miliseg milisegundos_running = milisegundos_entre_times(time_inicio_running, time_fin_running);
     pcb->milisegundos_en_running += milisegundos_running;
 }
 

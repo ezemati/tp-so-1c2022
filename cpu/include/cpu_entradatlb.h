@@ -13,7 +13,7 @@ typedef struct t_cpu_entradatlb
 {
     uint32_t numero_pagina;
     uint32_t numero_marco;
-    double last_used;
+    time_miliseg last_used;
 } t_cpu_entradatlb;
 
 t_cpu_entradatlb *entradatlb_new();

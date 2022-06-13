@@ -13,7 +13,7 @@ void swap_crear_archivo(uint32_t pid, uint32_t tamanio_proceso)
 
     // Si el proceso es de 50 bytes y el tamanio de pagina es 40 bytes, el proceso
     // necesita 2 paginas, porque con 1 sola no le alcanza (fragmentacion interna?)
-    uint32_t cantidad_paginas_del_proceso = ceil((double)tamanio_proceso / config->tamanio_pagina);
+    uint32_t cantidad_paginas_del_proceso = ceil((float)tamanio_proceso / config->tamanio_pagina);
     uint32_t bytes_del_archivo_swap = cantidad_paginas_del_proceso * config->tamanio_pagina;
 
     void *bytes_vacios = malloc(bytes_del_archivo_swap);
@@ -100,6 +100,6 @@ static void mover_puntero_de_archivo_a_pagina(FILE *file, uint32_t numero_pagina
 
 static void bloquear_hilo_por_retardo_swap()
 {
-    double retardo_swap_microsegundos = milisegundos_a_microsegundos(config->retardo_swap);
+    time_microseg retardo_swap_microsegundos = milisegundos_a_microsegundos(config->retardo_swap);
     usleep(retardo_swap_microsegundos);
 }

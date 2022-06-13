@@ -5,9 +5,9 @@ cd ..
 cd kernel
 ./vexec_tests
 cd ..
-cd memoria
+cd cpu
 ./vexec_tests
 cd ..
-cd cpu
+cd memoria
 ./vexec_tests
 cd ..

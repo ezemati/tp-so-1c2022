@@ -1,11 +1,12 @@
 #ifndef UTILS_SOCKETS_H
 #define UTILS_SOCKETS_H
 
+#include <serialization/serialization_utils.h>
+#include <types/identificador_operacion.h>
+#include <types/time_types.h>
 #include <utils/converter.h>
 #include <utils/logs.h>
 #include <utils/string.h>
-#include <serialization/serialization_utils.h>
-#include <types/identificador_operacion.h>
 
 #include <netdb.h>
 #include <stdbool.h>
