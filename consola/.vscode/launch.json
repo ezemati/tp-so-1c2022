@@ -12,8 +12,7 @@
             "program": "${workspaceFolder}/bin/consola.out",
             "args": [
                 // "--test"
-                "cfg/programa.program",
-                // "cfg/programa01.program",
+                "cfg/EXTRA_1",
                 "50"
             ],
             "stopAtEntry": true,
