@@ -9,5 +9,6 @@
 #include <string.h>
 
 FILE *fopen_with_format(char *mode, char *format, ...);
+uint32_t file_size(FILE *file);
 
 #endif

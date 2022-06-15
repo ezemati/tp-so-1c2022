@@ -7,6 +7,7 @@
 #include <utils/converter.h>
 #include <utils/files.h>
 
+#include <math.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
