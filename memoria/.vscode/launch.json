@@ -11,7 +11,7 @@
             "preLaunchTask": "Memoria - Make",
             "program": "${workspaceFolder}/bin/memoria.out",
             "args": [
-                // "--test"
+                "cfg/SUSPE_CONFIG"
             ],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",

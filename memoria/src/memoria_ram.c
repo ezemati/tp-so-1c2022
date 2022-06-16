@@ -142,6 +142,7 @@ uint32_t memoria_ram_obtener_numero_marco_para_entrada_tabla_2(t_memoria_ram *se
     t_entrada_segundonivel *entrada_segundonivel = tabla_segundonivel_obtener_entrada_segundo_nivel(tablaSegundoNivel, request->entrada_tablasegundonivel);
     if (!entrada_segundonivel_tiene_pagina_presente(entrada_segundonivel))
     {
+        log_debug(logger, "Entrada %d de tabla 2N %d (pagina %d) AUSENTE", request->entrada_tablasegundonivel, request->numero_tablasegundonivel, entrada_segundonivel->numero_pagina);
         t_tabla_primernivel *tablaPrimerNivel = memoria_ram_obtener_tablaprimernivel(self, request->numero_tablaprimernivel);
         memoria_ram_cargar_pagina(self, entrada_segundonivel, tablaPrimerNivel->clock);
     }
@@ -168,7 +169,7 @@ void memoria_ram_cargar_pagina(t_memoria_ram *self, t_entrada_segundonivel *entr
         log_info_if_logger_not_null(logger, "Pagina %d asignada a marco %d", entradaNueva->numero_entrada, entradaNueva->numero_marco);
 
         clock_agregar_entrada(clock, entradaNueva);
-        log_info_if_logger_not_null(logger, "Nueva cantidad de marcos en memoria: %d", clock_cantidad_entradas_llenas(clock));
+        log_info_if_logger_not_null(logger, "Nueva cantidad de marcos en memoria del proceso: %d", clock_cantidad_entradas_llenas(clock));
 
         return;
     }

@@ -34,15 +34,26 @@ void clock_clear(t_clock *clock)
 
 uint32_t clock_obtener_posicion_pagina_a_reemplazar(t_clock *self)
 {
+    uint32_t indice_pagina_a_reemplazar = 0;
+
     switch (self->algor_reemplazo)
     {
     case CLOCK:
-        return clock_obtener_posicion_pagina_a_reemplazar_clock(self);
+        indice_pagina_a_reemplazar = clock_obtener_posicion_pagina_a_reemplazar_clock(self);
+        break;
     case CLOCK_M:
-        return clock_obtener_posicion_pagina_a_reemplazar_clockmodificado(self);
+        indice_pagina_a_reemplazar = clock_obtener_posicion_pagina_a_reemplazar_clockmodificado(self);
+        break;
     default:
-        return -1;
+        indice_pagina_a_reemplazar = -1;
+        break;
     }
+
+    t_entrada_segundonivel *entrada_a_reemplazar = clock_obtener_entrada_en_posicion(self, indice_pagina_a_reemplazar);
+
+    log_info_if_logger_not_null(logger, "Entrada [%d] seleccionada para reemplazo: {pagina=%d}", indice_pagina_a_reemplazar, entrada_a_reemplazar->numero_pagina);
+
+    return indice_pagina_a_reemplazar;
 }
 
 void clock_agregar_entrada(t_clock *self, t_entrada_segundonivel *entradaNueva)
@@ -70,6 +81,29 @@ uint32_t clock_cantidad_entradas_llenas(t_clock *self)
     return list_size(self->entradas_segundonivel);
 }
 
+void clock_print_entradas(t_clock *self)
+{
+    for (int i = 0; i < config->marcos_por_proceso; i++)
+    {
+        t_entrada_segundonivel *entrada = clock_obtener_entrada_en_posicion(self, i);
+
+        if (self->puntero_aguja == i)
+        {
+            if (self->algor_reemplazo == CLOCK)
+                log_trace_if_logger_not_null(logger, " --> [%d]: {pagina=%d, marco=%d} (U=%d)", i, entrada->numero_pagina, entrada->numero_marco, (int)entrada->bit_uso);
+            else
+                log_trace_if_logger_not_null(logger, " --> [%d]: {pagina=%d, marco=%d} (U=%d, M=%d)", i, entrada->numero_pagina, entrada->numero_marco, (int)entrada->bit_uso, (int)entrada->bit_modificado);
+        }
+        else
+        {
+            if (self->algor_reemplazo == CLOCK)
+                log_trace_if_logger_not_null(logger, "     [%d]: {pagina=%d, marco=%d} (U=%d)", i, entrada->numero_pagina, entrada->numero_marco, (int)entrada->bit_uso);
+            else
+                log_trace_if_logger_not_null(logger, "     [%d]: {pagina=%d, marco=%d} (U=%d, M=%d)", i, entrada->numero_pagina, entrada->numero_marco, (int)entrada->bit_uso, (int)entrada->bit_modificado);
+        }
+    }
+}
+
 static uint32_t clock_obtener_posicion_pagina_a_reemplazar_clock(t_clock *self)
 {
     return clock_buscar_entrada_con_uso0(self);
@@ -95,8 +129,12 @@ static int32_t clock_buscar_entrada_con_uso0(t_clock *self)
 {
     int32_t posicionEntradaAReemplazar = -1;
 
+    log_trace_if_logger_not_null(logger, "Buscando entrada con U=0");
+
     while (posicionEntradaAReemplazar == -1)
     {
+        clock_print_entradas(self);
+
         t_entrada_segundonivel *entradaActualmenteApuntada = clock_obtener_entrada_actualmente_apuntada(self);
         if (entradaActualmenteApuntada->bit_uso == false)
         {
@@ -117,8 +155,12 @@ static int32_t clock_buscar_entrada_con_uso0_modificado0(t_clock *self)
 {
     int32_t posicionEntradaAReemplazar = -1;
 
+    log_trace_if_logger_not_null(logger, "Buscando entrada con (U=0, M=0)");
+
     for (int i = 0; i < config->marcos_por_proceso && posicionEntradaAReemplazar == -1; i++)
     {
+        clock_print_entradas(self);
+
         t_entrada_segundonivel *entradaActualmenteApuntada = clock_obtener_entrada_actualmente_apuntada(self);
         if (entradaActualmenteApuntada->bit_uso == false && entradaActualmenteApuntada->bit_modificado == false)
         {
@@ -135,8 +177,12 @@ static int32_t clock_buscar_entrada_con_uso0_modificado1(t_clock *self)
 {
     int32_t posicionEntradaAReemplazar = -1;
 
+    log_trace_if_logger_not_null(logger, "Buscando entrada con (U=0, M=1)");
+
     for (int i = 0; i < config->marcos_por_proceso && posicionEntradaAReemplazar == -1; i++)
     {
+        clock_print_entradas(self);
+
         t_entrada_segundonivel *entradaActualmenteApuntada = clock_obtener_entrada_actualmente_apuntada(self);
         if (entradaActualmenteApuntada->bit_uso == false && entradaActualmenteApuntada->bit_modificado == true)
         {

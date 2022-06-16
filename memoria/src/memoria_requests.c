@@ -127,6 +127,7 @@ void obtener_numero_tabla_2_para_entrada_tabla_1(int socket_cliente)
 
 	log_debug(logger, "Buscando numero de tabla 2 para entrada %d de la tabla de primer nivel %d", request->entrada_tablaprimernivel, request->numero_tablaprimernivel);
 	uint32_t numero_tablasegundonivel = memoria_ram_obtener_numero_tabla_2_para_entrada_tabla_1(memoria_ram, request);
+	log_debug(logger, "Numero de tabla 2 para entrada %d de la tabla de primer nivel %d = %d", request->entrada_tablaprimernivel, request->numero_tablaprimernivel, numero_tablasegundonivel);
 
 	t_memoria_numerotabla2paraentradatabla1_response *response = numerotabla2paraentradatabla1_response_new(numero_tablasegundonivel);
 	int bytes;
@@ -148,6 +149,7 @@ void obtener_marco_para_entrada_tabla_2(int socket_cliente)
 
 	log_debug(logger, "Buscando numero de marco para entrada %d de la tabla de segundo nivel %d", request->entrada_tablasegundonivel, request->numero_tablasegundonivel);
 	uint32_t numero_marco = memoria_ram_obtener_numero_marco_para_entrada_tabla_2(memoria_ram, request);
+	log_debug(logger, "Numero de marco para entrada %d de la tabla de 2N %d = %d", request->entrada_tablasegundonivel, request->numero_tablasegundonivel, numero_marco);
 
 	t_memoria_marcoparaentradatabla2_response *response = marcoparaentradatabla2_response_new(numero_marco);
 	int bytes;

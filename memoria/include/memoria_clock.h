@@ -35,4 +35,6 @@ t_entrada_segundonivel *clock_obtener_entrada_en_posicion(t_clock *self, uint32_
 bool clock_esta_lleno(t_clock *self);
 uint32_t clock_cantidad_entradas_llenas(t_clock *self);
 
+void clock_print_entradas(t_clock *self);
+
 #endif

@@ -86,6 +86,8 @@ void *procesar_cliente(uint32_t *args)
 		break;
 	}
 
+	log_info_if_logger_not_null(logger, "Operacion finalizada en Memoria: %s", identificador_operacion_to_string(id_op));
+
 	liberar_conexion(socket_cliente);
 	free(args);
 
