@@ -11,8 +11,8 @@
 
 typedef struct t_cpu_entradatlb
 {
-    uint32_t numero_pagina;
-    uint32_t numero_marco;
+    int32_t numero_pagina;
+    int32_t numero_marco;
     time_miliseg last_used;
 } t_cpu_entradatlb;
 

@@ -1,6 +1,11 @@
 #ifndef CPU_TLB_H
 #define CPU_TLB_H
 
+// Esto es necesario por la referencia recursiva que hay entre t_cpu_tlb y t_cpu_entradatlb (CREO)
+// (t_cpu_tlb referencia a t_cpu_entradatlb, t_cpu_entradatlb referencia a variables_globales,
+// y variables_globales referencia a t_cpu_tlb)
+struct t_cpu_entradatlb;
+
 #include <cpu_entradatlb.h>
 #include <cpu_variables_globales.h>
 #include <cpu_utils.h>
@@ -30,5 +35,9 @@ void tlb_clear(t_cpu_tlb *tlb);
 int tlb_try_read_entry(t_cpu_tlb *tlb, uint32_t numero_pagina);
 
 void tlb_add_entry(t_cpu_tlb *tlb, uint32_t numero_pagina, uint32_t numero_marco);
+
+void tlb_replace_entry(t_cpu_tlb *tlb, struct t_cpu_entradatlb *entrada, uint32_t numero_pagina_nueva);
+
+struct t_cpu_entradatlb *tlb_get_entry_con_numero_pagina(t_cpu_tlb *tlb, uint32_t numero_pagina);
 
 #endif

@@ -143,11 +143,12 @@ void serializar_deserializar_marcoparaentradatabla2_request_response()
     free(request_serializada);
     marcoparaentradatabla2_request_destroy(request);
 
-    t_memoria_marcoparaentradatabla2_response *response = marcoparaentradatabla2_response_new(1);
+    t_memoria_marcoparaentradatabla2_response *response = marcoparaentradatabla2_response_new(1, -1);
     int bytes_serializado_response;
     void *response_serializada = serializar_marcoparaentradatabla2_response(response, &bytes_serializado_response);
     t_memoria_marcoparaentradatabla2_response *response_deserializada = deserializar_marcoparaentradatabla2_response(response_serializada);
     CU_ASSERT_EQUAL(response_deserializada->numero_marco, 1);
+    CU_ASSERT_EQUAL(response_deserializada->numero_pagina_reemplazada, -1);
     marcoparaentradatabla2_response_destroy(response_deserializada);
     free(response_serializada);
     marcoparaentradatabla2_response_destroy(response);

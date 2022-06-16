@@ -61,6 +61,12 @@ void tlb_add_entry(t_cpu_tlb *tlb, uint32_t numero_pagina, uint32_t numero_marco
     entradatlb_update(entrada_a_reemplazar, numero_pagina, numero_marco);
 }
 
+void tlb_replace_entry(t_cpu_tlb *tlb, t_cpu_entradatlb *entrada, uint32_t numero_pagina_nueva)
+{
+    uint32_t numero_marco = entrada->numero_marco;
+    entradatlb_update(entrada, numero_pagina_nueva, numero_marco);
+}
+
 int tlb_try_read_entry(t_cpu_tlb *tlb, uint32_t numero_pagina)
 {
     for (int i = 0; i < tlb->cantidad_entradas_ocupadas; i++)
@@ -74,6 +80,24 @@ int tlb_try_read_entry(t_cpu_tlb *tlb, uint32_t numero_pagina)
     }
 
     return -1;
+}
+
+t_cpu_entradatlb *tlb_get_entry_con_numero_pagina(t_cpu_tlb *tlb, uint32_t numero_pagina)
+{
+    t_cpu_entradatlb *entrada_con_pagina = NULL;
+
+    t_list_iterator *iterator = list_iterator_create(tlb->entradas_tlb);
+    while (list_iterator_has_next(iterator) && entrada_con_pagina == NULL)
+    {
+        t_cpu_entradatlb *entrada = list_iterator_next(iterator);
+        if (entrada->numero_pagina == numero_pagina)
+        {
+            entrada_con_pagina = entrada;
+        }
+    }
+    list_iterator_destroy(iterator);
+
+    return entrada_con_pagina;
 }
 
 static bool tlb_tiene_espacios_libres(t_cpu_tlb *tlb)

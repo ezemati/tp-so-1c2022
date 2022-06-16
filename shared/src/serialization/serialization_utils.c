@@ -8,6 +8,14 @@ uint32_t leer_uint32_de_buffer(void *buffer, int *desplazamiento)
     return valor;
 }
 
+int32_t leer_int32_de_buffer(void *buffer, int *desplazamiento)
+{
+    int32_t valor;
+    memcpy(&valor, buffer + *desplazamiento, sizeof(int32_t));
+    (*desplazamiento) += sizeof(int32_t);
+    return valor;
+}
+
 bool leer_bool_de_buffer(void *buffer, int *desplazamiento)
 {
     bool valor;
@@ -48,6 +56,12 @@ void escribir_uint32_en_buffer(void *buffer, int *desplazamiento, uint32_t valor
 {
     memcpy(buffer + *desplazamiento, &valor, sizeof(uint32_t));
     (*desplazamiento) += sizeof(uint32_t);
+}
+
+void escribir_int32_en_buffer(void *buffer, int *desplazamiento, int32_t valor)
+{
+    memcpy(buffer + *desplazamiento, &valor, sizeof(int32_t));
+    (*desplazamiento) += sizeof(int32_t);
 }
 
 void escribir_bool_en_buffer(void *buffer, int *desplazamiento, bool valor)

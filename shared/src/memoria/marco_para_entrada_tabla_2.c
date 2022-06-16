@@ -14,10 +14,11 @@ void marcoparaentradatabla2_request_destroy(t_memoria_marcoparaentradatabla2_req
     free(request);
 }
 
-t_memoria_marcoparaentradatabla2_response *marcoparaentradatabla2_response_new(uint32_t numero_marco)
+t_memoria_marcoparaentradatabla2_response *marcoparaentradatabla2_response_new(uint32_t numero_marco, int32_t numero_pagina_reemplazada)
 {
     t_memoria_marcoparaentradatabla2_response *response = malloc(sizeof(t_memoria_marcoparaentradatabla2_response));
     response->numero_marco = numero_marco;
+    response->numero_pagina_reemplazada = numero_pagina_reemplazada;
     return response;
 }
 
@@ -70,13 +71,14 @@ int bytes_totales_marcoparaentradatabla2_request_serializada(t_memoria_marcopara
 
 void *serializar_marcoparaentradatabla2_response(t_memoria_marcoparaentradatabla2_response *response, int *bytes)
 {
-    // NUMERO_MARCO (uint32)
+    // NUMERO_MARCO (uint32), NUMERO_PAGINA_REEMPLAZADA (int32)
     (*bytes) = bytes_totales_marcoparaentradatabla2_response_serializada(response);
     void *buffer = malloc(*bytes);
 
     int desplazamiento = 0;
 
     escribir_uint32_en_buffer(buffer, &desplazamiento, response->numero_marco);
+    escribir_int32_en_buffer(buffer, &desplazamiento, response->numero_pagina_reemplazada);
 
     return buffer;
 }
@@ -86,18 +88,20 @@ t_memoria_marcoparaentradatabla2_response *deserializar_marcoparaentradatabla2_r
     int desplazamiento = 0;
 
     uint32_t numero_marco = leer_uint32_de_buffer(buffer, &desplazamiento);
+    int32_t numero_pagina_reemplazada = leer_int32_de_buffer(buffer, &desplazamiento);
 
-    t_memoria_marcoparaentradatabla2_response *response = marcoparaentradatabla2_response_new(numero_marco);
+    t_memoria_marcoparaentradatabla2_response *response = marcoparaentradatabla2_response_new(numero_marco, numero_pagina_reemplazada);
 
     return response;
 }
 
 int bytes_totales_marcoparaentradatabla2_response_serializada(t_memoria_marcoparaentradatabla2_response *response)
 {
-    // NUMERO_MARCO (uint32)
+    // NUMERO_MARCO (uint32), NUMERO_PAGINA_REEMPLAZADA (int32)
     int bytes = 0;
 
     bytes += sizeof(response->numero_marco);
+    bytes += sizeof(response->numero_pagina_reemplazada);
 
     return bytes;
 }

@@ -57,9 +57,9 @@ void memoria_ram_escribir_dato(t_memoria_ram *self, t_memoria_escribirdato_reque
 
 uint32_t memoria_ram_obtener_numero_tabla_2_para_entrada_tabla_1(t_memoria_ram *self, t_memoria_numerotabla2paraentradatabla1_request *request);
 
-uint32_t memoria_ram_obtener_numero_marco_para_entrada_tabla_2(t_memoria_ram *self, t_memoria_marcoparaentradatabla2_request *request);
+uint32_t memoria_ram_obtener_numero_marco_para_entrada_tabla_2(t_memoria_ram *self, t_memoria_marcoparaentradatabla2_request *request, int *numero_pagina_reemplazada);
 
-void memoria_ram_cargar_pagina(t_memoria_ram *self, t_entrada_segundonivel *entradaNueva, t_clock *clock);
+void memoria_ram_cargar_pagina(t_memoria_ram *self, t_entrada_segundonivel *entradaNueva, t_clock *clock, int *numero_pagina_reemplazada);
 void memoria_ram_reemplazar_pagina(t_memoria_ram *self, uint32_t pid, t_entrada_segundonivel *entradaNueva, t_entrada_segundonivel *entradaVieja);
 void memoria_ram_vaciar_marco(t_memoria_ram *self, uint32_t numero_marco);
 int32_t memoria_ram_obtener_numero_marco_libre(t_memoria_ram *self);

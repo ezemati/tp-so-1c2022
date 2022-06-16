@@ -102,6 +102,8 @@ void clock_print_entradas(t_clock *self)
                 log_trace_if_logger_not_null(logger, "     [%d]: {pagina=%d, marco=%d} (U=%d, M=%d)", i, entrada->numero_pagina, entrada->numero_marco, (int)entrada->bit_uso, (int)entrada->bit_modificado);
         }
     }
+
+    log_trace_if_logger_not_null(logger, "     -----------------------------------------");
 }
 
 static uint32_t clock_obtener_posicion_pagina_a_reemplazar_clock(t_clock *self)

@@ -135,7 +135,7 @@ uint32_t memoria_ram_obtener_numero_tabla_2_para_entrada_tabla_1(t_memoria_ram *
     return numero_tablasegundonivel;
 }
 
-uint32_t memoria_ram_obtener_numero_marco_para_entrada_tabla_2(t_memoria_ram *self, t_memoria_marcoparaentradatabla2_request *request)
+uint32_t memoria_ram_obtener_numero_marco_para_entrada_tabla_2(t_memoria_ram *self, t_memoria_marcoparaentradatabla2_request *request, int *numero_pagina_reemplazada)
 {
     t_tabla_segundonivel *tablaSegundoNivel = memoria_ram_obtener_tablasegundonivel(self, request->numero_tablasegundonivel);
 
@@ -144,16 +144,15 @@ uint32_t memoria_ram_obtener_numero_marco_para_entrada_tabla_2(t_memoria_ram *se
     {
         log_debug(logger, "Entrada %d de tabla 2N %d (pagina %d) AUSENTE", request->entrada_tablasegundonivel, request->numero_tablasegundonivel, entrada_segundonivel->numero_pagina);
         t_tabla_primernivel *tablaPrimerNivel = memoria_ram_obtener_tablaprimernivel(self, request->numero_tablaprimernivel);
-        memoria_ram_cargar_pagina(self, entrada_segundonivel, tablaPrimerNivel->clock);
+        memoria_ram_cargar_pagina(self, entrada_segundonivel, tablaPrimerNivel->clock, numero_pagina_reemplazada);
     }
 
     return entrada_segundonivel->numero_marco;
 }
 
-void memoria_ram_cargar_pagina(t_memoria_ram *self, t_entrada_segundonivel *entradaNueva, t_clock *clock)
+void memoria_ram_cargar_pagina(t_memoria_ram *self, t_entrada_segundonivel *entradaNueva, t_clock *clock, int *numero_pagina_reemplazada)
 {
-    // TODO: printear todas las entradas del clock, para debug
-    // (similar a la planificacion en Kernel)
+    *numero_pagina_reemplazada = -1;
 
     uint32_t pid = entradaNueva->pid;
 
@@ -169,7 +168,7 @@ void memoria_ram_cargar_pagina(t_memoria_ram *self, t_entrada_segundonivel *entr
         log_info_if_logger_not_null(logger, "Pagina %d asignada a marco %d", entradaNueva->numero_entrada, entradaNueva->numero_marco);
 
         clock_agregar_entrada(clock, entradaNueva);
-        log_info_if_logger_not_null(logger, "Nueva cantidad de marcos en memoria del proceso: %d", clock_cantidad_entradas_llenas(clock));
+        log_info_if_logger_not_null(logger, "Nueva cantidad de marcos en memoria del proceso: %d/%d", clock_cantidad_entradas_llenas(clock), config->marcos_por_proceso);
 
         return;
     }
@@ -178,6 +177,7 @@ void memoria_ram_cargar_pagina(t_memoria_ram *self, t_entrada_segundonivel *entr
 
     uint32_t posicionEntradaAReemplazar = clock_obtener_posicion_pagina_a_reemplazar(clock);
     t_entrada_segundonivel *entradaVieja = clock_obtener_entrada_en_posicion(clock, posicionEntradaAReemplazar);
+    *numero_pagina_reemplazada = entradaVieja->numero_pagina;
     log_info_if_logger_not_null(logger, "Reemplazando marco %d", entradaVieja->numero_marco);
     memoria_ram_reemplazar_pagina(self, pid, entradaNueva, entradaVieja);
     clock_reemplazar_entrada(clock, entradaNueva, posicionEntradaAReemplazar);

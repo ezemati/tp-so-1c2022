@@ -1,7 +1,7 @@
 #include <cpu_mmu.h>
 
 static uint32_t obtener_numero_tabla_2_para_entrada_tabla_1(uint32_t numero_tablaprimernivel, uint32_t entrada_tablaprimernivel);
-static uint32_t obtener_numero_marco_para_entrada_tabla_2(uint32_t numero_tablaprimernivel, uint32_t numero_tablasegundonivel, uint32_t entrada_tablasegundonivel);
+static uint32_t obtener_numero_marco_para_entrada_tabla_2(uint32_t numero_tablaprimernivel, uint32_t numero_tablasegundonivel, uint32_t entrada_tablasegundonivel, int32_t *numero_pagina_reemplazada);
 
 bool direccion_logica_valida(uint32_t direccion_logica)
 {
@@ -31,10 +31,27 @@ uint32_t traducir_direccion_logica_a_fisica(uint32_t direccion_logica)
         uint32_t entrada_tablasegundonivel = numero_pagina % config->memoria_entradas_por_tabla;
 
         uint32_t numero_tablasegundonivel = obtener_numero_tabla_2_para_entrada_tabla_1(info_ejecucion_actual->tabla_paginas_primer_nivel, entrada_tablaprimernivel);
-        numero_marco = obtener_numero_marco_para_entrada_tabla_2(info_ejecucion_actual->tabla_paginas_primer_nivel, numero_tablasegundonivel, entrada_tablasegundonivel);
 
-        tlb_add_entry(tlb, numero_pagina, numero_marco);
-        log_trace_if_logger_not_null(logger, "TLB: entrada {numero_pagina=%d, numero_marco=%d} agregada", numero_pagina, numero_marco);
+        int32_t numero_pagina_reemplazada = -1;
+        numero_marco = obtener_numero_marco_para_entrada_tabla_2(info_ejecucion_actual->tabla_paginas_primer_nivel, numero_tablasegundonivel, entrada_tablasegundonivel, &numero_pagina_reemplazada);
+
+        if (numero_pagina_reemplazada != -1)
+        {
+            // Si Memoria hizo un reemplazo de paginas, entonces usamos la entrada con el numero_pagina que fue reemplazado,
+            // y le metemos la nueva pagina (porque el numero_marco es el mismo ya que se reemplazo una por la otra)
+            t_cpu_entradatlb *entrada_con_pagina_reemplazada = tlb_get_entry_con_numero_pagina(tlb, numero_pagina_reemplazada);
+            if (entrada_con_pagina_reemplazada != NULL)
+            {
+                tlb_replace_entry(tlb, entrada_con_pagina_reemplazada, numero_pagina);
+            }
+            log_trace_if_logger_not_null(logger, "TLB: entrada {numero_pagina=%d, numero_marco=%d} agregada (reemplazando entrada con numero_pagina=%d)", numero_pagina, numero_marco, numero_pagina_reemplazada);
+        }
+        else
+        {
+            // Si Memoria no hizo ningun reemplazo, entonces hay que agregar una nueva entrada (o hacer un reemplazo en la TLB segun el algoritmo)
+            tlb_add_entry(tlb, numero_pagina, numero_marco);
+            log_trace_if_logger_not_null(logger, "TLB: entrada {numero_pagina=%d, numero_marco=%d} agregada", numero_pagina, numero_marco);
+        }
     }
 
     uint32_t desplazamiento = direccion_logica - (numero_pagina * config->memoria_tamanio_pagina);
@@ -72,7 +89,7 @@ static uint32_t obtener_numero_tabla_2_para_entrada_tabla_1(uint32_t numero_tabl
     return numero_tablasegundonivel;
 }
 
-static uint32_t obtener_numero_marco_para_entrada_tabla_2(uint32_t numero_tablaprimernivel, uint32_t numero_tablasegundonivel, uint32_t entrada_tablasegundonivel)
+static uint32_t obtener_numero_marco_para_entrada_tabla_2(uint32_t numero_tablaprimernivel, uint32_t numero_tablasegundonivel, uint32_t entrada_tablasegundonivel, int32_t *numero_pagina_reemplazada)
 {
     int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, NULL);
 
@@ -87,6 +104,7 @@ static uint32_t obtener_numero_marco_para_entrada_tabla_2(uint32_t numero_tablap
     recibir_buffer_con_bytes_por_socket(socket_memoria, &response_marcoparaentradatabla2_serializada);
     t_memoria_marcoparaentradatabla2_response *response_marcoparaentradatabla2 = deserializar_marcoparaentradatabla2_response(response_marcoparaentradatabla2_serializada);
     uint32_t numero_marco = response_marcoparaentradatabla2->numero_marco;
+    *numero_pagina_reemplazada = response_marcoparaentradatabla2->numero_pagina_reemplazada;
     marcoparaentradatabla2_response_destroy(response_marcoparaentradatabla2);
     free(response_marcoparaentradatabla2_serializada);
 

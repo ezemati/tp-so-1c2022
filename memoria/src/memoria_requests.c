@@ -148,10 +148,11 @@ void obtener_marco_para_entrada_tabla_2(int socket_cliente)
 	t_memoria_marcoparaentradatabla2_request *request = deserializar_marcoparaentradatabla2_request(buffer_request);
 
 	log_debug(logger, "Buscando numero de marco para entrada %d de la tabla de segundo nivel %d", request->entrada_tablasegundonivel, request->numero_tablasegundonivel);
-	uint32_t numero_marco = memoria_ram_obtener_numero_marco_para_entrada_tabla_2(memoria_ram, request);
+	int numero_pagina_reemplazada = -1;
+	uint32_t numero_marco = memoria_ram_obtener_numero_marco_para_entrada_tabla_2(memoria_ram, request, &numero_pagina_reemplazada);
 	log_debug(logger, "Numero de marco para entrada %d de la tabla de 2N %d = %d", request->entrada_tablasegundonivel, request->numero_tablasegundonivel, numero_marco);
 
-	t_memoria_marcoparaentradatabla2_response *response = marcoparaentradatabla2_response_new(numero_marco);
+	t_memoria_marcoparaentradatabla2_response *response = marcoparaentradatabla2_response_new(numero_marco, numero_pagina_reemplazada);
 	int bytes;
 	void *buffer_response = serializar_marcoparaentradatabla2_response(response, &bytes);
 	enviar_buffer_serializado_con_bytes_por_socket(socket_cliente, buffer_response, bytes);
