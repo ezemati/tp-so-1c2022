@@ -10,6 +10,7 @@ void swap_crear_archivo(uint32_t pid, uint32_t tamanio_proceso)
 {
     sem_wait(&sem_swap_libre);
 
+    // El modo "w" trunca el archivo y lo vacia
     FILE *file = obtener_archivo_swap_para_proceso("wb", pid);
 
     void *bytes_vacios = calloc(1, tamanio_proceso);
@@ -53,7 +54,7 @@ void swap_escribir_pagina(uint32_t pid, uint32_t numero_pagina, void *contenido_
 
     bloquear_hilo_por_retardo_swap();
 
-    FILE *file = obtener_archivo_swap_para_proceso("wb", pid);
+    FILE *file = obtener_archivo_swap_para_proceso("r+b", pid);
 
     uint32_t tamanio_proceso = file_size(file);
     uint32_t bytes_a_escribir = calcular_bytes_de_pagina(numero_pagina, tamanio_proceso);
