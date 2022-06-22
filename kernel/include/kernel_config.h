@@ -25,7 +25,7 @@ typedef struct t_kernel_config
     time_miliseg tiempo_maximo_bloqueado;
 } t_kernel_config;
 
-t_kernel_config *kernel_config_new(char *config_path, t_log *logger);
+t_kernel_config *kernel_config_new(char *config_path);
 
 void kernel_config_destroy(t_kernel_config *config);
 
