@@ -60,3 +60,6 @@ dkms.conf
 **/.settings/
 **/.cproject
 **/.project
+
+# CLion files
+.idea/

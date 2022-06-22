@@ -26,10 +26,10 @@ void serializar_deserializar_instrucciones()
     list_add(instrucciones, instruccion1);
 
     uint32_t tamanio_programa = 50;
-    t_programa *programa = programa_new_with_instructions(instrucciones, tamanio_programa);
+    t_programa *programa_test = programa_new_with_instructions(instrucciones, tamanio_programa);
 
     int bytes_programa_serializado;
-    void *serializado = serializar_programa(programa, &bytes_programa_serializado);
+    void *serializado = serializar_programa(programa_test, &bytes_programa_serializado);
 
     t_programa *programa_deserializado = deserializar_programa(serializado);
 
@@ -42,7 +42,7 @@ void serializar_deserializar_instrucciones()
 
     programa_destroy(programa_deserializado);
     free(serializado);
-    programa_destroy(programa);
+    programa_destroy(programa_test);
 }
 
 void assert_instruccion_serializada(t_instruccion *instruccion_serializada, t_instruccion *instruccion)

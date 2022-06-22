@@ -21,10 +21,6 @@
 #include <commons/txt.h>
 
 void inicializar_consola(int argc, char **argv);
-t_list *leer_instrucciones(FILE *archivo);
-void agregar_instruccion(char *linea, t_list *instrucciones);
-void instrucciones_destroy(t_list *instrucciones);
-void instruccion_buffer_destroy(void *buffer_instruccion);
 void terminar_consola();
 
 extern t_log *logger;
