@@ -8,7 +8,7 @@ void inicializar_memoria(int argc, char **argv)
 	char *ruta_config = argc > 1
 							? argv[1]
 							: "cfg/memoria.config";
-	config = memoria_config_new(ruta_config, logger);
+	config = memoria_config_new(ruta_config);
 	memoria_ram = memoria_ram_new();
 
 	sem_init(&sem_swap_libre, 0, 1);

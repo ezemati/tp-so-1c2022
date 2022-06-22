@@ -1,6 +1,6 @@
 #include <memoria_config.h>
 
-t_memoria_config *memoria_config_new(char *config_path, t_log *logger)
+t_memoria_config *memoria_config_new(char *config_path)
 {
     t_memoria_config *mem_config = malloc(sizeof(t_memoria_config));
 

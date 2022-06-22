@@ -185,12 +185,6 @@ void memoria_ram_cargar_pagina(t_memoria_ram *self, t_entrada_segundonivel *entr
 
 void memoria_ram_reemplazar_pagina(t_memoria_ram *self, uint32_t pid, t_entrada_segundonivel *entradaNueva, t_entrada_segundonivel *entradaVieja)
 {
-    // TODO: avisarle a CPU que la pagina fue reemplazada para que la saque de la TLB
-    // (ver como se puede implementar, porque como esta armado ahora la CPU espera una respuesta
-    // que tenga unicamente el numero de marco, habria que ver como adaptarlo para que ademas del marco
-    // se pueda enviar el numero_pagina que se descargo (podemos hacer que se envie directamente adentro
-    // del t_memoria_marco_response))
-
     uint32_t numero_marco = entradaVieja->numero_marco;
 
     if (pagina_esta_modificada(entradaVieja))

@@ -34,7 +34,7 @@ void clock_clear(t_clock *clock)
 
 uint32_t clock_obtener_posicion_pagina_a_reemplazar(t_clock *self)
 {
-    uint32_t indice_pagina_a_reemplazar = 0;
+    uint32_t indice_pagina_a_reemplazar;
 
     switch (self->algor_reemplazo)
     {

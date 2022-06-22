@@ -26,7 +26,7 @@ typedef struct t_memoria_config
 /**
  * @brief Crea un puntero a una estructura t_memoria_config
  */
-t_memoria_config *memoria_config_new(char *config_path, t_log *logger);
+t_memoria_config *memoria_config_new(char *config_path);
 
 /**
  * @brief Libera los recursos de un t_memoria_config
