@@ -1,6 +1,6 @@
 #include <cpu_config.h>
 
-t_cpu_config *cpu_config_new(char *config_path, t_log *logger)
+t_cpu_config *cpu_config_new(char *config_path)
 {
     t_cpu_config *cpu_config = malloc(sizeof(t_cpu_config));
 

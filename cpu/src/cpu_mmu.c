@@ -70,7 +70,7 @@ static uint32_t obtener_numero_tabla_2_para_entrada_tabla_1(uint32_t numero_tabl
 {
     int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, NULL);
 
-    t_memoria_numerotabla2paraentradatabla1_request *request_numerotabla2paraentradatabla1 = numerotabla2paraentradatabla1_request_new(info_ejecucion_actual->tabla_paginas_primer_nivel, entrada_tablaprimernivel);
+    t_memoria_numerotabla2paraentradatabla1_request *request_numerotabla2paraentradatabla1 = numerotabla2paraentradatabla1_request_new(numero_tablaprimernivel, entrada_tablaprimernivel);
     int bytes_request_numerotabla2paraentradatabla1_serializada;
     void *request_numerotabla2paraentradatabla1_serializada = serializar_numerotabla2paraentradatabla1_request(request_numerotabla2paraentradatabla1, &bytes_request_numerotabla2paraentradatabla1_serializada);
     enviar_buffer_serializado_con_instruccion_y_bytes_por_socket(socket_memoria, OBTENER_NUMERO_TABLA_2_PARA_ENTRADA_TABLA_1, request_numerotabla2paraentradatabla1_serializada, bytes_request_numerotabla2paraentradatabla1_serializada);

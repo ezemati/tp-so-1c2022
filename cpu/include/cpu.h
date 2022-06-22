@@ -5,6 +5,6 @@
 #include <cpu_variables_globales.h>
 #include <cpu_tests.h>
 
-void *interrupt_listener(void *args);
+void *interrupt_listener();
 
 #endif

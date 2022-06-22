@@ -36,7 +36,7 @@ void terminar_cpu();
 void procesar_request(int socket_cliente);
 void *procesar_cliente(void *args);
 
-void realizar_handshake_con_memoria(t_cpu_config *config);
+void realizar_handshake_con_memoria();
 void realizar_ejecucion();
 
 uint32_t leer_dato(uint32_t direccion_logica_lectura);

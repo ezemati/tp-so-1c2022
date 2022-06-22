@@ -3,15 +3,15 @@
 static void desalojar_proceso();
 static void bloquear_proceso();
 static void finalizar_proceso();
-static void enviar_pcb_actualizado_a_kernel_con_instruccion(code_instruccion codigo_instruccion);
-static t_kernel_actualizarpcb_request *crear_actualizarpcbrequest_para_infoejecucionactual();
+static void enviar_pcb_actualizado_a_kernel_con_instruccion(identificador_operacion operacion);
+static void *crear_actualizarpcbrequest_serializada_para_infoejecucionactual(int *bytes_request_serializada);
 
 void inicializar_cpu(int argc, char **argv)
 {
 	char *ruta_config = argc > 1
 							? argv[1]
 							: "cfg/cpu.config";
-	config = cpu_config_new(ruta_config, logger);
+	config = cpu_config_new(ruta_config);
 	tlb = tlb_new(config->entradas_tlb);
 }
 
@@ -64,7 +64,7 @@ void *procesar_cliente(void *args)
 	return NULL;
 }
 
-void realizar_handshake_con_memoria(t_cpu_config *config)
+void realizar_handshake_con_memoria()
 {
 	log_info_if_logger_not_null(logger, "Realizando handshake con Memoria");
 
@@ -203,14 +203,12 @@ void proceso_desalojado_de_cpu()
 
 static void desalojar_proceso()
 {
-	t_kernel_actualizarpcb_request *request = crear_actualizarpcbrequest_para_infoejecucionactual();
 	int bytes_request_serializada;
-	void *request_serializada = serializar_actualizarpcb_request(request, &bytes_request_serializada);
+	void *request_serializada = crear_actualizarpcbrequest_serializada_para_infoejecucionactual(&bytes_request_serializada);
 	enviar_buffer_serializado_con_bytes_por_socket(socket_conexion_kernel_interrupt, request_serializada, bytes_request_serializada);
 
 	liberar_conexion(socket_conexion_kernel_interrupt);
 	free(request_serializada);
-	actualizarpcb_request_destroy(request);
 
 	proceso_desalojado_de_cpu();
 }
@@ -229,18 +227,18 @@ static void finalizar_proceso()
 	proceso_desalojado_de_cpu();
 }
 
-static void enviar_pcb_actualizado_a_kernel_con_instruccion(code_instruccion codigo_instruccion)
+static void enviar_pcb_actualizado_a_kernel_con_instruccion(identificador_operacion operacion)
 {
-	t_kernel_actualizarpcb_request *request = crear_actualizarpcbrequest_para_infoejecucionactual();
 	int bytes_request_serializada;
-	void *request_serializada = serializar_actualizarpcb_request(request, &bytes_request_serializada);
-	enviar_buffer_serializado_con_instruccion_y_bytes_por_socket(socket_conexion_kernel_dispatch, codigo_instruccion, request_serializada, bytes_request_serializada);
+	void *request_serializada = crear_actualizarpcbrequest_serializada_para_infoejecucionactual(&bytes_request_serializada);
+	enviar_buffer_serializado_con_instruccion_y_bytes_por_socket(socket_conexion_kernel_dispatch, operacion, request_serializada, bytes_request_serializada);
 	free(request_serializada);
-	actualizarpcb_request_destroy(request);
 }
 
-static t_kernel_actualizarpcb_request *crear_actualizarpcbrequest_para_infoejecucionactual()
+static void *crear_actualizarpcbrequest_serializada_para_infoejecucionactual(int *bytes_request_serializada)
 {
 	t_kernel_actualizarpcb_request *request = actualizarpcb_request_new(info_ejecucion_actual->pid, info_ejecucion_actual->program_counter, info_ejecucion_actual->bloqueo_pendiente, info_ejecucion_actual->time_inicio_running, info_ejecucion_actual->time_fin_running);
-	return request;
+    void *request_serializada = serializar_actualizarpcb_request(request, bytes_request_serializada);
+    actualizarpcb_request_destroy(request);
+    return request_serializada;
 }

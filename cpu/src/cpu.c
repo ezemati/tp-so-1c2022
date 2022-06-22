@@ -22,7 +22,7 @@ int main(int argc, char **argv)
 
 	inicializar_cpu(argc, argv);
 
-	realizar_handshake_con_memoria(config);
+	realizar_handshake_con_memoria();
 
 	pthread_t thread_interrupt_id;
 	pthread_create(&thread_interrupt_id, NULL, (void *)interrupt_listener, NULL);
@@ -46,7 +46,7 @@ int main(int argc, char **argv)
 	return 0;
 }
 
-void *interrupt_listener(void *args)
+void *interrupt_listener()
 {
 	int socket_servidor_interrupt = iniciar_servidor(config->puerto_escucha_interrupt, logger);
 	if (socket_servidor_interrupt == -1)
