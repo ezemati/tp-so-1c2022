@@ -46,7 +46,7 @@ t_list *crear_instrucciones_de_archivo(char *ruta)
         string_trim(&line);
 
         // Las lineas que empiezan con "//" son comentarios y no se tienen en cuenta
-        if (!string_starts_with(line, "//"))
+        if (!string_starts_with(line, "//") && !string_is_empty(line))
         {
             agregar_instruccion(line, instrucciones);
         }
