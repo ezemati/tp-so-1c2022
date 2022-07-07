@@ -6,9 +6,7 @@ static t_kernel_pcb *obtener_proximo_para_ejecutar_srt();
 
 void agregar_proceso_a_ready(t_kernel_pcb *pcb)
 {
-    pthread_mutex_lock(&mutex_lista_ready);
-    int index = list_size(lista_ready);
-    pthread_mutex_unlock(&mutex_lista_ready);
+    int index = list_size_with_mutex(lista_ready, &mutex_lista_ready);
 
     agregar_proceso_a_ready_en_index_sin_replanificar(pcb, index);
 
@@ -24,9 +22,7 @@ void agregar_proceso_a_ready_en_index_sin_replanificar(t_kernel_pcb *pcb, int in
 
     pcb->estado = S_READY;
 
-    pthread_mutex_lock(&mutex_lista_ready);
-    list_add_in_index_custom(lista_ready, index, pcb);
-    pthread_mutex_unlock(&mutex_lista_ready);
+    list_add_in_index_with_mutex(lista_ready, index, pcb, &mutex_lista_ready);
 }
 
 void replanificar()
@@ -41,7 +37,7 @@ void replanificar()
         // Para respetar el criterio CPU->IO->NEW, tengo que meter el proceso desalojado
         // en la actual ultima posicion de la lista_ready, asi el proceso que paso a READY
         // se desplaza en la lista y queda despues del proceso desalojado
-        int ultimo_index = list_get_last_index(lista_ready);
+        int ultimo_index = list_get_last_index_with_mutex(lista_ready, &mutex_lista_ready);
         agregar_proceso_a_ready_en_index_sin_replanificar(pcb_desalojado, ultimo_index);
     }
 
@@ -74,10 +70,7 @@ static t_kernel_pcb *obtener_proximo_para_ejecutar()
 
 static t_kernel_pcb *obtener_proximo_para_ejecutar_fifo()
 {
-    pthread_mutex_lock(&mutex_lista_ready);
-    t_kernel_pcb *proximo_fifo = list_get_first_element(lista_ready);
-    pthread_mutex_unlock(&mutex_lista_ready);
-
+    t_kernel_pcb *proximo_fifo = list_get_first_element_with_mutex(lista_ready, &mutex_lista_ready);
     return proximo_fifo;
 }
 

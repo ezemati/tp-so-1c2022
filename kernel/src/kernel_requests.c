@@ -12,13 +12,9 @@ void atender_crear_proceso(int socket_cliente)
 	t_kernel_pcb *nuevo_pcb = pcb_new(pid, socket_cliente, programa);
 	log_info_if_logger_not_null(logger, "Proceso %d en NEW", nuevo_pcb->id);
 
-	pthread_mutex_lock(&mutex_lista_procesos);
-	list_add(lista_procesos, nuevo_pcb);
-	pthread_mutex_unlock(&mutex_lista_procesos);
+	list_add_with_mutex(lista_procesos, nuevo_pcb, &mutex_lista_procesos);
 
-	pthread_mutex_lock(&mutex_lista_new);
-	list_add(lista_new, nuevo_pcb);
-	pthread_mutex_unlock(&mutex_lista_new);
+	list_add_with_mutex(lista_new, nuevo_pcb, &mutex_lista_new);
 
 	intentar_pasar_proceso_a_memoria();
 

@@ -182,9 +182,7 @@ void bloquear_proceso(t_kernel_pcb *pcb, uint32_t tiempo_bloqueo)
 	pcb->milisegundos_en_running = 0;
 	pcb->time_inicio_bloqueo = current_time();
 
-	pthread_mutex_lock(&mutex_lista_blocked);
-	list_add(lista_blocked, pcb);
-	pthread_mutex_unlock(&mutex_lista_blocked);
+	list_add_with_mutex(lista_blocked, pcb, &mutex_lista_blocked);
 
 	// Thread que chequea si el proceso estuvo en BLOCKED mas tiempo del permitido
 	// y lo pasa a SUSPENDED_BLOCKED
@@ -323,9 +321,7 @@ void handler_atencion_procesos_bloqueados()
 	{
 		sem_wait(&sem_procesos_bloqueados);
 
-		pthread_mutex_lock(&mutex_lista_blocked);
-		t_kernel_pcb *primer_proceso_en_blocked = list_get_first_element(lista_blocked);
-		pthread_mutex_unlock(&mutex_lista_blocked);
+		t_kernel_pcb *primer_proceso_en_blocked = list_get_first_element_with_mutex(lista_blocked, &mutex_lista_blocked);
 
 		uint32_t milisegundos_io = primer_proceso_en_blocked->bloqueo_pendiente;
 		uint32_t microsegundos_io = milisegundos_a_microsegundos(milisegundos_io);

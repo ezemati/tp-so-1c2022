@@ -6,9 +6,7 @@ bool mediano_plazo_intentar_pasar_proceso_a_memoria()
 
     while (puedo_pasar_proceso_a_memoria())
     {
-        pthread_mutex_lock(&mutex_lista_suspended_ready);
-        t_kernel_pcb *pcb_suspended_ready = list_get_first_element(lista_suspended_ready);
-        pthread_mutex_unlock(&mutex_lista_suspended_ready);
+        t_kernel_pcb *pcb_suspended_ready = list_get_first_element_with_mutex(lista_suspended_ready, &mutex_lista_suspended_ready);
 
         if (pcb_suspended_ready == NULL)
         {

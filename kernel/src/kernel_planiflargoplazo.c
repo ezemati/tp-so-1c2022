@@ -10,9 +10,7 @@ bool largo_plazo_intentar_pasar_proceso_a_memoria()
 
     while (puedo_pasar_proceso_a_memoria())
     {
-        pthread_mutex_lock(&mutex_lista_new);
-        t_kernel_pcb *pcb_new = list_get_first_element(lista_new);
-        pthread_mutex_unlock(&mutex_lista_new);
+        t_kernel_pcb *pcb_new = list_get_first_element_with_mutex(lista_new, &mutex_lista_new);
 
         if (pcb_new == NULL)
             break;
