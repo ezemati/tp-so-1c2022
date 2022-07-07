@@ -1,0 +1,6 @@
+#!/bin/bash
+FILE=memoria.out
+make
+if test -f "./bin/$FILE"; then
+    ./bin/$FILE cfg/MEMORIA_CONFIG
+fi
