@@ -24,7 +24,7 @@
 #include <commons/txt.h>
 
 void agregar_proceso_a_ready(t_kernel_pcb *pcb);
-void agregar_proceso_a_ready_en_index_sin_replanificar(t_kernel_pcb *pcb, int index);
+void agregar_proceso_a_ready_en_anteultima_posicion_sin_replanificar(t_kernel_pcb *pcb);
 void replanificar();
 
 #endif

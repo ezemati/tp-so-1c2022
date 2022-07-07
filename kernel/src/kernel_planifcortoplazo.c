@@ -6,9 +6,11 @@ static t_kernel_pcb *obtener_proximo_para_ejecutar_srt();
 
 void agregar_proceso_a_ready(t_kernel_pcb *pcb)
 {
-    int index = list_size_with_mutex(lista_ready, &mutex_lista_ready);
+    log_info_if_logger_not_null(logger, "Pasando proceso %d de %s a READY", pcb->id, estado_proceso_to_string(pcb->estado));
 
-    agregar_proceso_a_ready_en_index_sin_replanificar(pcb, index);
+    pcb->estado = S_READY;
+
+    list_add_with_mutex(lista_ready, pcb, &mutex_lista_ready);
 
     if (algoritmo_es_con_desalojo() || !hay_proceso_en_ejecucion)
     {
@@ -16,13 +18,15 @@ void agregar_proceso_a_ready(t_kernel_pcb *pcb)
     }
 }
 
-void agregar_proceso_a_ready_en_index_sin_replanificar(t_kernel_pcb *pcb, int index)
+void agregar_proceso_a_ready_en_anteultima_posicion_sin_replanificar(t_kernel_pcb *pcb)
 {
     log_info_if_logger_not_null(logger, "Pasando proceso %d de %s a READY", pcb->id, estado_proceso_to_string(pcb->estado));
 
     pcb->estado = S_READY;
 
-    list_add_in_index_with_mutex(lista_ready, index, pcb, &mutex_lista_ready);
+    void *pcb_que_paso_a_ready = list_remove_last_with_mutex(lista_ready, &mutex_lista_ready);
+    list_add_with_mutex(lista_ready, pcb, &mutex_lista_ready);
+    list_add_with_mutex(lista_ready, pcb_que_paso_a_ready, &mutex_lista_ready);
 }
 
 void replanificar()
@@ -34,11 +38,11 @@ void replanificar()
         t_kernel_pcb *pcb_desalojado = enviar_interrupcion_a_cpu();
         hay_proceso_en_ejecucion = false;
 
-        // Para respetar el criterio CPU->IO->NEW, tengo que meter el proceso desalojado
-        // en la actual ultima posicion de la lista_ready, asi el proceso que paso a READY
-        // se desplaza en la lista y queda despues del proceso desalojado
-        int ultimo_index = list_get_last_index_with_mutex(lista_ready, &mutex_lista_ready);
-        agregar_proceso_a_ready_en_index_sin_replanificar(pcb_desalojado, ultimo_index);
+        // Para respetar el criterio CPU->IO->NEW, tengo que sacar el PCB que esta en la ultima
+        // posicion de la lista de READY (que seria el que paso de IO o NEW a READY), asi primero
+        // queda el proceso desalojado (que viene de CPU) y despues queda el de IO/NEW que produjo
+        // la replanificacion
+        agregar_proceso_a_ready_en_anteultima_posicion_sin_replanificar(pcb_desalojado);
     }
 
     t_kernel_pcb *pcb_a_ejecutar = obtener_proximo_para_ejecutar();

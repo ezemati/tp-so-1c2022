@@ -20,55 +20,10 @@ void *list_get_minimum_or_null_if_empty(t_list *list, void *(*minimum)(void *, v
                : NULL;
 }
 
-t_link_element *list_create_element(void *data)
-{
-    t_link_element *element = malloc(sizeof(*element));
-    element->data = data;
-    element->next = NULL;
-    return element;
-}
-
 void list_add_with_mutex(t_list *list, void *element, pthread_mutex_t *mutex)
 {
     pthread_mutex_lock(mutex);
     list_add(list, element);
-    pthread_mutex_unlock(mutex);
-}
-
-void list_add_in_index_with_mutex(t_list *list, int index, void *element, pthread_mutex_t *mutex)
-{
-    pthread_mutex_lock(mutex);
-
-    int size = list_size(list);
-    if (index == size)
-    {
-        // Si la lista tiene 2 elementos (indices 0 y 1) y quiero agregar al indice 2, seria agregar
-        // al final de la lista
-        list_add(list, element);
-    }
-    else
-    {
-        if (index == 0)
-        {
-            t_link_element *new_element = list_create_element(element);
-            new_element->next = list->head;
-            list->head = new_element;
-        }
-        else
-        {
-            t_link_element *previous_to_insert = list->head;
-            for (int i = 0; i < index - 1; i++)
-            {
-                previous_to_insert = previous_to_insert->next;
-            }
-            t_link_element *new_element = list_create_element(element);
-            new_element->next = previous_to_insert->next;
-            previous_to_insert->next = new_element;
-        }
-
-        list->elements_count++;
-    }
-
     pthread_mutex_unlock(mutex);
 }
 
@@ -96,4 +51,13 @@ int list_get_last_index_with_mutex(t_list *list, pthread_mutex_t *mutex)
     int last_index = list_size(list) - 1;
     pthread_mutex_unlock(mutex);
     return last_index;
+}
+
+void *list_remove_last_with_mutex(t_list *list, pthread_mutex_t *mutex)
+{
+    pthread_mutex_lock(mutex);
+    int last_index = list_size(list) - 1;
+    void *last_element = list_remove(list, last_index);
+    pthread_mutex_unlock(mutex);
+    return last_element;
 }
