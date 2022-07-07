@@ -13,7 +13,7 @@ int main(int argc, char **argv)
 		return 0;
 	}
 
-	logger = log_create("cfg/memoria.log", "Memoria", true, LOG_LEVEL_TRACE);
+	logger = log_create("logs/memoria.log", "Memoria", true, LOG_LEVEL_TRACE);
 	log_debug(logger, "Inicializando memoria...");
 
 	inicializar_memoria(argc, argv);

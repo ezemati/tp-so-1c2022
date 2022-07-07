@@ -17,7 +17,7 @@ int main(int argc, char **argv)
 		return 0;
 	}
 
-	logger = log_create("cfg/cpu.log", "CPU", true, LOG_LEVEL_TRACE);
+	logger = log_create("logs/cpu.log", "CPU", true, LOG_LEVEL_TRACE);
 	log_debug(logger, "Inicializando CPU...");
 
 	inicializar_cpu(argc, argv);
