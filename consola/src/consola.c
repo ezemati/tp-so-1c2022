@@ -12,7 +12,10 @@ int main(int argc, char **argv)
 		return 0;
 	}
 
-	logger = log_create("logs/consola.log", "Consola", true, LOG_LEVEL_TRACE);
+	char *file_name = get_log_file_name("consola");
+	logger = log_create(file_name, "Consola", true, LOG_LEVEL_TRACE);
+	free(file_name);
+
 	log_debug(logger, "Inicializando consola");
 
 	if (argc < 3)

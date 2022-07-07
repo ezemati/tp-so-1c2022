@@ -29,7 +29,10 @@ int main(int argc, char **argv)
 		return 0;
 	}
 
-	logger = log_create("logs/kernel.log", "Kernel", true, LOG_LEVEL_TRACE);
+	char *file_name = get_log_file_name("kernel");
+	logger = log_create(file_name, "Kernel", true, LOG_LEVEL_TRACE);
+	free(file_name);
+
 	log_debug(logger, "Inicializando Kernel...");
 
 	inicializar_kernel(argc, argv);

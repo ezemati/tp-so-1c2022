@@ -1,6 +1,7 @@
 #include <utils/logs.h>
 
 static void log_if_logger_not_null(t_log *logger, t_log_level log_level, char *format, va_list args);
+static int count_files_in_directory(char *path);
 
 void log_info_if_logger_not_null(t_log *logger, char *format, ...)
 {
@@ -65,4 +66,37 @@ void log_if_logger_not_null(t_log *logger, t_log_level log_level, char *format, 
     }
 
     free(message);
+}
+
+char *get_log_file_name(char *module)
+{
+    char cwd[PATH_MAX];
+    getcwd(cwd, sizeof(cwd));
+
+    char *folder_path = string_from_format("%s/logs", cwd);
+    int files_in_log_folder = count_files_in_directory(folder_path);
+    free(folder_path);
+
+    // Por ejemplo cpu_01.log, cpu_02.log, ...
+    char *relative_file_name = string_from_format("logs/%s_%02d.log", module, files_in_log_folder);
+    return relative_file_name;
+}
+
+static int count_files_in_directory(char *path)
+{
+    int file_count = 0;
+    struct dirent *entry;
+
+    DIR *dirp = opendir(path);
+    while ((entry = readdir(dirp)) != NULL)
+    {
+        if (entry->d_type == DT_REG)
+        {
+            /* If the entry is a regular file */
+            file_count++;
+        }
+    }
+    closedir(dirp);
+
+    return file_count;
 }
