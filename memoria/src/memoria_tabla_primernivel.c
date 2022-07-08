@@ -48,3 +48,14 @@ t_tabla_primernivel *obtener_tablaprimernivel_por_numero(t_list *tablas_primerni
 
     return list_find(tablas_primernivel, buscar_tablaprimernivel_por_numero);
 }
+
+t_tabla_primernivel *remover_tablaprimernivel_por_numero(t_list *tablas_primernivel, uint32_t numero_tablaprimernivel)
+{
+    bool buscar_tablaprimernivel_por_numero(void *element)
+    {
+        t_tabla_primernivel *tablaprimernivel = element;
+        return tablaprimernivel->numero_tablaprimernivel == numero_tablaprimernivel;
+    }
+
+    return list_remove_by_condition(tablas_primernivel, buscar_tablaprimernivel_por_numero);
+}

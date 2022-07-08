@@ -27,8 +27,6 @@ t_tabla_segundonivel *tabla_segundonivel_new(uint32_t pid, uint32_t numero_tabla
 void tabla_segundonivel_destroy(t_tabla_segundonivel *tabla_segundonivel)
 {
     list_destroy_and_destroy_elements(tabla_segundonivel->entradas_segundonivel, (void *)entrada_segundonivel_destroy);
-    free(tabla_segundonivel->entradas_segundonivel);
-
     free(tabla_segundonivel);
 }
 
@@ -59,4 +57,15 @@ t_tabla_segundonivel *obtener_tablasegundonivel_por_numero(t_list *tablas_segund
     }
 
     return list_find(tablas_segundonivel, buscar_tablasegundonivel_por_numero);
+}
+
+t_tabla_segundonivel *remover_tablasegundonivel_por_numero(t_list *tablas_segundonivel, uint32_t numero_tablasegundonivel)
+{
+    bool buscar_tablasegundonivel_por_numero(void *element)
+    {
+        t_tabla_segundonivel *tablasegundonivel = element;
+        return tablasegundonivel->numero_tabla_segundonivel == numero_tablasegundonivel;
+    }
+
+    return list_remove_by_condition(tablas_segundonivel, buscar_tablasegundonivel_por_numero);
 }

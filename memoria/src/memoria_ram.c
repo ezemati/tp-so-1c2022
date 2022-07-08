@@ -30,10 +30,8 @@ void memoria_ram_destroy(t_memoria_ram *memoria)
     free(memoria->bitmap_marcos_libres);
 
     list_destroy_and_destroy_elements(memoria->tablas_primer_nivel, (void *)tabla_primernivel_destroy);
-    free(memoria->tablas_primer_nivel);
 
     list_destroy_and_destroy_elements(memoria->tablas_segundo_nivel, (void *)tabla_segundonivel_destroy);
-    free(memoria->tablas_segundo_nivel);
 
     free(memoria);
 }
@@ -82,10 +80,12 @@ void memoria_ram_suspender_proceso(t_memoria_ram *self, uint32_t pid, uint32_t n
 void memoria_ram_finalizar_proceso(t_memoria_ram *self, uint32_t numero_tablaprimernivel)
 {
     t_tabla_primernivel *tablaprimernivel = obtener_tablaprimernivel_por_numero(self->tablas_primer_nivel, numero_tablaprimernivel);
+
     for (int i = 0; i < config->entradas_por_tabla; i++)
     {
         int numero_tablasegundonivel = tablaprimernivel->numeros_tablas_segundonivel[i];
         t_tabla_segundonivel *tablasegundonivel = obtener_tablasegundonivel_por_numero(self->tablas_segundo_nivel, numero_tablasegundonivel);
+
         t_list_iterator *iterator_entradassegundonivel = list_iterator_create(tablasegundonivel->entradas_segundonivel);
         while (list_iterator_has_next(iterator_entradassegundonivel))
         {
@@ -97,9 +97,22 @@ void memoria_ram_finalizar_proceso(t_memoria_ram *self, uint32_t numero_tablapri
             }
         }
         list_iterator_destroy(iterator_entradassegundonivel);
+
+        // Saca la tabla de 2N de la lista de tablas de 2N
+        remover_tablasegundonivel_por_numero(self->tablas_segundo_nivel, numero_tablasegundonivel);
+
+        // Libera recursos de la tabla de 2N y de sus entradas
+        tabla_segundonivel_destroy(tablasegundonivel);
     }
 
+    // Saca la tabla de 1N de la lista de tablas de 1N
+    remover_tablaprimernivel_por_numero(self->tablas_primer_nivel, numero_tablaprimernivel);
+
+    // Elimina el archivo SWAP del proceso
     swap_borrar_archivo(tablaprimernivel->pid);
+
+    // Libera recursos de la tabla de 1N
+    tabla_primernivel_destroy(tablaprimernivel);
 }
 
 void *memoria_ram_leer_dato(t_memoria_ram *self, t_memoria_leerdato_request *request)

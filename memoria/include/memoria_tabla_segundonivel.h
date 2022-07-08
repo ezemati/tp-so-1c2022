@@ -27,5 +27,6 @@ void tabla_segundonivel_destroy(t_tabla_segundonivel *tabla_segundonivel);
 t_entrada_segundonivel *tabla_segundonivel_obtener_entrada_segundo_nivel(t_tabla_segundonivel *self, uint32_t entrada_tablasegundonivel);
 
 t_tabla_segundonivel *obtener_tablasegundonivel_por_numero(t_list *tablas_segundonivel, uint32_t numero_tablasegundonivel);
+t_tabla_segundonivel *remover_tablasegundonivel_por_numero(t_list *tablas_segundonivel, uint32_t numero_tablasegundonivel);
 
 #endif

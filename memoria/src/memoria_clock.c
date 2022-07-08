@@ -22,7 +22,6 @@ t_clock *clock_new(char *algor_reemplazo)
 void clock_destroy(t_clock *clock)
 {
     list_destroy(clock->entradas_segundonivel);
-    free(clock->entradas_segundonivel);
     free(clock);
 }
 
