@@ -49,3 +49,14 @@ t_entrada_segundonivel *tabla_segundonivel_obtener_entrada_segundo_nivel(t_tabla
 
     return entrada_buscada;
 }
+
+t_tabla_segundonivel *obtener_tablasegundonivel_por_numero(t_list *tablas_segundonivel, uint32_t numero_tablasegundonivel)
+{
+    bool buscar_tablasegundonivel_por_numero(void *element)
+    {
+        t_tabla_segundonivel *tablasegundonivel = element;
+        return tablasegundonivel->numero_tabla_segundonivel == numero_tablasegundonivel;
+    }
+
+    return list_find(tablas_segundonivel, buscar_tablasegundonivel_por_numero);
+}
