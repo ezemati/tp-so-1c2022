@@ -1,6 +1,7 @@
 #include <kernel_utils.h>
 
 static void handler_chequear_suspension_de_proceso_bloqueado(void *args);
+static void handler_pasar_proceso_de_suspendedblocked_a_suspendedready(void *args);
 
 void inicializar_kernel(int argc, char **argv)
 {
@@ -347,8 +348,9 @@ void handler_atencion_procesos_bloqueados()
 			// Si el proceso se suspendio, entonces para desbloquearlo hay que esperar que Memoria termine
 			// de hacer todas las cosas que tiene que hacer (que son lentas porque involucra guardar las paginas
 			// en el SWAP)
-			sem_wait(&primer_proceso_en_blocked->sem_suspended_blocked_memoria);
-			agregar_proceso_a_suspended_ready(primer_proceso_en_blocked);
+			pthread_t thread_handler_pasar_proceso_de_suspendedblocked_a_suspendedready_id;
+			pthread_create(&thread_handler_pasar_proceso_de_suspendedblocked_a_suspendedready_id, NULL, (void *)handler_pasar_proceso_de_suspendedblocked_a_suspendedready, primer_proceso_en_blocked);
+			pthread_detach(thread_handler_pasar_proceso_de_suspendedblocked_a_suspendedready_id);
 		}
 	}
 }
@@ -378,4 +380,12 @@ static void handler_chequear_suspension_de_proceso_bloqueado(void *args)
 		bool se_paso_proceso_a_memoria = false;
 		suspender_proceso(pcb, &se_paso_proceso_a_memoria);
 	}
+}
+
+static void handler_pasar_proceso_de_suspendedblocked_a_suspendedready(void *args)
+{
+	t_kernel_pcb *pcb = args;
+
+	sem_wait(&pcb->sem_suspended_blocked_memoria);
+	agregar_proceso_a_suspended_ready(pcb);
 }
