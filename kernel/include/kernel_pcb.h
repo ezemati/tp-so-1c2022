@@ -39,6 +39,7 @@ typedef struct t_kernel_pcb
     time_miliseg time_inicio_running;
     time_miliseg time_fin_running;
     time_miliseg milisegundos_en_running; // En caso de que el proceso sea desalojado y vuelva a ejecutar, esto guarda el acumulado
+    sem_t sem_suspended_blocked_memoria;  // Semaforo que indica que Memoria termino de hacer el ritual para suspender al proceso (que es lento porque involucra SWAP)
 } t_kernel_pcb;
 
 t_kernel_pcb *pcb_new(uint32_t pid, uint32_t socket_consola, t_programa *programa);

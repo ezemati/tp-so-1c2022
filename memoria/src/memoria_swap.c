@@ -104,8 +104,10 @@ static void mover_puntero_de_archivo_a_pagina(FILE *file, uint32_t numero_pagina
 
 static void bloquear_hilo_por_retardo_swap()
 {
+    log_trace_if_logger_not_null(logger, "(SWAP) Empezando RETARDO_SWAP (%dms)", config->retardo_swap);
     time_microseg retardo_swap_microsegundos = milisegundos_a_microsegundos(config->retardo_swap);
     usleep(retardo_swap_microsegundos);
+    log_trace_if_logger_not_null(logger, "(SWAP) RETARDO_SWAP finalizado", config->retardo_swap);
 }
 
 static uint32_t calcular_bytes_de_pagina(uint32_t numero_pagina, uint32_t tamanio_proceso)

@@ -125,9 +125,9 @@ void obtener_numero_tabla_2_para_entrada_tabla_1(int socket_cliente)
 
 	t_memoria_numerotabla2paraentradatabla1_request *request = deserializar_numerotabla2paraentradatabla1_request(buffer_request);
 
-	log_debug(logger, "Buscando numero de tabla 2 para entrada %d de la tabla de primer nivel %d", request->entrada_tablaprimernivel, request->numero_tablaprimernivel);
+	log_debug(logger, "Buscando numero de tabla 2N para entrada %d de la tabla de 1N %d", request->entrada_tablaprimernivel, request->numero_tablaprimernivel);
 	uint32_t numero_tablasegundonivel = memoria_ram_obtener_numero_tabla_2_para_entrada_tabla_1(memoria_ram, request);
-	log_debug(logger, "Numero de tabla 2 para entrada %d de la tabla de primer nivel %d = %d", request->entrada_tablaprimernivel, request->numero_tablaprimernivel, numero_tablasegundonivel);
+	log_debug(logger, "Numero de tabla 2N para entrada %d de la tabla de 1N %d = %d", request->entrada_tablaprimernivel, request->numero_tablaprimernivel, numero_tablasegundonivel);
 
 	t_memoria_numerotabla2paraentradatabla1_response *response = numerotabla2paraentradatabla1_response_new(numero_tablasegundonivel);
 	int bytes;
@@ -147,7 +147,7 @@ void obtener_marco_para_entrada_tabla_2(int socket_cliente)
 
 	t_memoria_marcoparaentradatabla2_request *request = deserializar_marcoparaentradatabla2_request(buffer_request);
 
-	log_debug(logger, "Buscando numero de marco para entrada %d de la tabla de segundo nivel %d", request->entrada_tablasegundonivel, request->numero_tablasegundonivel);
+	log_debug(logger, "Buscando numero de marco para entrada %d de la tabla de 2N %d", request->entrada_tablasegundonivel, request->numero_tablasegundonivel);
 	int numero_pagina_reemplazada = -1;
 	uint32_t numero_marco = memoria_ram_obtener_numero_marco_para_entrada_tabla_2(memoria_ram, request, &numero_pagina_reemplazada);
 	log_debug(logger, "Numero de marco para entrada %d de la tabla de 2N %d = %d", request->entrada_tablasegundonivel, request->numero_tablasegundonivel, numero_marco);

@@ -15,7 +15,7 @@ typedef struct t_entrada_segundonivel
     uint32_t pid;
     uint32_t numero_entrada; // Posicion de la entrada dentro de la tabla de 2N
     uint32_t numero_pagina;
-    uint32_t numero_marco;
+    int32_t numero_marco;
     bool bit_presencia;
     bool bit_uso;
     bool bit_modificado;

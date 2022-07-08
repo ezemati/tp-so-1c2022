@@ -13,12 +13,14 @@ t_kernel_pcb *pcb_new(uint32_t pid, uint32_t socket_consola, t_programa *program
     pcb->socket_consola = socket_consola;
     pcb->bloqueo_pendiente = 0;
     pcb->milisegundos_en_running = 0;
+    sem_init(&pcb->sem_suspended_blocked_memoria, 0, 0);
     return pcb;
 }
 
 void pcb_destroy(t_kernel_pcb *pcb)
 {
     instrucciones_destroy(pcb->lista_instrucciones);
+    sem_destroy(&pcb->sem_suspended_blocked_memoria);
     free(pcb);
 }
 

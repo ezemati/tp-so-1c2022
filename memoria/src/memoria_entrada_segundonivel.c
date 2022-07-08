@@ -44,7 +44,7 @@ void entrada_segundonivel_marcar_pagina_cargada(t_entrada_segundonivel *self, ui
 
 void entrada_segundonivel_marcar_pagina_descargada(t_entrada_segundonivel *self)
 {
-    self->numero_marco = 131313;
+    self->numero_marco = -1;
     self->bit_presencia = false;
     self->bit_modificado = false;
     self->bit_uso = false;

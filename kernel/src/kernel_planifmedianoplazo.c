@@ -55,7 +55,11 @@ void suspender_proceso(t_kernel_pcb *pcb, bool *se_paso_proceso_a_memoria)
         return;
     }
 
-    (*se_paso_proceso_a_memoria) = intentar_pasar_proceso_a_memoria(); // Este proceso paso a SUSPENDED_BLOCKED asi que dejo un espacio de multiprogramacion libre
+    // Cuando Memoria termina de suspender al proceso, se hace un signal en el semaforo para avisar que ya puede pasar a READY
+    sem_post(&pcb->sem_suspended_blocked_memoria);
+
+    // Este proceso paso a SUSPENDED_BLOCKED asi que dejo un espacio de multiprogramacion libre
+    (*se_paso_proceso_a_memoria) = intentar_pasar_proceso_a_memoria();
 }
 
 void agregar_proceso_a_suspended_ready(t_kernel_pcb *pcb)

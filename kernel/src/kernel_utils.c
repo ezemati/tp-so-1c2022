@@ -344,6 +344,10 @@ void handler_atencion_procesos_bloqueados()
 		}
 		else if (primer_proceso_en_blocked->estado == S_SUSPENDED_BLOCKED)
 		{
+			// Si el proceso se suspendio, entonces para desbloquearlo hay que esperar que Memoria termine
+			// de hacer todas las cosas que tiene que hacer (que son lentas porque involucra guardar las paginas
+			// en el SWAP)
+			sem_wait(&primer_proceso_en_blocked->sem_suspended_blocked_memoria);
 			agregar_proceso_a_suspended_ready(primer_proceso_en_blocked);
 		}
 	}
