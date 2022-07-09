@@ -8,7 +8,7 @@ void atender_handshake_con_kernel(int socket_cliente)
     recibir_uint32_por_socket(socket_conexion_kernel_dispatch, &ok_recibido);
     if (ok_recibido != 1)
     {
-        log_error_if_logger_not_null(logger, "Fallo handshake con Kernel");
+        log_error(logger, "Fallo handshake con Kernel");
         exit(EXIT_FAILURE);
     }
     enviar_uint32_por_socket(socket_conexion_kernel_dispatch, ok_enviado);
@@ -34,7 +34,7 @@ void atender_ejecutar_proceso(int socket_cliente)
     ejecutarproceso_request_destroy(request);
     free(buffer_request);
 
-    log_debug(logger, "Empezando a ejecutar PID %d, con Program Counter %d", info_ejecucion_actual->pid, info_ejecucion_actual->program_counter);
+    log_info(logger, "Empezando a ejecutar PID %d, con Program Counter %d", info_ejecucion_actual->pid, info_ejecucion_actual->program_counter);
     pthread_t thread_ejecucion_id;
     pthread_create(&thread_ejecucion_id, NULL, (void *)realizar_ejecucion, NULL);
     pthread_detach(thread_ejecucion_id);

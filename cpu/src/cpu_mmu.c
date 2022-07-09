@@ -13,19 +13,19 @@ uint32_t traducir_direccion_logica_a_fisica(uint32_t direccion_logica)
 {
     uint32_t numero_pagina = floor(direccion_logica / config->memoria_tamanio_pagina);
 
-    log_info_if_logger_not_null(logger, "MMU: traduciendo direccion logica %d (numero_pagina=%d)", direccion_logica, numero_pagina);
+    log_info(logger, "MMU: traduciendo direccion logica %d (numero_pagina=%d)", direccion_logica, numero_pagina);
 
     int numero_marco = tlb_try_read_entry(tlb, numero_pagina);
     if (numero_marco != -1)
     {
         // Si encontre el numero_pagina en la TLB, directamente uso el numero_marco
-        log_trace_if_logger_not_null(logger, "TLB HIT: {numero_pagina=%d, numero_marco=%d}", numero_pagina, numero_marco);
+        log_info(logger, "TLB HIT: {numero_pagina=%d, numero_marco=%d}", numero_pagina, numero_marco);
     }
     else
     {
         // Si no encontre el numero_pagina en la TLB, hago todo el procedimiento para obtener el numero_marco
         // y al final agrego la entrada a la TLB
-        log_trace_if_logger_not_null(logger, "TLB MISS: la pagina %d no esta en la TLB", numero_pagina);
+        log_info(logger, "TLB MISS: la pagina %d no esta en la TLB", numero_pagina);
 
         uint32_t entrada_tablaprimernivel = floor(numero_pagina / config->memoria_entradas_por_tabla);
         uint32_t entrada_tablasegundonivel = numero_pagina % config->memoria_entradas_por_tabla;
@@ -44,19 +44,19 @@ uint32_t traducir_direccion_logica_a_fisica(uint32_t direccion_logica)
             {
                 tlb_replace_entry(tlb, entrada_con_pagina_reemplazada, numero_pagina);
             }
-            log_trace_if_logger_not_null(logger, "TLB: entrada {numero_pagina=%d, numero_marco=%d} agregada (reemplazando entrada con numero_pagina=%d)", numero_pagina, numero_marco, numero_pagina_reemplazada);
+            log_info(logger, "TLB: entrada {numero_pagina=%d, numero_marco=%d} agregada (reemplazando entrada con numero_pagina=%d)", numero_pagina, numero_marco, numero_pagina_reemplazada);
         }
         else
         {
             // Si Memoria no hizo ningun reemplazo, entonces hay que agregar una nueva entrada (o hacer un reemplazo en la TLB segun el algoritmo)
             tlb_add_entry(tlb, numero_pagina, numero_marco);
-            log_trace_if_logger_not_null(logger, "TLB: entrada {numero_pagina=%d, numero_marco=%d} agregada", numero_pagina, numero_marco);
+            log_info(logger, "TLB: nueva entrada {numero_pagina=%d, numero_marco=%d} agregada", numero_pagina, numero_marco);
         }
     }
 
     uint32_t desplazamiento = direccion_logica - (numero_pagina * config->memoria_tamanio_pagina);
     uint32_t direccion_fisica = (numero_marco * config->memoria_tamanio_pagina) + desplazamiento;
-    log_info_if_logger_not_null(logger, "MMU: {direccion_logica=%d, direccion_fisica=%d}", direccion_logica, direccion_fisica);
+    log_info(logger, "MMU: {direccion_logica=%d, direccion_fisica=%d}", direccion_logica, direccion_fisica);
 
     return direccion_fisica;
 }

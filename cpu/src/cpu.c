@@ -25,7 +25,7 @@ int main(int argc, char **argv)
 	logger = log_create(file_name, "CPU", true, LOG_LEVEL_TRACE);
 	free(file_name);
 
-	log_debug(logger, "Inicializando CPU...");
+	log_info(logger, "Inicializando CPU...");
 
 	inicializar_cpu(argc, argv);
 
@@ -38,7 +38,7 @@ int main(int argc, char **argv)
 	int socket_servidor_dispatch = iniciar_servidor(config->puerto_escucha_dispatch, logger);
 	if (socket_servidor_dispatch == -1)
 	{
-		log_error_if_logger_not_null(logger, "CPU no pudo crear el socket de servidor de dispatch");
+		log_error(logger, "CPU no pudo crear el socket de servidor de dispatch");
 		exit(EXIT_FAILURE);
 	}
 
@@ -58,7 +58,7 @@ void *interrupt_listener()
 	int socket_servidor_interrupt = iniciar_servidor(config->puerto_escucha_interrupt, logger);
 	if (socket_servidor_interrupt == -1)
 	{
-		log_error_if_logger_not_null(logger, "CPU no pudo crear el socket de servidor de interrupt");
+		log_error(logger, "CPU no pudo crear el socket de servidor de interrupt");
 		exit(EXIT_FAILURE);
 	}
 
@@ -70,7 +70,7 @@ void *interrupt_listener()
 		recibir_uint32_por_socket(socket_conexion_kernel_interrupt, &recibido);
 		if (recibido == 1)
 		{
-			log_info_if_logger_not_null(logger, "Interrupcion recibida en CPU");
+			log_info(logger, "Interrupcion recibida en CPU");
 
 			pthread_mutex_lock(&mutex_hay_proceso_en_ejecucion);
 			if (hay_proceso_en_ejecucion)
@@ -88,7 +88,7 @@ void *interrupt_listener()
 
 				// Si ya no hay un proceso ejecutandose, se responde con una respuesta "falsa" a
 				// la request de desalojo
-				log_error_if_logger_not_null(logger, "No hay ningun proceso en ejecucion, asi que se ignora la interrupcion");
+				log_error(logger, "No hay ningun proceso en ejecucion, asi que se ignora la interrupcion");
 				enviar_pcb_falso_a_kernel_por_interrupcion_de_desalojo();
 			}
 
