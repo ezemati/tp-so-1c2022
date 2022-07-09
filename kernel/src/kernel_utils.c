@@ -247,7 +247,7 @@ void print_procesos_listaready()
 		t_kernel_pcb *pcb = list_iterator_next(iterator_ready);
 		if (mostrar_rafaga_pendiente)
 		{
-			log_debug(logger, "[%d] - PID %d (pendiente=%dms)", i, pcb->id, tiempo_restante_segun_estimacion(pcb));
+			log_debug(logger, "[%d] - PID %d (pendiente=%lldms)", i, pcb->id, tiempo_restante_segun_estimacion(pcb));
 		}
 		else
 		{

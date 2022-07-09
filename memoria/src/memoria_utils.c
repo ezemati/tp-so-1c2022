@@ -101,7 +101,7 @@ static bool request_viene_de_cpu(identificador_operacion id_op)
 
 static void bloquear_hilo_por_retardo_memoria_con_cpu()
 {
-	log_trace(logger, "Empezando RETARDO_MEMORIA (%dms)", config->retardo_memoria);
+	log_trace(logger, "Empezando RETARDO_MEMORIA (%lldms)", config->retardo_memoria);
 
 	time_microseg microsegundos_retardo_memoria = milisegundos_a_microsegundos(config->retardo_memoria);
 	usleep(microsegundos_retardo_memoria);

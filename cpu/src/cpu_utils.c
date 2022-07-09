@@ -202,7 +202,7 @@ void escribir_o_copiar_dato(uint32_t direccion_logica_destino, uint32_t valor_a_
 void proceso_desalojado_de_cpu()
 {
 	time_miliseg milisegundos_en_running = milisegundos_entre_times(info_ejecucion_actual->time_inicio_running, info_ejecucion_actual->time_fin_running);
-	log_info(logger, "Desalojando proceso %d (ejecuto %dms)", info_ejecucion_actual->pid, milisegundos_en_running);
+	log_info(logger, "Desalojando proceso %d (ejecuto %lldms)", info_ejecucion_actual->pid, milisegundos_en_running);
 
 	tlb_clear(tlb);
 	infoejecucionactual_destroy(info_ejecucion_actual);

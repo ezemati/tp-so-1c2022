@@ -49,8 +49,8 @@ void recalcular_estimacion(t_kernel_pcb *pcb)
     pcb->estimacion_rafaga = nueva_estimacion;
 
     log_trace(logger, "Recalculando estimacion para proceso %d", pcb->id);
-    log_trace(logger, "{ EstimacionAnterior=%dms, RealAnterior=%dms }", estimacion_anterior, real_anterior);
-    log_info(logger, "Nueva estimacion para el proceso %d: %dms", pcb->id, nueva_estimacion);
+    log_trace(logger, "{ EstimacionAnterior=%lldms, RealAnterior=%lldms }", estimacion_anterior, real_anterior);
+    log_info(logger, "Nueva estimacion para el proceso %d: %lldms", pcb->id, nueva_estimacion);
 }
 
 void actualizar_pcb_desalojado(t_kernel_pcb *pcb, uint32_t nuevo_program_counter, time_miliseg time_inicio_running, time_miliseg time_fin_running)

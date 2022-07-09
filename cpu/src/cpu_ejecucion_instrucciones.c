@@ -28,7 +28,7 @@ void ejecutar_instruccion(t_instruccion *instruccion, uint32_t valor_para_copy)
 void ejecutar_noop(t_instruccion *instruccion)
 {
     time_miliseg milisegundos_noop = config->retardo_noop;
-    log_info(logger, "PID %d: empezando NO-OP por %dms", info_ejecucion_actual->pid, milisegundos_noop);
+    log_info(logger, "PID %d: empezando NO-OP por %lldms", info_ejecucion_actual->pid, milisegundos_noop);
 
     time_microseg microsegundos_noop = milisegundos_a_microsegundos(milisegundos_noop);
     usleep(microsegundos_noop);
