@@ -1,0 +1,6 @@
+#!/bin/bash
+FILE=kernel.out
+make
+if test -f "./bin/$FILE"; then
+    valgrind --tool=helgrind --log-file="logs/helgrind.log" ./bin/$FILE cfg/SUSPE_CONFIG
+fi
