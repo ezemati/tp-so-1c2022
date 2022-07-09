@@ -12,6 +12,7 @@ extern struct t_memoria_config *config;
 extern struct t_memoria_ram *memoria_ram;
 extern t_log *logger;
 
+extern pthread_mutex_t mutex_logger;
 extern sem_t sem_swap_libre;
 
 #endif

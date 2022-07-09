@@ -27,7 +27,7 @@ uint32_t marco_de_pagina_de_entrada_segundonivel(t_entrada_segundonivel *self)
 {
     if (!entrada_segundonivel_tiene_pagina_presente(self))
     {
-        log_error(logger, "Marco solicitado a una entrada de 2do nivel cuya pagina no esta presente: entrada nro %d", self->numero_entrada);
+        log_error_with_mutex(logger, &mutex_logger, "Marco solicitado a una entrada de 2do nivel cuya pagina no esta presente: entrada nro %d", self->numero_entrada);
         return -1;
     }
 

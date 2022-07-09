@@ -3,6 +3,8 @@
 t_log *logger = NULL;
 t_memoria_config *config = NULL;
 t_memoria_ram *memoria_ram = NULL;
+
+pthread_mutex_t mutex_logger;
 sem_t sem_swap_libre;
 
 int main(int argc, char **argv)
@@ -24,7 +26,7 @@ int main(int argc, char **argv)
 	int socket_servidor = iniciar_servidor(config->puerto_escucha, logger);
 	if (socket_servidor == -1)
 	{
-		log_error(logger, "Memoria no pudo crear el socket de servidor");
+		log_error_with_mutex(logger, &mutex_logger, "Memoria no pudo crear el socket de servidor");
 		exit(EXIT_FAILURE);
 	}
 

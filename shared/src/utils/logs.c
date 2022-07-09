@@ -33,7 +33,77 @@ void log_error_if_logger_not_null(t_log *logger, char *format, ...)
     va_end(args);
 }
 
-void log_if_logger_not_null(t_log *logger, t_log_level log_level, char *format, va_list args)
+void log_trace_with_mutex(t_log *logger, pthread_mutex_t *mutex, char *format, ...)
+{
+    pthread_mutex_lock(mutex);
+
+    va_list args;
+    va_start(args, format);
+
+    log_if_logger_not_null(logger, LOG_LEVEL_TRACE, format, args);
+
+    va_end(args);
+
+    pthread_mutex_unlock(mutex);
+}
+
+void log_debug_with_mutex(t_log *logger, pthread_mutex_t *mutex, char *format, ...)
+{
+    pthread_mutex_lock(mutex);
+
+    va_list args;
+    va_start(args, format);
+
+    log_if_logger_not_null(logger, LOG_LEVEL_DEBUG, format, args);
+
+    va_end(args);
+
+    pthread_mutex_unlock(mutex);
+}
+
+void log_info_with_mutex(t_log *logger, pthread_mutex_t *mutex, char *format, ...)
+{
+    pthread_mutex_lock(mutex);
+
+    va_list args;
+    va_start(args, format);
+
+    log_if_logger_not_null(logger, LOG_LEVEL_INFO, format, args);
+
+    va_end(args);
+
+    pthread_mutex_unlock(mutex);
+}
+
+void log_error_with_mutex(t_log *logger, pthread_mutex_t *mutex, char *format, ...)
+{
+    pthread_mutex_lock(mutex);
+
+    va_list args;
+    va_start(args, format);
+
+    log_if_logger_not_null(logger, LOG_LEVEL_ERROR, format, args);
+
+    va_end(args);
+
+    pthread_mutex_unlock(mutex);
+}
+
+char *get_log_file_name(char *module)
+{
+    char cwd[PATH_MAX];
+    getcwd(cwd, sizeof(cwd));
+
+    char *folder_path = string_from_format("%s/logs", cwd);
+    int files_in_log_folder = count_files_in_directory(folder_path);
+    free(folder_path);
+
+    // Por ejemplo cpu_01.log, cpu_02.log, ...
+    char *relative_file_name = string_from_format("logs/%s_%02d.log", module, files_in_log_folder);
+    return relative_file_name;
+}
+
+static void log_if_logger_not_null(t_log *logger, t_log_level log_level, char *format, va_list args)
 {
     if (logger == NULL)
     {
@@ -66,20 +136,6 @@ void log_if_logger_not_null(t_log *logger, t_log_level log_level, char *format, 
     }
 
     free(message);
-}
-
-char *get_log_file_name(char *module)
-{
-    char cwd[PATH_MAX];
-    getcwd(cwd, sizeof(cwd));
-
-    char *folder_path = string_from_format("%s/logs", cwd);
-    int files_in_log_folder = count_files_in_directory(folder_path);
-    free(folder_path);
-
-    // Por ejemplo cpu_01.log, cpu_02.log, ...
-    char *relative_file_name = string_from_format("logs/%s_%02d.log", module, files_in_log_folder);
-    return relative_file_name;
 }
 
 static int count_files_in_directory(char *path)

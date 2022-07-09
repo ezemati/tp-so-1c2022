@@ -11,6 +11,7 @@ void inicializar_memoria(int argc, char **argv)
 	config = memoria_config_new(ruta_config);
 	memoria_ram = memoria_ram_new();
 
+	pthread_mutex_init(&mutex_logger, NULL);
 	sem_init(&sem_swap_libre, 0, 1);
 
 	char command_crear_carpeta_swap[1024];
@@ -20,7 +21,7 @@ void inicializar_memoria(int argc, char **argv)
 
 void terminar_memoria()
 {
-	log_info(logger, "Finalizando memoria...");
+	log_info_with_mutex(logger, &mutex_logger, "Finalizando memoria...");
 	log_destroy(logger);
 
 	memoria_config_destroy(config);
@@ -43,12 +44,12 @@ void procesar_request(int socket_cliente)
 void *procesar_cliente(uint32_t *args)
 {
 	uint32_t socket_cliente = *args;
-	// log_debug(logger, "Cliente conectado por socket %d", socket_cliente);
+	// log_debug_with_mutex(logger, &mutex_logger, "Cliente conectado por socket %d", socket_cliente);
 
 	uint32_t id_op = -1;
 	recibir_uint32_por_socket(socket_cliente, &id_op);
 
-	log_info(logger, "Operacion recibida en Memoria: %s", identificador_operacion_to_string(id_op));
+	log_info_with_mutex(logger, &mutex_logger, "Operacion recibida en Memoria: %s", identificador_operacion_to_string(id_op));
 
 	if (request_viene_de_cpu(id_op))
 	{
@@ -86,7 +87,7 @@ void *procesar_cliente(uint32_t *args)
 		break;
 	}
 
-	log_info(logger, "Operacion finalizada en Memoria: %s", identificador_operacion_to_string(id_op));
+	log_info_with_mutex(logger, &mutex_logger, "Operacion finalizada en Memoria: %s", identificador_operacion_to_string(id_op));
 
 	liberar_conexion(socket_cliente);
 	free(args);
@@ -101,10 +102,10 @@ static bool request_viene_de_cpu(identificador_operacion id_op)
 
 static void bloquear_hilo_por_retardo_memoria_con_cpu()
 {
-	log_trace(logger, "Empezando RETARDO_MEMORIA (%lldms)", config->retardo_memoria);
+	log_trace_with_mutex(logger, &mutex_logger, "Empezando RETARDO_MEMORIA (%lldms)", config->retardo_memoria);
 
 	time_microseg microsegundos_retardo_memoria = milisegundos_a_microsegundos(config->retardo_memoria);
 	usleep(microsegundos_retardo_memoria);
 
-	log_trace(logger, "RETARDO_MEMORIA finalizado");
+	log_trace_with_mutex(logger, &mutex_logger, "RETARDO_MEMORIA finalizado");
 }
