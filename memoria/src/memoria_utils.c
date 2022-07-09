@@ -20,7 +20,7 @@ void inicializar_memoria(int argc, char **argv)
 
 void terminar_memoria()
 {
-	log_debug(logger, "Finalizando memoria...");
+	log_info(logger, "Finalizando memoria...");
 	log_destroy(logger);
 
 	memoria_config_destroy(config);
@@ -48,7 +48,7 @@ void *procesar_cliente(uint32_t *args)
 	uint32_t id_op = -1;
 	recibir_uint32_por_socket(socket_cliente, &id_op);
 
-	log_info_if_logger_not_null(logger, "Operacion recibida en Memoria: %s", identificador_operacion_to_string(id_op));
+	log_info(logger, "Operacion recibida en Memoria: %s", identificador_operacion_to_string(id_op));
 
 	if (request_viene_de_cpu(id_op))
 	{
@@ -86,7 +86,7 @@ void *procesar_cliente(uint32_t *args)
 		break;
 	}
 
-	log_info_if_logger_not_null(logger, "Operacion finalizada en Memoria: %s", identificador_operacion_to_string(id_op));
+	log_info(logger, "Operacion finalizada en Memoria: %s", identificador_operacion_to_string(id_op));
 
 	liberar_conexion(socket_cliente);
 	free(args);
@@ -101,10 +101,10 @@ static bool request_viene_de_cpu(identificador_operacion id_op)
 
 static void bloquear_hilo_por_retardo_memoria_con_cpu()
 {
-	log_trace_if_logger_not_null(logger, "Empezando RETARDO_MEMORIA (%dms)", config->retardo_memoria);
+	log_trace(logger, "Empezando RETARDO_MEMORIA (%dms)", config->retardo_memoria);
 
 	time_microseg microsegundos_retardo_memoria = milisegundos_a_microsegundos(config->retardo_memoria);
 	usleep(microsegundos_retardo_memoria);
 
-	log_trace_if_logger_not_null(logger, "RETARDO_MEMORIA finalizado");
+	log_trace(logger, "RETARDO_MEMORIA finalizado");
 }

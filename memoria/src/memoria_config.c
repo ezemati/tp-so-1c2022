@@ -18,7 +18,7 @@ t_memoria_config *memoria_config_new(char *config_path)
 
     config_destroy(config);
 
-    // log_info_if_logger_not_null(logger, "{ IP_KERNEL = %s, PUERTO_KERNEL = %s }", mem_config->ip_kernel, mem_config->puerto_kernel);
+    // log_info(logger, "{ IP_KERNEL = %s, PUERTO_KERNEL = %s }", mem_config->ip_kernel, mem_config->puerto_kernel);
 
     return mem_config;
 }

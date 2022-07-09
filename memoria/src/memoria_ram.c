@@ -152,7 +152,7 @@ uint32_t memoria_ram_obtener_numero_marco_para_entrada_tabla_2(t_memoria_ram *se
     t_entrada_segundonivel *entrada_segundonivel = tabla_segundonivel_obtener_entrada_segundo_nivel(tabla_segundonivel, request->entrada_tablasegundonivel);
     if (!entrada_segundonivel_tiene_pagina_presente(entrada_segundonivel))
     {
-        log_debug(logger, "Entrada %d de tabla 2N %d (pagina %d) AUSENTE", request->entrada_tablasegundonivel, request->numero_tablasegundonivel, entrada_segundonivel->numero_pagina);
+        log_info(logger, "Entrada %d de tabla 2N %d (pagina %d) AUSENTE", request->entrada_tablasegundonivel, request->numero_tablasegundonivel, entrada_segundonivel->numero_pagina);
         t_tabla_primernivel *tablaprimernivel = obtener_tablaprimernivel_por_numero(self->tablas_primer_nivel, request->numero_tablaprimernivel);
         memoria_ram_cargar_pagina(self, entrada_segundonivel, tablaprimernivel->clock, numero_pagina_reemplazada);
     }
@@ -169,26 +169,26 @@ void memoria_ram_cargar_pagina(t_memoria_ram *self, t_entrada_segundonivel *entr
     if (!clock_esta_lleno(clock))
     {
         // Todavia no se asignaron todos los marcos al proceso, asi que puedo asignarle uno nuevo
-        log_info_if_logger_not_null(logger, "Asignando pagina %d a nuevo marco", entrada_nueva->numero_entrada);
+        log_info(logger, "Asignando pagina %d a nuevo marco", entrada_nueva->numero_entrada);
 
         uint32_t numero_marco_libre = memoria_ram_obtener_numero_marco_libre(self);
         leer_pagina_de_swap(self, pid, entrada_nueva->numero_pagina, numero_marco_libre);
         entrada_segundonivel_marcar_pagina_cargada(entrada_nueva, numero_marco_libre);
         memoria_ram_marcar_marco_ocupado(self, numero_marco_libre);
-        log_info_if_logger_not_null(logger, "Pagina %d asignada a marco %d", entrada_nueva->numero_entrada, entrada_nueva->numero_marco);
+        log_info(logger, "Pagina %d asignada a marco %d", entrada_nueva->numero_entrada, entrada_nueva->numero_marco);
 
         clock_agregar_entrada(clock, entrada_nueva);
-        log_info_if_logger_not_null(logger, "Nueva cantidad de marcos en memoria del proceso: %d/%d", clock_cantidad_entradas_llenas(clock), config->marcos_por_proceso);
+        log_info(logger, "Nueva cantidad de marcos en memoria del proceso: %d/%d", clock_cantidad_entradas_llenas(clock), config->marcos_por_proceso);
 
         return;
     }
 
-    log_info_if_logger_not_null(logger, "El proceso %d ya tiene todos los marcos posibles asignados - Usando algoritmo de reemplazo %s", pid, config->algoritmo_reemplazo);
+    log_info(logger, "El proceso %d ya tiene todos los marcos posibles asignados - Usando algoritmo de reemplazo %s", pid, config->algoritmo_reemplazo);
 
     uint32_t posicionEntradaAReemplazar = clock_obtener_posicion_pagina_a_reemplazar(clock);
     t_entrada_segundonivel *entrada_vieja = clock_obtener_entrada_en_posicion(clock, posicionEntradaAReemplazar);
     *numero_pagina_reemplazada = entrada_vieja->numero_pagina;
-    log_info_if_logger_not_null(logger, "Reemplazando marco %d", entrada_vieja->numero_marco);
+    log_info(logger, "Reemplazando marco %d", entrada_vieja->numero_marco);
     memoria_ram_reemplazar_pagina(self, pid, entrada_nueva, entrada_vieja);
     clock_reemplazar_entrada(clock, entrada_nueva, posicionEntradaAReemplazar);
 }

@@ -7,7 +7,7 @@ void inicializar_proceso(int socket_cliente)
 
 	t_memoria_inicializarproceso_request *request = deserializar_inicializarproceso_request(buffer_request);
 
-	log_debug(logger, "Inicializando estructuras para proceso %d con tamanio %d", request->pid, request->tamanio_proceso);
+	log_trace(logger, "Inicializando estructuras para proceso %d con tamanio %d", request->pid, request->tamanio_proceso);
 	uint32_t numero_tablaprimernivel = memoria_ram_agregar_proceso(memoria_ram, request->pid, request->tamanio_proceso);
 
 	t_memoria_inicializarproceso_response *response = inicializarproceso_response_new(numero_tablaprimernivel);
@@ -28,7 +28,7 @@ void suspender_proceso(int socket_cliente)
 
 	t_memoria_suspenderproceso_request *request = deserializar_suspenderproceso_request(buffer_request);
 
-	log_debug(logger, "Suspendiendo proceso %d cuya tabla 1N es %d", request->pid, request->numero_tablaprimernivel);
+	log_info(logger, "Suspendiendo proceso %d cuya tabla 1N es %d", request->pid, request->numero_tablaprimernivel);
 	memoria_ram_suspender_proceso(memoria_ram, request->pid, request->numero_tablaprimernivel);
 
 	bool ok = true;
@@ -50,7 +50,7 @@ void finalizar_proceso(int socket_cliente)
 
 	t_memoria_finalizarproceso_request *request = deserializar_finalizarproceso_request(buffer_request);
 
-	log_debug(logger, "Finalizando proceso %d cuya tabla 1N es %d", request->pid, request->numero_tablaprimernivel);
+	log_info(logger, "Finalizando proceso %d cuya tabla 1N es %d", request->pid, request->numero_tablaprimernivel);
 	memoria_ram_finalizar_proceso(memoria_ram, request->numero_tablaprimernivel);
 
 	t_memoria_finalizarproceso_response *response = finalizarproceso_response_new();
@@ -82,7 +82,7 @@ void leer_dato(int socket_cliente)
 
 	t_memoria_leerdato_request *request = deserializar_leerdato_request(buffer_request);
 
-	log_debug(logger, "Leyendo %d bytes de la direccion fisica %d", request->cantidad_bytes, request->direccion_fisica);
+	log_info(logger, "Leyendo %d bytes de la direccion fisica %d", request->cantidad_bytes, request->direccion_fisica);
 	void *dato = memoria_ram_leer_dato(memoria_ram, request);
 
 	t_memoria_leerdato_response *response = leerdato_response_new(dato, request->cantidad_bytes);
@@ -104,7 +104,7 @@ void escribir_dato(int socket_cliente)
 
 	t_memoria_escribirdato_request *request = deserializar_escribirdato_request(buffer_request);
 
-	log_debug(logger, "Escribiendo %d bytes en la direccion fisica %d", request->cantidad_bytes, request->direccion_fisica);
+	log_info(logger, "Escribiendo %d bytes en la direccion fisica %d", request->cantidad_bytes, request->direccion_fisica);
 	memoria_ram_escribir_dato(memoria_ram, request);
 
 	t_memoria_escribirdato_response *response = escribirdato_response_new(request->cantidad_bytes);
@@ -125,9 +125,9 @@ void obtener_numero_tabla_2_para_entrada_tabla_1(int socket_cliente)
 
 	t_memoria_numerotabla2paraentradatabla1_request *request = deserializar_numerotabla2paraentradatabla1_request(buffer_request);
 
-	log_debug(logger, "Buscando numero de tabla 2N para entrada %d de la tabla de 1N %d", request->entrada_tablaprimernivel, request->numero_tablaprimernivel);
+	log_trace(logger, "Buscando numero de tabla 2N para entrada %d de la tabla de 1N %d", request->entrada_tablaprimernivel, request->numero_tablaprimernivel);
 	uint32_t numero_tablasegundonivel = memoria_ram_obtener_numero_tabla_2_para_entrada_tabla_1(memoria_ram, request);
-	log_debug(logger, "Numero de tabla 2N para entrada %d de la tabla de 1N %d = %d", request->entrada_tablaprimernivel, request->numero_tablaprimernivel, numero_tablasegundonivel);
+	log_info(logger, "Numero de tabla 2N para entrada %d de la tabla de 1N %d = %d", request->entrada_tablaprimernivel, request->numero_tablaprimernivel, numero_tablasegundonivel);
 
 	t_memoria_numerotabla2paraentradatabla1_response *response = numerotabla2paraentradatabla1_response_new(numero_tablasegundonivel);
 	int bytes;
@@ -147,10 +147,10 @@ void obtener_marco_para_entrada_tabla_2(int socket_cliente)
 
 	t_memoria_marcoparaentradatabla2_request *request = deserializar_marcoparaentradatabla2_request(buffer_request);
 
-	log_debug(logger, "Buscando numero de marco para entrada %d de la tabla de 2N %d", request->entrada_tablasegundonivel, request->numero_tablasegundonivel);
+	log_trace(logger, "Buscando numero de marco para entrada %d de la tabla de 2N %d", request->entrada_tablasegundonivel, request->numero_tablasegundonivel);
 	int numero_pagina_reemplazada = -1;
 	uint32_t numero_marco = memoria_ram_obtener_numero_marco_para_entrada_tabla_2(memoria_ram, request, &numero_pagina_reemplazada);
-	log_debug(logger, "Numero de marco para entrada %d de la tabla de 2N %d = %d", request->entrada_tablasegundonivel, request->numero_tablasegundonivel, numero_marco);
+	log_info(logger, "Numero de marco para entrada %d de la tabla de 2N %d = %d", request->entrada_tablasegundonivel, request->numero_tablasegundonivel, numero_marco);
 
 	t_memoria_marcoparaentradatabla2_response *response = marcoparaentradatabla2_response_new(numero_marco, numero_pagina_reemplazada);
 	int bytes;

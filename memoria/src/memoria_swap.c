@@ -35,13 +35,13 @@ void *swap_leer_pagina(uint32_t pid, uint32_t numero_pagina)
     uint32_t tamanio_proceso = file_size(file);
     uint32_t bytes_a_leer = calcular_bytes_de_pagina(numero_pagina, tamanio_proceso);
 
-    log_trace_if_logger_not_null(logger, "(SWAP) PID %d: leyendo %d bytes de la pagina %d", pid, bytes_a_leer, numero_pagina);
+    log_trace(logger, "(SWAP) PID %d: leyendo %d bytes de la pagina %d", pid, bytes_a_leer, numero_pagina);
     mover_puntero_de_archivo_a_pagina(file, numero_pagina);
     fread(contenido_pagina, bytes_a_leer, 1, file);
 
     fclose(file);
 
-    log_trace_if_logger_not_null(logger, "(SWAP) PID %d: pagina %d leida", pid, numero_pagina);
+    log_info(logger, "(SWAP) PID %d: pagina %d leida", pid, numero_pagina);
 
     sem_post(&sem_swap_libre);
 
@@ -59,13 +59,13 @@ void swap_escribir_pagina(uint32_t pid, uint32_t numero_pagina, void *contenido_
     uint32_t tamanio_proceso = file_size(file);
     uint32_t bytes_a_escribir = calcular_bytes_de_pagina(numero_pagina, tamanio_proceso);
 
-    log_trace_if_logger_not_null(logger, "(SWAP) PID %d: escribiendo %d bytes en la pagina %d", pid, bytes_a_escribir, numero_pagina);
+    log_trace(logger, "(SWAP) PID %d: escribiendo %d bytes en la pagina %d", pid, bytes_a_escribir, numero_pagina);
     mover_puntero_de_archivo_a_pagina(file, numero_pagina);
     fwrite(contenido_pagina, bytes_a_escribir, 1, file);
 
     fclose(file);
 
-    log_trace_if_logger_not_null(logger, "(SWAP) PID %d: pagina %d escrita", pid, numero_pagina);
+    log_info(logger, "(SWAP) PID %d: pagina %d escrita", pid, numero_pagina);
 
     sem_post(&sem_swap_libre);
 }
@@ -78,7 +78,7 @@ void swap_borrar_archivo(uint32_t pid)
     remove(full_path);
     free(full_path);
 
-    log_trace_if_logger_not_null(logger, "(SWAP) PID %d: archivo SWAP eliminado", pid);
+    log_trace(logger, "(SWAP) PID %d: archivo SWAP eliminado", pid);
 
     sem_post(&sem_swap_libre);
 }
@@ -104,10 +104,10 @@ static void mover_puntero_de_archivo_a_pagina(FILE *file, uint32_t numero_pagina
 
 static void bloquear_hilo_por_retardo_swap()
 {
-    log_trace_if_logger_not_null(logger, "(SWAP) Empezando RETARDO_SWAP (%dms)", config->retardo_swap);
+    log_trace(logger, "(SWAP) Empezando RETARDO_SWAP (%dms)", config->retardo_swap);
     time_microseg retardo_swap_microsegundos = milisegundos_a_microsegundos(config->retardo_swap);
     usleep(retardo_swap_microsegundos);
-    log_trace_if_logger_not_null(logger, "(SWAP) RETARDO_SWAP finalizado", config->retardo_swap);
+    log_trace(logger, "(SWAP) RETARDO_SWAP finalizado", config->retardo_swap);
 }
 
 static uint32_t calcular_bytes_de_pagina(uint32_t numero_pagina, uint32_t tamanio_proceso)

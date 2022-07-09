@@ -50,7 +50,7 @@ uint32_t clock_obtener_posicion_pagina_a_reemplazar(t_clock *self)
 
     t_entrada_segundonivel *entrada_a_reemplazar = clock_obtener_entrada_en_posicion(self, indice_pagina_a_reemplazar);
 
-    log_info_if_logger_not_null(logger, "Entrada [%d] seleccionada para reemplazo: {pagina=%d}", indice_pagina_a_reemplazar, entrada_a_reemplazar->numero_pagina);
+    log_info(logger, "Entrada [%d] seleccionada para reemplazo: {pagina=%d}", indice_pagina_a_reemplazar, entrada_a_reemplazar->numero_pagina);
 
     return indice_pagina_a_reemplazar;
 }
@@ -89,20 +89,20 @@ void clock_print_entradas(t_clock *self)
         if (self->puntero_aguja == i)
         {
             if (self->algor_reemplazo == CLOCK)
-                log_trace_if_logger_not_null(logger, " --> [%d]: {pagina=%d, marco=%d} (U=%d)", i, entrada->numero_pagina, entrada->numero_marco, (int)entrada->bit_uso);
+                log_trace(logger, " --> [%d]: {pagina=%d, marco=%d} (U=%d)", i, entrada->numero_pagina, entrada->numero_marco, (int)entrada->bit_uso);
             else
-                log_trace_if_logger_not_null(logger, " --> [%d]: {pagina=%d, marco=%d} (U=%d, M=%d)", i, entrada->numero_pagina, entrada->numero_marco, (int)entrada->bit_uso, (int)entrada->bit_modificado);
+                log_trace(logger, " --> [%d]: {pagina=%d, marco=%d} (U=%d, M=%d)", i, entrada->numero_pagina, entrada->numero_marco, (int)entrada->bit_uso, (int)entrada->bit_modificado);
         }
         else
         {
             if (self->algor_reemplazo == CLOCK)
-                log_trace_if_logger_not_null(logger, "     [%d]: {pagina=%d, marco=%d} (U=%d)", i, entrada->numero_pagina, entrada->numero_marco, (int)entrada->bit_uso);
+                log_trace(logger, "     [%d]: {pagina=%d, marco=%d} (U=%d)", i, entrada->numero_pagina, entrada->numero_marco, (int)entrada->bit_uso);
             else
-                log_trace_if_logger_not_null(logger, "     [%d]: {pagina=%d, marco=%d} (U=%d, M=%d)", i, entrada->numero_pagina, entrada->numero_marco, (int)entrada->bit_uso, (int)entrada->bit_modificado);
+                log_trace(logger, "     [%d]: {pagina=%d, marco=%d} (U=%d, M=%d)", i, entrada->numero_pagina, entrada->numero_marco, (int)entrada->bit_uso, (int)entrada->bit_modificado);
         }
     }
 
-    log_trace_if_logger_not_null(logger, "     -----------------------------------------");
+    log_trace(logger, "     -----------------------------------------");
 }
 
 static uint32_t clock_obtener_posicion_pagina_a_reemplazar_clock(t_clock *self)
@@ -130,7 +130,7 @@ static int32_t clock_buscar_entrada_con_uso0(t_clock *self)
 {
     int32_t posicionEntradaAReemplazar = -1;
 
-    log_trace_if_logger_not_null(logger, "Buscando entrada con (U=0)");
+    log_trace(logger, "Buscando entrada con (U=0)");
 
     while (posicionEntradaAReemplazar == -1)
     {
@@ -156,7 +156,7 @@ static int32_t clock_buscar_entrada_con_uso0_modificado0(t_clock *self)
 {
     int32_t posicionEntradaAReemplazar = -1;
 
-    log_trace_if_logger_not_null(logger, "Buscando entrada con (U=0, M=0)");
+    log_trace(logger, "Buscando entrada con (U=0, M=0)");
 
     for (int i = 0; i < config->marcos_por_proceso && posicionEntradaAReemplazar == -1; i++)
     {
@@ -178,7 +178,7 @@ static int32_t clock_buscar_entrada_con_uso0_modificado1(t_clock *self)
 {
     int32_t posicionEntradaAReemplazar = -1;
 
-    log_trace_if_logger_not_null(logger, "Buscando entrada con (U=0, M=1)");
+    log_trace(logger, "Buscando entrada con (U=0, M=1)");
 
     for (int i = 0; i < config->marcos_por_proceso && posicionEntradaAReemplazar == -1; i++)
     {

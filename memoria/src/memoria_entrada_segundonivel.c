@@ -27,7 +27,7 @@ uint32_t marco_de_pagina_de_entrada_segundonivel(t_entrada_segundonivel *self)
 {
     if (!entrada_segundonivel_tiene_pagina_presente(self))
     {
-        log_error_if_logger_not_null(logger, "Marco solicitado a una entrada de 2do nivel cuya pagina no esta presente: entrada nro %d", self->numero_entrada);
+        log_error(logger, "Marco solicitado a una entrada de 2do nivel cuya pagina no esta presente: entrada nro %d", self->numero_entrada);
         return -1;
     }
 

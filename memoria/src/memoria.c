@@ -17,14 +17,14 @@ int main(int argc, char **argv)
 	logger = log_create(file_name, "Memoria", true, LOG_LEVEL_TRACE);
 	free(file_name);
 
-	log_debug(logger, "Inicializando memoria...");
+	log_info(logger, "Inicializando memoria...");
 
 	inicializar_memoria(argc, argv);
 
 	int socket_servidor = iniciar_servidor(config->puerto_escucha, logger);
 	if (socket_servidor == -1)
 	{
-		log_error_if_logger_not_null(logger, "Memoria no pudo crear el socket de servidor");
+		log_error(logger, "Memoria no pudo crear el socket de servidor");
 		exit(EXIT_FAILURE);
 	}
 
