@@ -42,6 +42,7 @@ void replanificar()
             // Puede pasar que el proceso ya se haya desalojado a si mismo justo cuando se le manda
             // la interrupcion de desalojo. Si eso pasa, hay que cancelar la replanificacion en este hilo, porque
             // si el proceso se auto-desalojo (IO/EXIT) entonces ya se hace una replanificacion automatica
+            log_error_if_logger_not_null(logger, "Se mando una interrupcion de desalojo pero no habia ningun proceso ejecutandose en CPU");
             return;
         }
 
