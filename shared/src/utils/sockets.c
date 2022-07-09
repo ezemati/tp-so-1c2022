@@ -45,7 +45,7 @@ int crear_conexion(char *ip, uint32_t puerto, t_log *logger)
         }
         else
         {
-            log_trace_if_logger_not_null(logger, "No se pudo establecer la conexion con IP %s, PUERTO %s", ip, strPuerto);
+            log_error_if_logger_not_null(logger, "No se pudo establecer la conexion con IP %s, PUERTO %s", ip, strPuerto);
             error = true;
         }
     }
