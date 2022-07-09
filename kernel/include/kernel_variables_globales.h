@@ -20,6 +20,7 @@ extern uint32_t proximo_pid;
 extern int socket_conexion_cpu_dispatch;
 extern bool hay_proceso_en_ejecucion;
 
+extern pthread_mutex_t mutex_logger;
 extern pthread_mutex_t mutex_proximo_pid;
 extern pthread_mutex_t mutex_lista_procesos;
 extern pthread_mutex_t mutex_lista_ready;

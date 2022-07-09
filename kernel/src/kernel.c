@@ -12,6 +12,7 @@ uint32_t proximo_pid = 0;
 int socket_conexion_cpu_dispatch = -1;
 bool hay_proceso_en_ejecucion = false;
 
+pthread_mutex_t mutex_logger;
 pthread_mutex_t mutex_proximo_pid;
 pthread_mutex_t mutex_lista_procesos;
 pthread_mutex_t mutex_lista_ready;
@@ -37,7 +38,7 @@ int main(int argc, char **argv)
 
 	inicializar_kernel(argc, argv);
 
-	log_info(logger, "Realizando handshake con CPU dispatch");
+	log_info_with_mutex(logger, &mutex_logger, "Realizando handshake con CPU dispatch");
 	socket_conexion_cpu_dispatch = crear_conexion(config->ip_cpu, config->puerto_cpu_dispatch, logger);
 	uint32_t ok_enviado = 1, ok_recibido = 0;
 	enviar_uint32_por_socket(socket_conexion_cpu_dispatch, HANDSHAKE_SOY_KERNEL);
@@ -45,7 +46,7 @@ int main(int argc, char **argv)
 	recibir_uint32_por_socket(socket_conexion_cpu_dispatch, &ok_recibido);
 	if (ok_recibido != 1)
 	{
-		log_error(logger, "No pude establecer conexion con CPU Dispatch");
+		log_error_with_mutex(logger, &mutex_logger, "No pude establecer conexion con CPU Dispatch");
 		exit(EXIT_FAILURE);
 	}
 
@@ -60,7 +61,7 @@ int main(int argc, char **argv)
 	int socket_servidor = iniciar_servidor(config->puerto_escucha, logger);
 	if (socket_servidor == -1)
 	{
-		log_error(logger, "Kernel no pudo crear el socket de servidor");
+		log_error_with_mutex(logger, &mutex_logger, "Kernel no pudo crear el socket de servidor");
 		exit(EXIT_FAILURE);
 	}
 
@@ -82,7 +83,7 @@ void handler_escucha_cpu_dispatch()
 		uint32_t id_op = 0;
 		recibir_uint32_por_socket(socket_conexion_cpu_dispatch, &id_op);
 
-		log_info(logger, "Operacion recibida de CPU Dispatch: %s", identificador_operacion_to_string(id_op));
+		log_info_with_mutex(logger, &mutex_logger, "Operacion recibida de CPU Dispatch: %s", identificador_operacion_to_string(id_op));
 
 		switch (id_op)
 		{

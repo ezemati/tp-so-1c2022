@@ -6,7 +6,7 @@ static t_kernel_pcb *obtener_proximo_para_ejecutar_srt();
 
 void agregar_proceso_a_ready(t_kernel_pcb *pcb)
 {
-    log_info(logger, "Pasando proceso %d de %s a READY", pcb->id, estado_proceso_to_string(pcb->estado));
+    log_info_with_mutex(logger, &mutex_logger, "Pasando proceso %d de %s a READY", pcb->id, estado_proceso_to_string(pcb->estado));
 
     pcb->estado = S_READY;
 
@@ -20,7 +20,7 @@ void agregar_proceso_a_ready(t_kernel_pcb *pcb)
 
 void agregar_proceso_a_ready_en_anteultima_posicion_sin_replanificar(t_kernel_pcb *pcb)
 {
-    log_info(logger, "Pasando proceso %d de %s a READY", pcb->id, estado_proceso_to_string(pcb->estado));
+    log_info_with_mutex(logger, &mutex_logger, "Pasando proceso %d de %s a READY", pcb->id, estado_proceso_to_string(pcb->estado));
 
     pcb->estado = S_READY;
 
@@ -42,7 +42,7 @@ void replanificar()
             // Puede pasar que el proceso ya se haya desalojado a si mismo justo cuando se le manda
             // la interrupcion de desalojo. Si eso pasa, hay que cancelar la replanificacion en este hilo, porque
             // si el proceso se auto-desalojo (IO/EXIT) entonces ya se hace una replanificacion automatica
-            log_error(logger, "Se mando una interrupcion de desalojo pero no habia ningun proceso ejecutandose en CPU");
+            log_error_with_mutex(logger, &mutex_logger, "Se mando una interrupcion de desalojo pero no habia ningun proceso ejecutandose en CPU");
             return;
         }
 
@@ -58,11 +58,11 @@ void replanificar()
     t_kernel_pcb *pcb_a_ejecutar = obtener_proximo_para_ejecutar();
     if (pcb_a_ejecutar == NULL)
     {
-        log_info(logger, "No hay ningun proceso para ejecutar...");
+        log_info_with_mutex(logger, &mutex_logger, "No hay ningun proceso para ejecutar...");
         return;
     }
 
-    log_info(logger, "Proceso %d seleccionado para ejecutar", pcb_a_ejecutar->id);
+    log_info_with_mutex(logger, &mutex_logger, "Proceso %d seleccionado para ejecutar", pcb_a_ejecutar->id);
 
     pthread_mutex_lock(&mutex_lista_ready);
     sacar_proceso_de_lista(lista_ready, pcb_a_ejecutar);
