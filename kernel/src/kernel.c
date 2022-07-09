@@ -33,11 +33,11 @@ int main(int argc, char **argv)
 	logger = log_create(file_name, "Kernel", true, LOG_LEVEL_TRACE);
 	free(file_name);
 
-	log_debug(logger, "Inicializando Kernel...");
+	log_info(logger, "Inicializando Kernel...");
 
 	inicializar_kernel(argc, argv);
 
-	log_info_if_logger_not_null(logger, "Realizando handshake con CPU dispatch");
+	log_info(logger, "Realizando handshake con CPU dispatch");
 	socket_conexion_cpu_dispatch = crear_conexion(config->ip_cpu, config->puerto_cpu_dispatch, logger);
 	uint32_t ok_enviado = 1, ok_recibido = 0;
 	enviar_uint32_por_socket(socket_conexion_cpu_dispatch, HANDSHAKE_SOY_KERNEL);
@@ -45,7 +45,7 @@ int main(int argc, char **argv)
 	recibir_uint32_por_socket(socket_conexion_cpu_dispatch, &ok_recibido);
 	if (ok_recibido != 1)
 	{
-		log_error_if_logger_not_null(logger, "No pude establecer conexion con CPU Dispatch");
+		log_error(logger, "No pude establecer conexion con CPU Dispatch");
 		exit(EXIT_FAILURE);
 	}
 
@@ -60,7 +60,7 @@ int main(int argc, char **argv)
 	int socket_servidor = iniciar_servidor(config->puerto_escucha, logger);
 	if (socket_servidor == -1)
 	{
-		log_error_if_logger_not_null(logger, "Kernel no pudo crear el socket de servidor");
+		log_error(logger, "Kernel no pudo crear el socket de servidor");
 		exit(EXIT_FAILURE);
 	}
 
@@ -82,7 +82,7 @@ void handler_escucha_cpu_dispatch()
 		uint32_t id_op = 0;
 		recibir_uint32_por_socket(socket_conexion_cpu_dispatch, &id_op);
 
-		log_info_if_logger_not_null(logger, "Operacion recibida de CPU Dispatch: %s", identificador_operacion_to_string(id_op));
+		log_info(logger, "Operacion recibida de CPU Dispatch: %s", identificador_operacion_to_string(id_op));
 
 		switch (id_op)
 		{

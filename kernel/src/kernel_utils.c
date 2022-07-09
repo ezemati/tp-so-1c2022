@@ -27,7 +27,7 @@ void inicializar_kernel(int argc, char **argv)
 
 void terminar_kernel()
 {
-	log_debug(logger, "Finalizando kernel...");
+	log_info(logger, "Finalizando kernel...");
 	log_destroy(logger);
 
 	kernel_config_destroy(config);
@@ -68,7 +68,7 @@ void *procesar_cliente(void *args)
 	uint32_t id_op = -1;
 	recibir_uint32_por_socket(socket_cliente, &id_op);
 
-	log_info_if_logger_not_null(logger, "Operacion recibida en Kernel: %s", identificador_operacion_to_string(id_op));
+	log_info(logger, "Operacion recibida en Kernel: %s", identificador_operacion_to_string(id_op));
 
 	switch (id_op)
 	{
@@ -102,7 +102,7 @@ uint32_t obtener_proximo_pid()
 bool puedo_pasar_proceso_a_memoria()
 {
 	uint32_t cantidad_procesos_en_memoria = calcular_multiprogramacion();
-	log_trace_if_logger_not_null(logger, "Cantidad de procesos en memoria: %d/%d", cantidad_procesos_en_memoria, config->grado_multiprogramacion);
+	log_debug(logger, "Cantidad de procesos en memoria: %d/%d", cantidad_procesos_en_memoria, config->grado_multiprogramacion);
 	return cantidad_procesos_en_memoria < config->grado_multiprogramacion;
 }
 
@@ -179,7 +179,7 @@ void sacar_proceso_de_lista(t_list *lista, t_kernel_pcb *pcb)
 
 void bloquear_proceso(t_kernel_pcb *pcb, uint32_t tiempo_bloqueo)
 {
-	log_info_if_logger_not_null(logger, "Pasando proceso %d de %s a BLOCKED", pcb->id, estado_proceso_to_string(pcb->estado));
+	log_info(logger, "Pasando proceso %d de %s a BLOCKED", pcb->id, estado_proceso_to_string(pcb->estado));
 
 	pcb->estado = S_BLOCKED;
 	pcb->bloqueo_pendiente = tiempo_bloqueo;
@@ -213,7 +213,7 @@ void print_instrucciones(t_kernel_pcb *pcb)
 	{
 		t_instruccion *instruccion = list_iterator_next(iterator);
 		char *format_instruccion = format_instruccion_para_print(instruccion);
-		log_trace_if_logger_not_null(logger, "Instruccion: %s", format_instruccion);
+		log_trace(logger, "Instruccion: %s", format_instruccion);
 		free(format_instruccion);
 	}
 	list_iterator_destroy(iterator);
@@ -225,7 +225,7 @@ void print_instrucciones_de_todos_los_procesos(t_list *pcbs)
 	while (list_iterator_has_next(iterator))
 	{
 		t_kernel_pcb *pcb = list_iterator_next(iterator);
-		log_trace_if_logger_not_null(logger, "PID %d", pcb->id);
+		log_trace(logger, "PID %d", pcb->id);
 		print_instrucciones(pcb);
 	}
 	list_iterator_destroy(iterator);
@@ -238,7 +238,7 @@ void print_procesos_listaready()
 
 	pthread_mutex_lock(&mutex_lista_ready);
 
-	log_trace_if_logger_not_null(logger, "----- Procesos en READY -----");
+	log_debug(logger, "----- Procesos en READY -----");
 
 	t_list_iterator *iterator_ready = list_iterator_create(lista_ready);
 	uint32_t i = 0;
@@ -247,11 +247,11 @@ void print_procesos_listaready()
 		t_kernel_pcb *pcb = list_iterator_next(iterator_ready);
 		if (mostrar_rafaga_pendiente)
 		{
-			log_trace_if_logger_not_null(logger, "[%d] - PID %d (pendiente=%dms)", i, pcb->id, tiempo_restante_segun_estimacion(pcb));
+			log_debug(logger, "[%d] - PID %d (pendiente=%dms)", i, pcb->id, tiempo_restante_segun_estimacion(pcb));
 		}
 		else
 		{
-			log_trace_if_logger_not_null(logger, "[%d] - PID %d", i, pcb->id);
+			log_debug(logger, "[%d] - PID %d", i, pcb->id);
 		}
 
 		i++;
@@ -264,7 +264,7 @@ void print_procesos_listaready()
 
 t_kernel_pcb *enviar_interrupcion_a_cpu()
 {
-	log_info_if_logger_not_null(logger, "Enviando interrupcion a CPU para desalojar proceso");
+	log_info(logger, "Enviando interrupcion a CPU para desalojar proceso");
 
 	int socket_interrupt_cpu = crear_conexion(config->ip_cpu, config->puerto_cpu_interrupt, NULL);
 
@@ -294,7 +294,7 @@ t_kernel_pcb *enviar_interrupcion_a_cpu()
 
 void enviar_proceso_a_cpu_para_ejecucion(t_kernel_pcb *pcb_a_ejecutar)
 {
-	log_info_if_logger_not_null(logger, "Pasando proceso %d de %s a RUNNING", pcb_a_ejecutar->id, estado_proceso_to_string(pcb_a_ejecutar->estado));
+	log_info(logger, "Pasando proceso %d de %s a RUNNING", pcb_a_ejecutar->id, estado_proceso_to_string(pcb_a_ejecutar->estado));
 
 	int socket_dispatch_cpu = crear_conexion(config->ip_cpu, config->puerto_cpu_dispatch, NULL);
 
@@ -316,7 +316,7 @@ void enviar_proceso_a_cpu_para_ejecucion(t_kernel_pcb *pcb_a_ejecutar)
 
 	if (!ok)
 	{
-		log_error_if_logger_not_null(logger, "Error al enviar nuevo proceso para ejecucion (PID %d) a CPU", pcb_a_ejecutar->id);
+		log_error(logger, "Error al enviar nuevo proceso para ejecucion (PID %d) a CPU", pcb_a_ejecutar->id);
 	}
 
 	pcb_a_ejecutar->estado = S_RUNNING;
@@ -333,18 +333,18 @@ void handler_atencion_procesos_bloqueados()
 
 		if (primer_proceso_en_blocked == NULL)
 		{
-			log_error_if_logger_not_null(logger, "No hay procesos bloqueados");
+			log_error(logger, "El handler de procesos bloqueados se ejecuto, pero no hay procesos bloqueados");
 			continue;
 		}
 
 		uint32_t milisegundos_io = primer_proceso_en_blocked->bloqueo_pendiente;
 		uint32_t microsegundos_io = milisegundos_a_microsegundos(milisegundos_io);
 
-		log_info_if_logger_not_null(logger, "Atendiendo I/O de proceso %d por %dms", primer_proceso_en_blocked->id, milisegundos_io);
+		log_info(logger, "Atendiendo I/O de proceso %d por %dms", primer_proceso_en_blocked->id, milisegundos_io);
 
 		usleep(microsegundos_io);
 
-		log_info_if_logger_not_null(logger, "Fin de I/O de proceso %d", primer_proceso_en_blocked->id);
+		log_info(logger, "Fin de I/O de proceso %d", primer_proceso_en_blocked->id);
 
 		primer_proceso_en_blocked->bloqueo_pendiente = 0;
 

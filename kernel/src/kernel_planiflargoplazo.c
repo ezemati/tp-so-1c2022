@@ -29,7 +29,7 @@ bool largo_plazo_intentar_pasar_proceso_a_memoria()
 
 void finalizar_proceso(t_kernel_pcb *pcb)
 {
-    log_info_if_logger_not_null(logger, "Pasando proceso %d de %s a EXIT", pcb->id, estado_proceso_to_string(pcb->estado));
+    log_info(logger, "Pasando proceso %d de %s a EXIT", pcb->id, estado_proceso_to_string(pcb->estado));
 
     pcb->estado = S_EXIT;
     finalizar_proceso_en_memoria(pcb);
@@ -52,7 +52,7 @@ void finalizar_proceso(t_kernel_pcb *pcb)
 
 static void pasar_proceso_new_a_ready(t_kernel_pcb *pcb)
 {
-    log_info_if_logger_not_null(logger, "Inicializando proceso %d en Memoria", pcb->id);
+    log_info(logger, "Inicializando proceso %d en Memoria", pcb->id);
 
     int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, NULL);
 
