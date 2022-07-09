@@ -17,7 +17,13 @@ void atender_handshake_con_kernel(int socket_cliente)
 void atender_ejecutar_proceso(int socket_cliente)
 {
     // Reinicio el flag, por si quedo algun valor perdido
+    pthread_mutex_lock(&mutex_hay_interrupcion);
     hay_interrupcion = false;
+    pthread_mutex_unlock(&mutex_hay_interrupcion);
+
+    pthread_mutex_lock(&mutex_hay_proceso_en_ejecucion);
+    hay_proceso_en_ejecucion = true;
+    pthread_mutex_unlock(&mutex_hay_proceso_en_ejecucion);
 
     void *buffer_request = NULL;
     recibir_buffer_con_bytes_por_socket(socket_cliente, &buffer_request);

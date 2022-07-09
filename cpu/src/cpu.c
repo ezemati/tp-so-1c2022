@@ -6,8 +6,12 @@ t_cpu_info_ejecucion_actual *info_ejecucion_actual = NULL;
 t_cpu_tlb *tlb = NULL;
 
 bool hay_interrupcion = false;
+bool hay_proceso_en_ejecucion = false;
 int socket_conexion_kernel_dispatch = -1;
 int socket_conexion_kernel_interrupt = -1;
+
+pthread_mutex_t mutex_hay_interrupcion;
+pthread_mutex_t mutex_hay_proceso_en_ejecucion;
 
 int main(int argc, char **argv)
 {
@@ -67,7 +71,27 @@ void *interrupt_listener()
 		if (recibido == 1)
 		{
 			log_info_if_logger_not_null(logger, "Interrupcion recibida en CPU");
-			hay_interrupcion = true;
+
+			pthread_mutex_lock(&mutex_hay_proceso_en_ejecucion);
+			if (hay_proceso_en_ejecucion)
+			{
+				pthread_mutex_unlock(&mutex_hay_proceso_en_ejecucion);
+
+				// Si de verdad hay un proceso en ejecucion, se guarda la interrupcion para desalojarlo
+				pthread_mutex_lock(&mutex_hay_interrupcion);
+				hay_interrupcion = true;
+				pthread_mutex_unlock(&mutex_hay_interrupcion);
+			}
+			else
+			{
+				pthread_mutex_unlock(&mutex_hay_proceso_en_ejecucion);
+
+				// Si ya no hay un proceso ejecutandose, se responde con una respuesta "falsa" a
+				// la request de desalojo
+				log_error_if_logger_not_null(logger, "No hay ningun proceso en ejecucion, asi que se ignora la interrupcion");
+				enviar_pcb_falso_a_kernel_por_interrupcion_de_desalojo();
+			}
+
 			// El PCB actualizado se manda al chequear interrupciones en el ciclo de ejecucion
 		}
 

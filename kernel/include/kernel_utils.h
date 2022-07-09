@@ -64,7 +64,7 @@ bool intentar_pasar_proceso_a_memoria();
 t_kernel_pcb *enviar_interrupcion_a_cpu();
 
 t_list *obtener_procesos_con_estado(estado_proceso estado);
-t_kernel_pcb *obtener_proceso_por_pid(uint32_t pid);
+t_kernel_pcb *obtener_proceso_por_pid(int32_t pid);
 bool existe_proceso_con_pid(uint32_t pid);
 uint32_t cantidad_procesos_con_estado(estado_proceso estado);
 void sacar_proceso_de_lista(t_list *lista, t_kernel_pcb *pcb);

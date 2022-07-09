@@ -10,7 +10,7 @@
 
 typedef struct t_kernel_actualizarpcb_request
 {
-    uint32_t pid;
+    int32_t pid;
     uint32_t program_counter;
     uint32_t bloqueo_pendiente;
     time_miliseg time_inicio_running;
@@ -22,7 +22,7 @@ typedef struct t_kernel_actualizarpcb_response
 
 } t_kernel_actualizarpcb_response;
 
-t_kernel_actualizarpcb_request *actualizarpcb_request_new(uint32_t pid, uint32_t program_counter, uint32_t bloqueo_pendiente, time_miliseg time_inicio_running, time_miliseg time_fin_running);
+t_kernel_actualizarpcb_request *actualizarpcb_request_new(int32_t pid, uint32_t program_counter, uint32_t bloqueo_pendiente, time_miliseg time_inicio_running, time_miliseg time_fin_running);
 void actualizarpcb_request_destroy(t_kernel_actualizarpcb_request *request);
 
 t_kernel_actualizarpcb_response *actualizarpcb_response_new();

@@ -137,13 +137,16 @@ t_list *obtener_procesos_con_estado(estado_proceso estado)
 	return list_filter(lista_procesos, proceso_tiene_estado);
 }
 
-t_kernel_pcb *obtener_proceso_por_pid(uint32_t pid)
+t_kernel_pcb *obtener_proceso_por_pid(int32_t pid)
 {
 	bool get_element(void *element)
 	{
 		t_kernel_pcb *elementPcb = element;
 		return elementPcb->id == pid;
 	}
+
+	if (pid == -1)
+		return NULL;
 
 	return list_find(lista_procesos, get_element);
 }
@@ -275,7 +278,11 @@ t_kernel_pcb *enviar_interrupcion_a_cpu()
 	hay_proceso_en_ejecucion = false;
 
 	t_kernel_pcb *pcb = obtener_proceso_por_pid(pcb_actualizado->pid);
-	actualizar_pcb_desalojado(pcb, pcb_actualizado->program_counter, pcb_actualizado->time_inicio_running, pcb_actualizado->time_fin_running);
+
+	if (pcb != NULL)
+	{
+		actualizar_pcb_desalojado(pcb, pcb_actualizado->program_counter, pcb_actualizado->time_inicio_running, pcb_actualizado->time_fin_running);
+	}
 
 	actualizarpcb_request_destroy(pcb_actualizado);
 	free(response_serializada);
@@ -323,6 +330,12 @@ void handler_atencion_procesos_bloqueados()
 		sem_wait(&sem_procesos_bloqueados);
 
 		t_kernel_pcb *primer_proceso_en_blocked = list_get_first_element_with_mutex(lista_blocked, &mutex_lista_blocked);
+
+		if (primer_proceso_en_blocked == NULL)
+		{
+			log_error_if_logger_not_null(logger, "No hay procesos bloqueados");
+			continue;
+		}
 
 		uint32_t milisegundos_io = primer_proceso_en_blocked->bloqueo_pendiente;
 		uint32_t microsegundos_io = milisegundos_a_microsegundos(milisegundos_io);

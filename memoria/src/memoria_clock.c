@@ -130,7 +130,7 @@ static int32_t clock_buscar_entrada_con_uso0(t_clock *self)
 {
     int32_t posicionEntradaAReemplazar = -1;
 
-    log_trace_if_logger_not_null(logger, "Buscando entrada con U=0");
+    log_trace_if_logger_not_null(logger, "Buscando entrada con (U=0)");
 
     while (posicionEntradaAReemplazar == -1)
     {

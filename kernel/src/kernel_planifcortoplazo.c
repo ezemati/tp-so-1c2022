@@ -36,12 +36,21 @@ void replanificar()
         // Este if unicamente se ejecuta para planificacion SRT (porque en FIFO no hay
         // desalojo de CPU)
         t_kernel_pcb *pcb_desalojado = enviar_interrupcion_a_cpu();
+
+        if (pcb_desalojado == NULL)
+        {
+            // Puede pasar que el proceso ya se haya desalojado a si mismo justo cuando se le manda
+            // la interrupcion de desalojo. Si eso pasa, hay que cancelar la replanificacion en este hilo, porque
+            // si el proceso se auto-desalojo (IO/EXIT) entonces ya se hace una replanificacion automatica
+            return;
+        }
+
         hay_proceso_en_ejecucion = false;
 
         // Para respetar el criterio CPU->IO->NEW, tengo que sacar el PCB que esta en la ultima
-        // posicion de la lista de READY (que seria el que paso de IO o NEW a READY), asi primero
-        // queda el proceso desalojado (que viene de CPU) y despues queda el de IO/NEW que produjo
-        // la replanificacion
+        // posicion de la lista de READY (que seria el que paso de IO o NEW a READY y produjo esta
+        // replanificacion), asi queda primero el proceso desalojado (que viene de CPU) y despues
+        // queda el de IO/NEW que produjo la replanificacion
         agregar_proceso_a_ready_en_anteultima_posicion_sin_replanificar(pcb_desalojado);
     }
 

@@ -5,6 +5,7 @@ static void bloquear_proceso();
 static void finalizar_proceso();
 static void enviar_pcb_actualizado_a_kernel_con_instruccion(identificador_operacion operacion);
 static void *crear_actualizarpcbrequest_serializada_para_infoejecucionactual(int *bytes_request_serializada);
+static void *crear_actualizarpcbrequest_falsa_serializada(int *bytes_request_serializada);
 
 void inicializar_cpu(int argc, char **argv)
 {
@@ -13,6 +14,9 @@ void inicializar_cpu(int argc, char **argv)
 							: "cfg/cpu.config";
 	config = cpu_config_new(ruta_config);
 	tlb = tlb_new(config->entradas_tlb);
+
+	pthread_mutex_init(&mutex_hay_interrupcion, NULL);
+	pthread_mutex_init(&mutex_hay_proceso_en_ejecucion, NULL);
 }
 
 void terminar_cpu()
@@ -22,6 +26,9 @@ void terminar_cpu()
 
 	cpu_config_destroy(config);
 	tlb_destroy(tlb);
+
+	pthread_mutex_destroy(&mutex_hay_interrupcion);
+	pthread_mutex_destroy(&mutex_hay_proceso_en_ejecucion);
 }
 
 void procesar_request(int socket_cliente)
@@ -124,6 +131,10 @@ void realizar_ejecucion()
 		// CHECK INTERRUPT (se chequea automaticamente por la condicion del while)
 	} while (!hay_interrupcion && info_ejecucion_actual->ultima_instruccion_ejecutada != IO && !ejecucion_completada(info_ejecucion_actual) && info_ejecucion_actual->ultima_instruccion_ejecutada != EXIT);
 
+	pthread_mutex_lock(&mutex_hay_proceso_en_ejecucion);
+	hay_proceso_en_ejecucion = false;
+	pthread_mutex_unlock(&mutex_hay_proceso_en_ejecucion);
+
 	info_ejecucion_actual->time_fin_running = current_time();
 
 	if (hay_interrupcion)
@@ -137,10 +148,6 @@ void realizar_ejecucion()
 	else if (ejecucion_completada(info_ejecucion_actual) || info_ejecucion_actual->ultima_instruccion_ejecutada == EXIT)
 	{
 		finalizar_proceso();
-	}
-	else
-	{
-		log_error_if_logger_not_null(logger, "Aca paso algo raro...");
 	}
 }
 
@@ -201,6 +208,20 @@ void proceso_desalojado_de_cpu()
 	infoejecucionactual_destroy(info_ejecucion_actual);
 }
 
+void enviar_pcb_falso_a_kernel_por_interrupcion_de_desalojo()
+{
+	// A veces pasaba que Kernel mandaba una interrupcion de desalojo justo cuando en CPU se ejecutaba una IO o un EXIT,
+	// y eso hacia que el proceso en ejecucion se desaloje dos veces (una por la instruccion IO/EXIT y otra por la interrupcion de Kernel),
+	// y pasaban cosas raras. Asi que esta funcion deberia ejecutarse cuando CPU recibe una interrupcion de Kernel y el proceso ya dejo de ejecutarse,
+	// y le manda como respuesta al desalojo un PCB falso
+	int bytes_request_serializada;
+	void *request_serializada = crear_actualizarpcbrequest_falsa_serializada(&bytes_request_serializada);
+	enviar_buffer_serializado_con_bytes_por_socket(socket_conexion_kernel_interrupt, request_serializada, bytes_request_serializada);
+
+	liberar_conexion(socket_conexion_kernel_interrupt);
+	free(request_serializada);
+}
+
 static void desalojar_proceso()
 {
 	int bytes_request_serializada;
@@ -238,7 +259,16 @@ static void enviar_pcb_actualizado_a_kernel_con_instruccion(identificador_operac
 static void *crear_actualizarpcbrequest_serializada_para_infoejecucionactual(int *bytes_request_serializada)
 {
 	t_kernel_actualizarpcb_request *request = actualizarpcb_request_new(info_ejecucion_actual->pid, info_ejecucion_actual->program_counter, info_ejecucion_actual->bloqueo_pendiente, info_ejecucion_actual->time_inicio_running, info_ejecucion_actual->time_fin_running);
-    void *request_serializada = serializar_actualizarpcb_request(request, bytes_request_serializada);
-    actualizarpcb_request_destroy(request);
-    return request_serializada;
+	void *request_serializada = serializar_actualizarpcb_request(request, bytes_request_serializada);
+	actualizarpcb_request_destroy(request);
+	return request_serializada;
+}
+
+static void *crear_actualizarpcbrequest_falsa_serializada(int *bytes_request_serializada)
+{
+	int32_t pid_falso = -1;
+	t_kernel_actualizarpcb_request *request = actualizarpcb_request_new(pid_falso, 0, 0, 0, 0);
+	void *request_serializada = serializar_actualizarpcb_request(request, bytes_request_serializada);
+	actualizarpcb_request_destroy(request);
+	return request_serializada;
 }

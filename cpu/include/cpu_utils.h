@@ -43,5 +43,6 @@ uint32_t leer_dato(uint32_t direccion_logica_lectura);
 void escribir_o_copiar_dato(uint32_t direccion_logica_destino, uint32_t valor_a_escribir_o_copiar);
 
 void proceso_desalojado_de_cpu();
+void enviar_pcb_falso_a_kernel_por_interrupcion_de_desalojo();
 
 #endif
