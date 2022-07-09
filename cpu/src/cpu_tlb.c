@@ -47,7 +47,7 @@ void tlb_add_entry(t_cpu_tlb *self, uint32_t numero_pagina, uint32_t numero_marc
 
     if (tlb_tiene_espacios_libres(self))
     {
-        log_info(logger, "TLB: agregando pagina %d en espacio vacio", numero_pagina);
+        log_info_with_mutex(logger, &mutex_logger, "TLB: agregando pagina %d en espacio vacio", numero_pagina);
         tlb_add_entry_in_empty_space(self, numero_pagina, numero_marco);
         return;
     }
@@ -56,7 +56,7 @@ void tlb_add_entry(t_cpu_tlb *self, uint32_t numero_pagina, uint32_t numero_marc
                                                  ? tlb_get_entry_to_replace_fifo(self)
                                                  : tlb_get_entry_to_replace_lru(self);
 
-    log_info(logger, "TLB: haciendo reemplazo, sale pagina %d y entra pagina %d", entrada_a_reemplazar->numero_pagina, numero_pagina);
+    log_info_with_mutex(logger, &mutex_logger, "TLB: haciendo reemplazo, sale pagina %d y entra pagina %d", entrada_a_reemplazar->numero_pagina, numero_pagina);
 
     entradatlb_update(entrada_a_reemplazar, numero_pagina, numero_marco);
 }

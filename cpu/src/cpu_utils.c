@@ -15,13 +15,14 @@ void inicializar_cpu(int argc, char **argv)
 	config = cpu_config_new(ruta_config);
 	tlb = tlb_new(config->entradas_tlb);
 
+	pthread_mutex_init(&mutex_logger, NULL);
 	pthread_mutex_init(&mutex_hay_interrupcion, NULL);
 	pthread_mutex_init(&mutex_hay_proceso_en_ejecucion, NULL);
 }
 
 void terminar_cpu()
 {
-	log_info(logger, "Finalizando CPU...");
+	log_info_with_mutex(logger, &mutex_logger, "Finalizando CPU...");
 	log_destroy(logger);
 
 	cpu_config_destroy(config);
@@ -49,7 +50,7 @@ void *procesar_cliente(void *args)
 	uint32_t id_op = -1;
 	recibir_uint32_por_socket(socket_cliente, &id_op);
 
-	log_info(logger, "Operacion recibida en CPU: %s", identificador_operacion_to_string(id_op));
+	log_info_with_mutex(logger, &mutex_logger, "Operacion recibida en CPU: %s", identificador_operacion_to_string(id_op));
 
 	switch (id_op)
 	{
@@ -73,7 +74,7 @@ void *procesar_cliente(void *args)
 
 void realizar_handshake_con_memoria()
 {
-	log_info(logger, "Realizando handshake con Memoria");
+	log_info_with_mutex(logger, &mutex_logger, "Realizando handshake con Memoria");
 
 	int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, logger);
 
@@ -86,7 +87,7 @@ void realizar_handshake_con_memoria()
 	config->memoria_entradas_por_tabla = response->entradas_por_tabla;
 	config->memoria_tamanio_pagina = response->tamanio_pagina;
 
-	log_info(logger, "Handshake finalizado - {entradas_por_tabla=%d, tamanio_pagina=%d}", config->memoria_entradas_por_tabla, config->memoria_tamanio_pagina);
+	log_info_with_mutex(logger, &mutex_logger, "Handshake finalizado - {entradas_por_tabla=%d, tamanio_pagina=%d}", config->memoria_entradas_por_tabla, config->memoria_tamanio_pagina);
 
 	handshakeconfiguraciones_memoria_response_destroy(response);
 	free(buffer_response);
@@ -112,7 +113,7 @@ void realizar_ejecucion()
 			if (!direccion_valida)
 			{
 				// TODO: ver si aca desalojamos al proceso por intentar acceder a una direccion no valida
-				log_error(logger, "Direccion %d invalida (el tamanio del proceso es %d)", direccion_logica_origen, info_ejecucion_actual->tamanio);
+				log_error_with_mutex(logger, &mutex_logger, "Direccion %d invalida (el tamanio del proceso es %d)", direccion_logica_origen, info_ejecucion_actual->tamanio);
 			}
 			else
 			{
@@ -202,7 +203,7 @@ void escribir_o_copiar_dato(uint32_t direccion_logica_destino, uint32_t valor_a_
 void proceso_desalojado_de_cpu()
 {
 	time_miliseg milisegundos_en_running = milisegundos_entre_times(info_ejecucion_actual->time_inicio_running, info_ejecucion_actual->time_fin_running);
-	log_info(logger, "Desalojando proceso %d (ejecuto %lldms)", info_ejecucion_actual->pid, milisegundos_en_running);
+	log_info_with_mutex(logger, &mutex_logger, "Desalojando proceso %d (ejecuto %lldms)", info_ejecucion_actual->pid, milisegundos_en_running);
 
 	tlb_clear(tlb);
 	infoejecucionactual_destroy(info_ejecucion_actual);

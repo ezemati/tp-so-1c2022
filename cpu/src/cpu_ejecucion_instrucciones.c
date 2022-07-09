@@ -28,37 +28,37 @@ void ejecutar_instruccion(t_instruccion *instruccion, uint32_t valor_para_copy)
 void ejecutar_noop(t_instruccion *instruccion)
 {
     time_miliseg milisegundos_noop = config->retardo_noop;
-    log_info(logger, "PID %d: empezando NO-OP por %lldms", info_ejecucion_actual->pid, milisegundos_noop);
+    log_info_with_mutex(logger, &mutex_logger, "PID %d: empezando NO-OP por %lldms", info_ejecucion_actual->pid, milisegundos_noop);
 
     time_microseg microsegundos_noop = milisegundos_a_microsegundos(milisegundos_noop);
     usleep(microsegundos_noop);
 
-    log_info(logger, "PID %d: NO-OP finalizado", info_ejecucion_actual->pid);
+    log_info_with_mutex(logger, &mutex_logger, "PID %d: NO-OP finalizado", info_ejecucion_actual->pid);
 }
 
 void ejecutar_io(t_instruccion *instruccion)
 {
     uint32_t duracion_io = instruccion->parametros[0];
     info_ejecucion_actual->bloqueo_pendiente = duracion_io;
-    log_info(logger, "PID %d: IO por %d milisegundos", info_ejecucion_actual->pid, duracion_io);
+    log_info_with_mutex(logger, &mutex_logger, "PID %d: IO por %d milisegundos", info_ejecucion_actual->pid, duracion_io);
 }
 
 void ejecutar_read(t_instruccion *instruccion)
 {
     uint32_t direccion_logica_lectura = instruccion->parametros[0];
 
-    log_info(logger, "PID %d: ejecutando READ %d", info_ejecucion_actual->pid, direccion_logica_lectura);
+    log_info_with_mutex(logger, &mutex_logger, "PID %d: ejecutando READ %d", info_ejecucion_actual->pid, direccion_logica_lectura);
 
     bool direccion_valida = direccion_logica_valida(direccion_logica_lectura);
     if (!direccion_valida)
     {
-        log_error(logger, "Direccion %d invalida (el tamanio del proceso es %d)", direccion_logica_lectura, info_ejecucion_actual->tamanio);
+        log_error_with_mutex(logger, &mutex_logger, "Direccion %d invalida (el tamanio del proceso es %d)", direccion_logica_lectura, info_ejecucion_actual->tamanio);
         return;
     }
 
     uint32_t dato_leido = leer_dato(direccion_logica_lectura);
 
-    log_info(logger, "PID %d: READ %d = %d", info_ejecucion_actual->pid, direccion_logica_lectura, dato_leido);
+    log_info_with_mutex(logger, &mutex_logger, "PID %d: READ %d = %d", info_ejecucion_actual->pid, direccion_logica_lectura, dato_leido);
 }
 
 void ejecutar_write(t_instruccion *instruccion)
@@ -66,18 +66,18 @@ void ejecutar_write(t_instruccion *instruccion)
     uint32_t direccion_logica_escritura = instruccion->parametros[0];
     uint32_t valor_a_escribir = instruccion->parametros[1];
 
-    log_info(logger, "PID %d: ejecutando WRITE %d %d", info_ejecucion_actual->pid, direccion_logica_escritura, valor_a_escribir);
+    log_info_with_mutex(logger, &mutex_logger, "PID %d: ejecutando WRITE %d %d", info_ejecucion_actual->pid, direccion_logica_escritura, valor_a_escribir);
 
     bool direccion_valida = direccion_logica_valida(direccion_logica_escritura);
     if (!direccion_valida)
     {
-        log_error(logger, "Direccion %d invalida (el tamanio del proceso es %d)", direccion_logica_escritura, info_ejecucion_actual->tamanio);
+        log_error_with_mutex(logger, &mutex_logger, "Direccion %d invalida (el tamanio del proceso es %d)", direccion_logica_escritura, info_ejecucion_actual->tamanio);
         return;
     }
 
     escribir_o_copiar_dato(direccion_logica_escritura, valor_a_escribir);
 
-    log_info(logger, "PID %d: WRITE %d %d finalizado", info_ejecucion_actual->pid, direccion_logica_escritura, valor_a_escribir);
+    log_info_with_mutex(logger, &mutex_logger, "PID %d: WRITE %d %d finalizado", info_ejecucion_actual->pid, direccion_logica_escritura, valor_a_escribir);
 }
 
 void ejecutar_copy(t_instruccion *instruccion, uint32_t valor_a_copiar)
@@ -85,21 +85,21 @@ void ejecutar_copy(t_instruccion *instruccion, uint32_t valor_a_copiar)
     uint32_t direccion_logica_destino = instruccion->parametros[0];
     uint32_t direccion_logica_origen = instruccion->parametros[1];
 
-    log_info(logger, "PID %d: ejecutando COPY %d %d", info_ejecucion_actual->pid, direccion_logica_destino, direccion_logica_origen);
+    log_info_with_mutex(logger, &mutex_logger, "PID %d: ejecutando COPY %d %d", info_ejecucion_actual->pid, direccion_logica_destino, direccion_logica_origen);
 
     bool direccion_valida = direccion_logica_valida(direccion_logica_destino);
     if (!direccion_valida)
     {
-        log_error(logger, "Direccion %d invalida (el tamanio del proceso es %d)", direccion_logica_destino, info_ejecucion_actual->tamanio);
+        log_error_with_mutex(logger, &mutex_logger, "Direccion %d invalida (el tamanio del proceso es %d)", direccion_logica_destino, info_ejecucion_actual->tamanio);
         return;
     }
 
     escribir_o_copiar_dato(direccion_logica_destino, valor_a_copiar);
 
-    log_info(logger, "PID %d: COPY %d %d finalizado (valor_copiado=%d)", info_ejecucion_actual->pid, direccion_logica_destino, direccion_logica_origen, valor_a_copiar);
+    log_info_with_mutex(logger, &mutex_logger, "PID %d: COPY %d %d finalizado (valor_copiado=%d)", info_ejecucion_actual->pid, direccion_logica_destino, direccion_logica_origen, valor_a_copiar);
 }
 
 void ejecutar_exit(t_instruccion *instruccion)
 {
-    log_info(logger, "PID %d: ejecutando EXIT", info_ejecucion_actual->pid);
+    log_info_with_mutex(logger, &mutex_logger, "PID %d: ejecutando EXIT", info_ejecucion_actual->pid);
 }
