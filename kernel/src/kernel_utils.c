@@ -151,7 +151,10 @@ t_kernel_pcb *obtener_proceso_por_pid(int32_t pid)
 	if (pid == -1)
 		return NULL;
 
-	return list_find(lista_procesos, get_element);
+	pthread_mutex_lock(&mutex_lista_procesos);
+	t_kernel_pcb *pcb = list_find(lista_procesos, get_element);
+	pthread_mutex_unlock(&mutex_lista_procesos);
+	return pcb;
 }
 
 bool existe_proceso_con_pid(uint32_t pid)
