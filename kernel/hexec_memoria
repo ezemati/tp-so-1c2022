@@ -2,5 +2,5 @@
 FILE=kernel.out
 make
 if test -f "./bin/$FILE"; then
-    valgrind --tool=helgrind --log-file="logs/helgrind.log" ./bin/$FILE cfg/MEMORIA_CONFIG
+    valgrind --tool=helgrind --read-var-info=yes --log-file="logs/helgrind.log" ./bin/$FILE cfg/MEMORIA_CONFIG
 fi
