@@ -29,6 +29,13 @@ void atender_ejecutar_proceso(int socket_cliente)
     recibir_buffer_con_bytes_por_socket(socket_cliente, &buffer_request);
     t_cpu_ejecutarproceso_request *request = deserializar_ejecutarproceso_request(buffer_request);
 
+    tlb_clear(tlb);
+
+    if (info_ejecucion_actual != NULL)
+    {
+        // Si no se liberaron los recursos del infoejecucionactual anterior, se liberan
+        infoejecucionactual_destroy(info_ejecucion_actual);
+    }
     info_ejecucion_actual = infoejecucionactual_new(request);
 
     ejecutarproceso_request_destroy(request);

@@ -65,6 +65,11 @@ void *procesar_cliente(void *args)
 		break;
 	}
 
+	if (id_op != EJECUTAR_PROCESO)
+	{
+		log_info_with_mutex(logger, &mutex_logger, "Operacion finalizada en CPU: %s", identificador_operacion_to_string(id_op));
+	}
+
 	// liberar_conexion(socket_cliente);
 
 	free(args);
@@ -205,8 +210,8 @@ void proceso_desalojado_de_cpu()
 	time_miliseg milisegundos_en_running = milisegundos_entre_times(info_ejecucion_actual->time_inicio_running, info_ejecucion_actual->time_fin_running);
 	log_info_with_mutex(logger, &mutex_logger, "Desalojando proceso %d (ejecuto %lldms)", info_ejecucion_actual->pid, milisegundos_en_running);
 
-	tlb_clear(tlb);
-	infoejecucionactual_destroy(info_ejecucion_actual);
+	// tlb_clear(tlb);
+	// infoejecucionactual_destroy(info_ejecucion_actual);
 }
 
 void enviar_pcb_falso_a_kernel_por_interrupcion_de_desalojo()
