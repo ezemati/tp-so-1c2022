@@ -11,6 +11,7 @@
 #include <kernel_planifcortoplazo.h>
 
 #include <utils/list.h>
+#include <utils/sincro.h>
 #include <utils/sockets.h>
 #include <utils/time.h>
 #include <types/identificador_operacion.h>

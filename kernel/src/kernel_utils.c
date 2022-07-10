@@ -278,9 +278,7 @@ t_kernel_pcb *enviar_interrupcion_a_cpu()
 	recibir_buffer_con_bytes_por_socket(socket_interrupt_cpu, &response_serializada);
 	t_kernel_actualizarpcb_request *pcb_actualizado = deserializar_actualizarpcb_request(response_serializada);
 
-	pthread_mutex_lock(&mutex_hay_proceso_en_ejecucion);
-	hay_proceso_en_ejecucion = false;
-	pthread_mutex_unlock(&mutex_hay_proceso_en_ejecucion);
+	sincro_set_bool(&hay_proceso_en_ejecucion, false, &mutex_hay_proceso_en_ejecucion);
 
 	t_kernel_pcb *pcb = obtener_proceso_por_pid(pcb_actualizado->pid);
 
@@ -326,9 +324,7 @@ void enviar_proceso_a_cpu_para_ejecucion(t_kernel_pcb *pcb_a_ejecutar)
 
 	pcb_a_ejecutar->estado = S_RUNNING;
 
-	pthread_mutex_lock(&mutex_hay_proceso_en_ejecucion);
-	hay_proceso_en_ejecucion = true;
-	pthread_mutex_unlock(&mutex_hay_proceso_en_ejecucion);
+	sincro_set_bool(&hay_proceso_en_ejecucion, true, &mutex_hay_proceso_en_ejecucion);
 }
 
 void handler_atencion_procesos_bloqueados()

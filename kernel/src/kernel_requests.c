@@ -26,9 +26,7 @@ void atender_crear_proceso(int socket_cliente)
 
 void atender_bloquear_proceso(int socket_cliente)
 {
-	pthread_mutex_lock(&mutex_hay_proceso_en_ejecucion);
-	hay_proceso_en_ejecucion = false;
-	pthread_mutex_unlock(&mutex_hay_proceso_en_ejecucion);
+	sincro_set_bool(&hay_proceso_en_ejecucion, false, &mutex_hay_proceso_en_ejecucion);
 
 	void *buffer_request = NULL;
 	recibir_buffer_con_bytes_por_socket(socket_cliente, &buffer_request);
@@ -46,9 +44,7 @@ void atender_bloquear_proceso(int socket_cliente)
 
 void atender_finalizar_proceso(int socket_cliente)
 {
-	pthread_mutex_lock(&mutex_hay_proceso_en_ejecucion);
-	hay_proceso_en_ejecucion = false;
-	pthread_mutex_unlock(&mutex_hay_proceso_en_ejecucion);
+	sincro_set_bool(&hay_proceso_en_ejecucion, false, &mutex_hay_proceso_en_ejecucion);
 
 	void *buffer_request = NULL;
 	recibir_buffer_con_bytes_por_socket(socket_cliente, &buffer_request);

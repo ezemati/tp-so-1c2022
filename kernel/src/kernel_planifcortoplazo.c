@@ -12,16 +12,9 @@ void agregar_proceso_a_ready(t_kernel_pcb *pcb)
 
     list_add_with_mutex(lista_ready, pcb, &mutex_lista_ready);
 
-    pthread_mutex_lock(&mutex_hay_proceso_en_ejecucion);
-    if (algoritmo_es_con_desalojo() || !hay_proceso_en_ejecucion)
+    if (algoritmo_es_con_desalojo() || !sincro_test_bool(&hay_proceso_en_ejecucion, &mutex_hay_proceso_en_ejecucion))
     {
-        pthread_mutex_unlock(&mutex_hay_proceso_en_ejecucion);
-
         replanificar();
-    }
-    else
-    {
-        pthread_mutex_unlock(&mutex_hay_proceso_en_ejecucion);
     }
 }
 
@@ -38,11 +31,8 @@ void agregar_proceso_a_ready_en_anteultima_posicion_sin_replanificar(t_kernel_pc
 
 void replanificar()
 {
-    pthread_mutex_lock(&mutex_hay_proceso_en_ejecucion);
-    if (hay_proceso_en_ejecucion)
+    if (sincro_test_bool(&hay_proceso_en_ejecucion, &mutex_hay_proceso_en_ejecucion))
     {
-        pthread_mutex_unlock(&mutex_hay_proceso_en_ejecucion);
-
         // Este if unicamente se ejecuta para planificacion SRT (porque en FIFO no hay
         // desalojo de CPU)
         t_kernel_pcb *pcb_desalojado = enviar_interrupcion_a_cpu();
@@ -56,19 +46,13 @@ void replanificar()
             return;
         }
 
-        pthread_mutex_lock(&mutex_hay_proceso_en_ejecucion);
-        hay_proceso_en_ejecucion = false;
-        pthread_mutex_unlock(&mutex_hay_proceso_en_ejecucion);
+        sincro_set_bool(&hay_proceso_en_ejecucion, false, &mutex_hay_proceso_en_ejecucion);
 
         // Para respetar el criterio CPU->IO->NEW, tengo que sacar el PCB que esta en la ultima
         // posicion de la lista de READY (que seria el que paso de IO o NEW a READY y produjo esta
         // replanificacion), asi queda primero el proceso desalojado (que viene de CPU) y despues
         // queda el de IO/NEW que produjo la replanificacion
         agregar_proceso_a_ready_en_anteultima_posicion_sin_replanificar(pcb_desalojado);
-    }
-    else
-    {
-        pthread_mutex_unlock(&mutex_hay_proceso_en_ejecucion);
     }
 
     t_kernel_pcb *pcb_a_ejecutar = obtener_proximo_para_ejecutar();
@@ -86,9 +70,7 @@ void replanificar()
 
     enviar_proceso_a_cpu_para_ejecucion(pcb_a_ejecutar);
 
-    pthread_mutex_lock(&mutex_hay_proceso_en_ejecucion);
-    hay_proceso_en_ejecucion = true;
-    pthread_mutex_unlock(&mutex_hay_proceso_en_ejecucion);
+    sincro_set_bool(&hay_proceso_en_ejecucion, true, &mutex_hay_proceso_en_ejecucion);
 }
 
 static t_kernel_pcb *obtener_proximo_para_ejecutar()
