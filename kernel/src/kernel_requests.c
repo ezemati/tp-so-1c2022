@@ -52,7 +52,7 @@ void atender_finalizar_proceso(int socket_cliente)
 	t_kernel_actualizarpcb_request *request = deserializar_actualizarpcb_request(buffer_request);
 
 	t_kernel_pcb *pcb = obtener_proceso_por_pid(request->pid);
-	actualizar_pcb_bloqueado(pcb, request->program_counter, request->time_inicio_running, request->time_fin_running); // Innecesario, pero por las dudas
+	// actualizar_pcb_bloqueado(pcb, request->program_counter, request->time_inicio_running, request->time_fin_running); // Innecesario, pero por las dudas
 
 	finalizar_proceso(pcb);
 
