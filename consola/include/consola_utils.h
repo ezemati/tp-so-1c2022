@@ -9,6 +9,7 @@
 #include <types/programa.h>
 
 #include <netdb.h>
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -26,5 +27,7 @@ void terminar_consola();
 extern t_log *logger;
 extern t_consola_config *config;
 extern t_programa *programa;
+
+extern pthread_mutex_t mutex_logger;
 
 #endif

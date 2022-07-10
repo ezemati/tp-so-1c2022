@@ -68,7 +68,7 @@ uint32_t fetch_valor_para_copy(uint32_t direccion_logica_origen)
 
 static uint32_t obtener_numero_tabla_2_para_entrada_tabla_1(uint32_t numero_tablaprimernivel, uint32_t entrada_tablaprimernivel)
 {
-    int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, NULL);
+    int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, NULL, NULL);
 
     t_memoria_numerotabla2paraentradatabla1_request *request_numerotabla2paraentradatabla1 = numerotabla2paraentradatabla1_request_new(numero_tablaprimernivel, entrada_tablaprimernivel);
     int bytes_request_numerotabla2paraentradatabla1_serializada;
@@ -91,7 +91,7 @@ static uint32_t obtener_numero_tabla_2_para_entrada_tabla_1(uint32_t numero_tabl
 
 static uint32_t obtener_numero_marco_para_entrada_tabla_2(uint32_t numero_tablaprimernivel, uint32_t numero_tablasegundonivel, uint32_t entrada_tablasegundonivel, int32_t *numero_pagina_reemplazada)
 {
-    int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, NULL);
+    int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, NULL, NULL);
 
     t_memoria_marcoparaentradatabla2_request *request_marcoparaentradatabla2 = marcoparaentradatabla2_request_new(numero_tablaprimernivel, numero_tablasegundonivel, entrada_tablasegundonivel);
     int bytes_request_marcoparaentradatabla2_serializada;

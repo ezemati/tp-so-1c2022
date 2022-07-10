@@ -41,7 +41,7 @@ int main(int argc, char **argv)
 	inicializar_kernel(argc, argv);
 
 	log_info_with_mutex(logger, &mutex_logger, "Realizando handshake con CPU dispatch");
-	socket_conexion_cpu_dispatch = crear_conexion(config->ip_cpu, config->puerto_cpu_dispatch, logger);
+	socket_conexion_cpu_dispatch = crear_conexion(config->ip_cpu, config->puerto_cpu_dispatch, logger, &mutex_logger);
 	uint32_t ok_enviado = 1, ok_recibido = 0;
 	enviar_uint32_por_socket(socket_conexion_cpu_dispatch, HANDSHAKE_SOY_KERNEL);
 	enviar_uint32_por_socket(socket_conexion_cpu_dispatch, ok_enviado);
@@ -60,7 +60,7 @@ int main(int argc, char **argv)
 	pthread_create(&thread_atencion_procesos_bloqueados_id, NULL, (void *)handler_atencion_procesos_bloqueados, NULL);
 	pthread_detach(thread_atencion_procesos_bloqueados_id);
 
-	int socket_servidor = iniciar_servidor(config->puerto_escucha, logger);
+	int socket_servidor = iniciar_servidor(config->puerto_escucha, logger, &mutex_logger);
 	if (socket_servidor == -1)
 	{
 		log_error_with_mutex(logger, &mutex_logger, "Kernel no pudo crear el socket de servidor");

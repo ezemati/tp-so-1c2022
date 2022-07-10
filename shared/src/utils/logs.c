@@ -1,6 +1,7 @@
 #include <utils/logs.h>
 
 static void log_if_logger_not_null(t_log *logger, t_log_level log_level, char *format, va_list args);
+static void log_with_mutex(t_log *logger, pthread_mutex_t *mutex, t_log_level log_level, char *format, va_list args);
 static int count_files_in_directory(char *path);
 
 void log_info_if_logger_not_null(t_log *logger, char *format, ...)
@@ -35,58 +36,42 @@ void log_error_if_logger_not_null(t_log *logger, char *format, ...)
 
 void log_trace_with_mutex(t_log *logger, pthread_mutex_t *mutex, char *format, ...)
 {
-    pthread_mutex_lock(mutex);
-
     va_list args;
     va_start(args, format);
 
-    log_if_logger_not_null(logger, LOG_LEVEL_TRACE, format, args);
+    log_with_mutex(logger, mutex, LOG_LEVEL_TRACE, format, args);
 
     va_end(args);
-
-    pthread_mutex_unlock(mutex);
 }
 
 void log_debug_with_mutex(t_log *logger, pthread_mutex_t *mutex, char *format, ...)
 {
-    pthread_mutex_lock(mutex);
-
     va_list args;
     va_start(args, format);
 
-    log_if_logger_not_null(logger, LOG_LEVEL_DEBUG, format, args);
+    log_with_mutex(logger, mutex, LOG_LEVEL_DEBUG, format, args);
 
     va_end(args);
-
-    pthread_mutex_unlock(mutex);
 }
 
 void log_info_with_mutex(t_log *logger, pthread_mutex_t *mutex, char *format, ...)
 {
-    pthread_mutex_lock(mutex);
-
     va_list args;
     va_start(args, format);
 
-    log_if_logger_not_null(logger, LOG_LEVEL_INFO, format, args);
+    log_with_mutex(logger, mutex, LOG_LEVEL_INFO, format, args);
 
     va_end(args);
-
-    pthread_mutex_unlock(mutex);
 }
 
 void log_error_with_mutex(t_log *logger, pthread_mutex_t *mutex, char *format, ...)
 {
-    pthread_mutex_lock(mutex);
-
     va_list args;
     va_start(args, format);
 
-    log_if_logger_not_null(logger, LOG_LEVEL_ERROR, format, args);
+    log_with_mutex(logger, mutex, LOG_LEVEL_ERROR, format, args);
 
     va_end(args);
-
-    pthread_mutex_unlock(mutex);
 }
 
 char *get_log_file_name(char *module)
@@ -136,6 +121,17 @@ static void log_if_logger_not_null(t_log *logger, t_log_level log_level, char *f
     }
 
     free(message);
+}
+
+static void log_with_mutex(t_log *logger, pthread_mutex_t *mutex, t_log_level log_level, char *format, va_list args)
+{
+    if (mutex != NULL)
+        pthread_mutex_lock(mutex);
+
+    log_if_logger_not_null(logger, log_level, format, args);
+
+    if (mutex != NULL)
+        pthread_mutex_unlock(mutex);
 }
 
 static int count_files_in_directory(char *path)

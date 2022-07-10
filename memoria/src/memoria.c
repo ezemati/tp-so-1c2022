@@ -23,7 +23,7 @@ int main(int argc, char **argv)
 
 	inicializar_memoria(argc, argv);
 
-	int socket_servidor = iniciar_servidor(config->puerto_escucha, logger);
+	int socket_servidor = iniciar_servidor(config->puerto_escucha, logger, &mutex_logger);
 	if (socket_servidor == -1)
 	{
 		log_error_with_mutex(logger, &mutex_logger, "Memoria no pudo crear el socket de servidor");

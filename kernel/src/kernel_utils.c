@@ -269,7 +269,7 @@ t_kernel_pcb *enviar_interrupcion_a_cpu()
 {
 	log_info_with_mutex(logger, &mutex_logger, "Enviando interrupcion a CPU para desalojar proceso");
 
-	int socket_interrupt_cpu = crear_conexion(config->ip_cpu, config->puerto_cpu_interrupt, NULL);
+	int socket_interrupt_cpu = crear_conexion(config->ip_cpu, config->puerto_cpu_interrupt, NULL, NULL);
 
 	uint32_t interrumpir_ejecucion = 1;
 	enviar_uint32_por_socket(socket_interrupt_cpu, interrumpir_ejecucion);
@@ -299,7 +299,7 @@ void enviar_proceso_a_cpu_para_ejecucion(t_kernel_pcb *pcb_a_ejecutar)
 {
 	log_info_with_mutex(logger, &mutex_logger, "Pasando proceso %d de %s a RUNNING", pcb_a_ejecutar->id, estado_proceso_to_string(pcb_a_ejecutar->estado));
 
-	int socket_dispatch_cpu = crear_conexion(config->ip_cpu, config->puerto_cpu_dispatch, NULL);
+	int socket_dispatch_cpu = crear_conexion(config->ip_cpu, config->puerto_cpu_dispatch, NULL, NULL);
 
 	t_cpu_ejecutarproceso_request *request = ejecutarproceso_request_new(pcb_a_ejecutar->id, pcb_a_ejecutar->tamanio, pcb_a_ejecutar->program_counter, pcb_a_ejecutar->tabla_paginas_primer_nivel, pcb_a_ejecutar->lista_instrucciones);
 	int bytes_request_serializada;

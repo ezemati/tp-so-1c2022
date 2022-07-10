@@ -1,6 +1,6 @@
 #include <utils/sockets.h>
 
-int crear_conexion(char *ip, uint32_t puerto, t_log *logger)
+int crear_conexion(char *ip, uint32_t puerto, t_log *logger, pthread_mutex_t *mutex_logger)
 {
     bool error = false;
 
@@ -16,7 +16,7 @@ int crear_conexion(char *ip, uint32_t puerto, t_log *logger)
     int socket_fd;
     if ((socket_fd = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol)) == -1)
     {
-        log_error_if_logger_not_null(logger, "Error al crear el socket con IP %s, PUERTO %s", ip, strPuerto);
+        log_error_with_mutex(logger, mutex_logger, "Error al crear el socket con IP %s, PUERTO %s", ip, strPuerto);
         error = true;
     }
     else
@@ -26,26 +26,26 @@ int crear_conexion(char *ip, uint32_t puerto, t_log *logger)
         time_miliseg milisegundos_sleep = 1000;
         for (int intento_actual = 1; intento_actual <= maximo_intentos; intento_actual++)
         {
-            log_trace_if_logger_not_null(logger, "Intento %d/%d de conexion con IP %s, PUERTO %s", intento_actual, maximo_intentos, ip, strPuerto);
+            log_trace_with_mutex(logger, mutex_logger, "Intento %d/%d de conexion con IP %s, PUERTO %s", intento_actual, maximo_intentos, ip, strPuerto);
 
             if (connect(socket_fd, servinfo->ai_addr, servinfo->ai_addrlen) != -1)
             {
-                log_trace_if_logger_not_null(logger, "Intento %d/%d exitoso", intento_actual, maximo_intentos);
+                log_trace_with_mutex(logger, mutex_logger, "Intento %d/%d exitoso", intento_actual, maximo_intentos);
                 connect_exitoso = true;
                 break;
             }
 
-            log_error_if_logger_not_null(logger, "Intento %d/%d fallido", intento_actual, maximo_intentos);
+            log_error_with_mutex(logger, mutex_logger, "Intento %d/%d fallido", intento_actual, maximo_intentos);
             usleep(milisegundos_a_microsegundos(milisegundos_sleep)); // Sleep para darle tiempo al servidor de levantar
         }
 
         if (connect_exitoso)
         {
-            log_trace_if_logger_not_null(logger, "Conexion con IP %s, PUERTO %s establecida correctamente", ip, strPuerto);
+            log_trace_with_mutex(logger, mutex_logger, "Conexion con IP %s, PUERTO %s establecida correctamente", ip, strPuerto);
         }
         else
         {
-            log_error_if_logger_not_null(logger, "No se pudo establecer la conexion con IP %s, PUERTO %s", ip, strPuerto);
+            log_error_with_mutex(logger, mutex_logger, "No se pudo establecer la conexion con IP %s, PUERTO %s", ip, strPuerto);
             error = true;
         }
     }
@@ -56,7 +56,7 @@ int crear_conexion(char *ip, uint32_t puerto, t_log *logger)
     return error ? -1 : socket_fd;
 }
 
-int iniciar_servidor(uint32_t puerto, t_log *logger)
+int iniciar_servidor(uint32_t puerto, t_log *logger, pthread_mutex_t *mutex_logger)
 {
     bool error = false;
 
@@ -74,7 +74,7 @@ int iniciar_servidor(uint32_t puerto, t_log *logger)
     int socket_servidor;
     if ((socket_servidor = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol)) == -1)
     {
-        log_error_if_logger_not_null(logger, "Error al crear el socket de escucha, con puerto %s", strPuerto);
+        log_error_with_mutex(logger, mutex_logger, "Error al crear el socket de escucha, con puerto %s", strPuerto);
         error = true;
     }
     else
@@ -85,7 +85,7 @@ int iniciar_servidor(uint32_t puerto, t_log *logger)
         // Asociamos el socket a un puerto
         if (bind(socket_servidor, servinfo->ai_addr, servinfo->ai_addrlen) != 0)
         {
-            log_error_if_logger_not_null(logger, "Fallo el bind del socket de escucha");
+            log_error_with_mutex(logger, mutex_logger, "Fallo el bind del socket de escucha");
             error = true;
         }
         else
@@ -93,12 +93,12 @@ int iniciar_servidor(uint32_t puerto, t_log *logger)
             // Escuchamos las conexiones entrantes
             if (listen(socket_servidor, SOMAXCONN) != 0)
             {
-                log_error_if_logger_not_null(logger, "Fallo el listen del socket de escucha");
+                log_error_with_mutex(logger, mutex_logger, "Fallo el listen del socket de escucha");
                 error = true;
             }
             else
             {
-                log_trace_if_logger_not_null(logger, "Listo para escuchar a mi cliente");
+                log_trace_with_mutex(logger, mutex_logger, "Listo para escuchar a mi cliente");
             }
         }
     }

@@ -76,7 +76,7 @@ void realizar_handshake_con_memoria()
 {
 	log_info_with_mutex(logger, &mutex_logger, "Realizando handshake con Memoria");
 
-	int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, logger);
+	int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, logger, &mutex_logger);
 
 	enviar_uint32_por_socket(socket_memoria, HANDSHAKE_INFO_TRADUCCION);
 
@@ -156,7 +156,7 @@ uint32_t leer_dato(uint32_t direccion_logica_lectura)
 {
 	uint32_t direccion_fisica_lectura = traducir_direccion_logica_a_fisica(direccion_logica_lectura);
 
-	int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, NULL);
+	int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, NULL, NULL);
 
 	// ? Ver si implementamos lo de leer de multiples paginas
 	uint32_t cantidad_bytes_lectura = sizeof(uint32_t);
@@ -181,7 +181,7 @@ void escribir_o_copiar_dato(uint32_t direccion_logica_destino, uint32_t valor_a_
 {
 	uint32_t direccion_fisica_escritura = traducir_direccion_logica_a_fisica(direccion_logica_destino);
 
-	int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, NULL);
+	int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, NULL, NULL);
 
 	// ? Ver si implementamos lo de escribir en multiples paginas
 	uint32_t cantidad_bytes_escritura = sizeof(uint32_t);

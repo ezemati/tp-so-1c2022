@@ -8,6 +8,8 @@ void inicializar_consola(int argc, char **argv)
 
 	config = consola_config_new(ruta_config, logger);
 	programa = programa_new(argv[1], string_to_long(argv[2]));
+
+	pthread_mutex_init(&mutex_logger, NULL);
 }
 
 void terminar_consola()
@@ -17,4 +19,6 @@ void terminar_consola()
 
 	consola_config_destroy(config);
 	programa_destroy(programa);
+
+	pthread_mutex_destroy(&mutex_logger);
 }
