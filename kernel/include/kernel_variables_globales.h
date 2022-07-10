@@ -22,6 +22,8 @@ extern bool hay_proceso_en_ejecucion;
 
 extern pthread_mutex_t mutex_logger;
 extern pthread_mutex_t mutex_proximo_pid;
+extern pthread_mutex_t mutex_hay_proceso_en_ejecucion;
+
 extern pthread_mutex_t mutex_lista_procesos;
 extern pthread_mutex_t mutex_lista_ready;
 extern pthread_mutex_t mutex_lista_suspended_ready;

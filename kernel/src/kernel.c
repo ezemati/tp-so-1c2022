@@ -14,6 +14,8 @@ bool hay_proceso_en_ejecucion = false;
 
 pthread_mutex_t mutex_logger;
 pthread_mutex_t mutex_proximo_pid;
+pthread_mutex_t mutex_hay_proceso_en_ejecucion;
+
 pthread_mutex_t mutex_lista_procesos;
 pthread_mutex_t mutex_lista_ready;
 pthread_mutex_t mutex_lista_suspended_ready;
