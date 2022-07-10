@@ -132,12 +132,12 @@ bool intentar_pasar_proceso_a_memoria()
 
 t_list *obtener_procesos_con_estado(estado_proceso estado)
 {
-	bool proceso_tiene_estado(void *element)
+	bool tiene_estado(void *element)
 	{
 		t_kernel_pcb *elementPcb = element;
-		return elementPcb->estado == estado;
+		return proceso_tiene_estado(elementPcb, estado);
 	}
-	return list_filter(lista_procesos, proceso_tiene_estado);
+	return list_filter(lista_procesos, tiene_estado);
 }
 
 t_kernel_pcb *obtener_proceso_por_pid(int32_t pid)
@@ -164,12 +164,12 @@ bool existe_proceso_con_pid(uint32_t pid)
 
 uint32_t cantidad_procesos_con_estado(estado_proceso estado)
 {
-	bool proceso_tiene_estado(void *element)
+	bool tiene_estado(void *element)
 	{
 		t_kernel_pcb *elementPcb = element;
-		return elementPcb->estado == estado;
+		return proceso_tiene_estado(elementPcb, estado);
 	}
-	return list_count_satisfying(lista_procesos, proceso_tiene_estado);
+	return list_count_satisfying(lista_procesos, tiene_estado);
 }
 
 void sacar_proceso_de_lista(t_list *lista, t_kernel_pcb *pcb)
@@ -185,9 +185,9 @@ void sacar_proceso_de_lista(t_list *lista, t_kernel_pcb *pcb)
 
 void bloquear_proceso(t_kernel_pcb *pcb, uint32_t tiempo_bloqueo)
 {
-	log_info_with_mutex(logger, &mutex_logger, "Pasando proceso %d de %s a BLOCKED", pcb->id, estado_proceso_to_string(pcb->estado));
+	log_info_with_mutex(logger, &mutex_logger, "Pasando proceso %d de %s a BLOCKED", pcb->id, estado_proceso_to_string(pcb));
 
-	pcb->estado = S_BLOCKED;
+	proceso_cambiar_estado(pcb, S_BLOCKED);
 	pcb->bloqueo_pendiente = tiempo_bloqueo;
 	pcb->milisegundos_en_running = 0;
 	pcb->time_inicio_bloqueo = current_time();
@@ -300,7 +300,7 @@ t_kernel_pcb *enviar_interrupcion_a_cpu()
 
 void enviar_proceso_a_cpu_para_ejecucion(t_kernel_pcb *pcb_a_ejecutar)
 {
-	log_info_with_mutex(logger, &mutex_logger, "Pasando proceso %d de %s a RUNNING", pcb_a_ejecutar->id, estado_proceso_to_string(pcb_a_ejecutar->estado));
+	log_info_with_mutex(logger, &mutex_logger, "Pasando proceso %d de %s a RUNNING", pcb_a_ejecutar->id, estado_proceso_to_string(pcb_a_ejecutar));
 
 	int socket_dispatch_cpu = crear_conexion(config->ip_cpu, config->puerto_cpu_dispatch, NULL, NULL);
 
@@ -325,7 +325,7 @@ void enviar_proceso_a_cpu_para_ejecucion(t_kernel_pcb *pcb_a_ejecutar)
 		log_error_with_mutex(logger, &mutex_logger, "Error al enviar nuevo proceso para ejecucion (PID %d) a CPU", pcb_a_ejecutar->id);
 	}
 
-	pcb_a_ejecutar->estado = S_RUNNING;
+	proceso_cambiar_estado(pcb_a_ejecutar, S_RUNNING);
 
 	sincro_set_bool(&hay_proceso_en_ejecucion, true, &mutex_hay_proceso_en_ejecucion);
 }
@@ -359,11 +359,11 @@ void handler_atencion_procesos_bloqueados()
 		sacar_proceso_de_lista(lista_blocked, primer_proceso_en_blocked);
 		pthread_mutex_unlock(&mutex_lista_blocked);
 
-		if (primer_proceso_en_blocked->estado == S_BLOCKED)
+		if (proceso_tiene_estado(primer_proceso_en_blocked, S_BLOCKED))
 		{
 			agregar_proceso_a_ready(primer_proceso_en_blocked);
 		}
-		else if (primer_proceso_en_blocked->estado == S_SUSPENDED_BLOCKED)
+		else if (proceso_tiene_estado(primer_proceso_en_blocked, S_SUSPENDED_BLOCKED))
 		{
 			// Si el proceso se suspendio, entonces para desbloquearlo hay que esperar que Memoria termine
 			// de hacer todas las cosas que tiene que hacer (que son lentas porque involucra guardar las paginas
@@ -395,7 +395,7 @@ static void handler_chequear_suspension_de_proceso_bloqueado(void *args)
 	// bloqueado, entonces lo suspendo
 	usleep(microsegundos_maximos_de_bloqueo);
 
-	if (existe_proceso_con_pid(pid) && pcb->estado == S_BLOCKED && times_son_iguales(pcb->time_inicio_bloqueo, time_inicio_bloqueo))
+	if (existe_proceso_con_pid(pid) && proceso_tiene_estado(pcb, S_BLOCKED) && times_son_iguales(pcb->time_inicio_bloqueo, time_inicio_bloqueo))
 	{
 		bool se_paso_proceso_a_memoria = false;
 		suspender_proceso(pcb, &se_paso_proceso_a_memoria);

@@ -7,6 +7,7 @@ t_kernel_pcb *pcb_new(uint32_t pid, uint32_t socket_consola, t_programa *program
     pcb->tamanio = programa->tamanio;
     pcb->lista_instrucciones = pcb_duplicar_instrucciones(programa);
     pcb->estado = S_NEW;
+    pthread_mutex_init(&(pcb->mutex_estado), NULL);
     pcb->program_counter = 0;
     pcb->tabla_paginas_primer_nivel = 9999;
     pcb->estimacion_rafaga = config->estimacion_inicial; // Apenas se crea el PCB, la estimacion se inicializa con el valor inicial
@@ -21,6 +22,7 @@ void pcb_destroy(t_kernel_pcb *pcb)
 {
     instrucciones_destroy(pcb->lista_instrucciones);
     sem_destroy(&pcb->sem_suspended_blocked_memoria);
+    pthread_mutex_destroy(&(pcb->mutex_estado));
     free(pcb);
 }
 
@@ -66,6 +68,21 @@ void actualizar_pcb_bloqueado(t_kernel_pcb *pcb, uint32_t nuevo_program_counter,
     recalcular_estimacion(pcb);
 }
 
+bool proceso_tiene_estado(t_kernel_pcb *pcb, estado_proceso estado)
+{
+    pthread_mutex_lock(&(pcb->mutex_estado));
+    bool ret = (pcb->estado == estado);
+    pthread_mutex_unlock(&(pcb->mutex_estado));
+    return ret;
+}
+
+void proceso_cambiar_estado(t_kernel_pcb *pcb, estado_proceso nuevo_estado)
+{
+    pthread_mutex_lock(&(pcb->mutex_estado));
+    pcb->estado = nuevo_estado;
+    pthread_mutex_unlock(&(pcb->mutex_estado));
+}
+
 time_miliseg tiempo_restante_segun_estimacion(t_kernel_pcb *self)
 {
     return self->estimacion_rafaga - self->milisegundos_en_running;
@@ -77,25 +94,37 @@ void cargar_tiempo_ejecucion_en_cpu(t_kernel_pcb *pcb, time_miliseg time_inicio_
     pcb->milisegundos_en_running += milisegundos_running;
 }
 
-char *estado_proceso_to_string(estado_proceso status)
+char *estado_proceso_to_string(t_kernel_pcb *pcb)
 {
-    switch (status)
+    pthread_mutex_lock(&(pcb->mutex_estado));
+
+    char *estado = NULL;
+    switch (pcb->estado)
     {
     case S_NEW:
-        return "NEW";
+        estado = "NEW";
+        break;
     case S_READY:
-        return "READY";
+        estado = "READY";
+        break;
     case S_RUNNING:
-        return "RUNNING";
+        estado = "RUNNING";
+        break;
     case S_BLOCKED:
-        return "BLOCKED";
+        estado = "BLOCKED";
+        break;
     case S_SUSPENDED_READY:
-        return "SUSPENDED_READY";
+        estado = "SUSPENDED_READY";
+        break;
     case S_SUSPENDED_BLOCKED:
-        return "SUSPENDED_BLOCKED";
+        estado = "SUSPENDED_BLOCKED";
+        break;
     case S_EXIT:
-        return "EXIT";
-    default:
-        return "ERRORRRR";
+        estado = "EXIT";
+        break;
     }
+
+    pthread_mutex_unlock(&(pcb->mutex_estado));
+
+    return estado;
 }

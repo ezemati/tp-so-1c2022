@@ -29,9 +29,9 @@ bool largo_plazo_intentar_pasar_proceso_a_memoria()
 
 void finalizar_proceso(t_kernel_pcb *pcb)
 {
-    log_info_with_mutex(logger, &mutex_logger, "Pasando proceso %d de %s a EXIT", pcb->id, estado_proceso_to_string(pcb->estado));
+    log_info_with_mutex(logger, &mutex_logger, "Pasando proceso %d de %s a EXIT", pcb->id, estado_proceso_to_string(pcb));
 
-    pcb->estado = S_EXIT;
+    proceso_cambiar_estado(pcb, S_EXIT);
     finalizar_proceso_en_memoria(pcb);
     finalizar_proceso_en_consola(pcb);
 

@@ -30,6 +30,7 @@ typedef struct t_kernel_pcb
     uint32_t tamanio;
     t_list *lista_instrucciones; // De tipo t_instruccion
     estado_proceso estado;
+    pthread_mutex_t mutex_estado;
     uint32_t program_counter;
     uint32_t tabla_paginas_primer_nivel;
     time_miliseg estimacion_rafaga;
@@ -51,8 +52,11 @@ void recalcular_estimacion(t_kernel_pcb *pcb);
 void actualizar_pcb_desalojado(t_kernel_pcb *pcb, uint32_t nuevo_program_counter, time_miliseg time_inicio_running, time_miliseg time_fin_running);
 void actualizar_pcb_bloqueado(t_kernel_pcb *pcb, uint32_t nuevo_program_counter, time_miliseg time_inicio_running, time_miliseg time_fin_running);
 
+bool proceso_tiene_estado(t_kernel_pcb *pcb, estado_proceso estado);
+void proceso_cambiar_estado(t_kernel_pcb *pcb, estado_proceso nuevo_estado);
+
 void cargar_tiempo_ejecucion_en_cpu(t_kernel_pcb *pcb, time_miliseg time_inicio_running, time_miliseg time_fin_running);
 
-char *estado_proceso_to_string(estado_proceso status);
+char *estado_proceso_to_string(t_kernel_pcb *pcb);
 
 #endif
