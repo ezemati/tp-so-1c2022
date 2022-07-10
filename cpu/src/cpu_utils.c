@@ -18,6 +18,7 @@ void inicializar_cpu(int argc, char **argv)
 	pthread_mutex_init(&mutex_logger, NULL);
 	pthread_mutex_init(&mutex_hay_interrupcion, NULL);
 	pthread_mutex_init(&mutex_hay_proceso_en_ejecucion, NULL);
+	pthread_mutex_init(&mutex_socket_conexion_kernel_interrupt, NULL);
 }
 
 void terminar_cpu()
@@ -135,7 +136,7 @@ void realizar_ejecucion()
 		info_ejecucion_actual->ultima_instruccion_ejecutada = instruccion_a_ejecutar->codigo_instruccion;
 
 		// CHECK INTERRUPT (se chequea automaticamente por la condicion del while)
-	} while (!hay_interrupcion && info_ejecucion_actual->ultima_instruccion_ejecutada != IO && !ejecucion_completada(info_ejecucion_actual) && info_ejecucion_actual->ultima_instruccion_ejecutada != EXIT);
+	} while (!sincro_test_bool(&hay_interrupcion, &mutex_hay_interrupcion) && info_ejecucion_actual->ultima_instruccion_ejecutada != IO && !ejecucion_completada(info_ejecucion_actual) && info_ejecucion_actual->ultima_instruccion_ejecutada != EXIT);
 
 	pthread_mutex_lock(&mutex_hay_proceso_en_ejecucion);
 	hay_proceso_en_ejecucion = false;
@@ -220,16 +221,23 @@ void enviar_pcb_falso_a_kernel_por_interrupcion_de_desalojo()
 	// y eso hacia que el proceso en ejecucion se desaloje dos veces (una por la instruccion IO/EXIT y otra por la interrupcion de Kernel),
 	// y pasaban cosas raras. Asi que esta funcion deberia ejecutarse cuando CPU recibe una interrupcion de Kernel y el proceso ya dejo de ejecutarse,
 	// y le manda como respuesta al desalojo un PCB falso
+
+	pthread_mutex_lock(&mutex_socket_conexion_kernel_interrupt);
+
 	int bytes_request_serializada;
 	void *request_serializada = crear_actualizarpcbrequest_falsa_serializada(&bytes_request_serializada);
 	enviar_buffer_serializado_con_bytes_por_socket(socket_conexion_kernel_interrupt, request_serializada, bytes_request_serializada);
 
 	liberar_conexion(socket_conexion_kernel_interrupt);
 	free(request_serializada);
+
+	pthread_mutex_unlock(&mutex_socket_conexion_kernel_interrupt);
 }
 
 static void desalojar_proceso()
 {
+	pthread_mutex_lock(&mutex_socket_conexion_kernel_interrupt);
+
 	int bytes_request_serializada;
 	void *request_serializada = crear_actualizarpcbrequest_serializada_para_infoejecucionactual(&bytes_request_serializada);
 	enviar_buffer_serializado_con_bytes_por_socket(socket_conexion_kernel_interrupt, request_serializada, bytes_request_serializada);
@@ -238,6 +246,8 @@ static void desalojar_proceso()
 	free(request_serializada);
 
 	proceso_desalojado_de_cpu();
+
+	pthread_mutex_unlock(&mutex_socket_conexion_kernel_interrupt);
 }
 
 static void bloquear_proceso()

@@ -13,6 +13,7 @@ int socket_conexion_kernel_interrupt = -1;
 pthread_mutex_t mutex_logger;
 pthread_mutex_t mutex_hay_interrupcion;
 pthread_mutex_t mutex_hay_proceso_en_ejecucion;
+pthread_mutex_t mutex_socket_conexion_kernel_interrupt;
 
 int main(int argc, char **argv)
 {
@@ -65,7 +66,11 @@ void *interrupt_listener()
 
 	while (true)
 	{
-		socket_conexion_kernel_interrupt = esperar_cliente(socket_servidor_interrupt);
+		int sock_interrupt = esperar_cliente(socket_servidor_interrupt);
+
+		pthread_mutex_lock(&mutex_socket_conexion_kernel_interrupt);
+		socket_conexion_kernel_interrupt = sock_interrupt;
+		pthread_mutex_unlock(&mutex_socket_conexion_kernel_interrupt);
 
 		uint32_t recibido;
 		recibir_uint32_por_socket(socket_conexion_kernel_interrupt, &recibido);
@@ -73,11 +78,8 @@ void *interrupt_listener()
 		{
 			log_info_with_mutex(logger, &mutex_logger, "Interrupcion recibida en CPU");
 
-			pthread_mutex_lock(&mutex_hay_proceso_en_ejecucion);
-			if (hay_proceso_en_ejecucion)
+			if (sincro_test_bool(&hay_proceso_en_ejecucion, &mutex_hay_proceso_en_ejecucion))
 			{
-				pthread_mutex_unlock(&mutex_hay_proceso_en_ejecucion);
-
 				// Si de verdad hay un proceso en ejecucion, se guarda la interrupcion para desalojarlo
 				pthread_mutex_lock(&mutex_hay_interrupcion);
 				hay_interrupcion = true;
@@ -85,8 +87,6 @@ void *interrupt_listener()
 			}
 			else
 			{
-				pthread_mutex_unlock(&mutex_hay_proceso_en_ejecucion);
-
 				// Si ya no hay un proceso ejecutandose, se responde con una respuesta "falsa" a
 				// la request de desalojo
 				log_error_with_mutex(logger, &mutex_logger, "No hay ningun proceso en ejecucion, asi que se ignora la interrupcion");

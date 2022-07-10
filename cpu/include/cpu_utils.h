@@ -8,6 +8,7 @@
 #include <cpu_mmu.h>
 #include <cpu_tlb.h>
 
+#include <utils/sincro.h>
 #include <utils/sockets.h>
 #include <types/identificador_operacion.h>
 
