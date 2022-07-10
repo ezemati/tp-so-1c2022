@@ -76,11 +76,13 @@ bool proceso_tiene_estado(t_kernel_pcb *pcb, estado_proceso estado)
     return ret;
 }
 
-void proceso_cambiar_estado(t_kernel_pcb *pcb, estado_proceso nuevo_estado)
+estado_proceso proceso_cambiar_estado(t_kernel_pcb *pcb, estado_proceso nuevo_estado)
 {
     pthread_mutex_lock(&(pcb->mutex_estado));
+    estado_proceso estado_viejo = pcb->estado;
     pcb->estado = nuevo_estado;
     pthread_mutex_unlock(&(pcb->mutex_estado));
+    return estado_viejo;
 }
 
 time_miliseg tiempo_restante_segun_estimacion(t_kernel_pcb *self)
@@ -94,37 +96,33 @@ void cargar_tiempo_ejecucion_en_cpu(t_kernel_pcb *pcb, time_miliseg time_inicio_
     pcb->milisegundos_en_running += milisegundos_running;
 }
 
-char *estado_proceso_to_string(t_kernel_pcb *pcb)
+char *estado_proceso_del_proceso_to_string(t_kernel_pcb *pcb)
 {
     pthread_mutex_lock(&(pcb->mutex_estado));
+    char *estado = estado_proceso_to_string(pcb->estado);
+    pthread_mutex_unlock(&(pcb->mutex_estado));
+    return estado;
+}
 
-    char *estado = NULL;
-    switch (pcb->estado)
+char *estado_proceso_to_string(estado_proceso estado)
+{
+    switch (estado)
     {
     case S_NEW:
-        estado = "NEW";
-        break;
+        return "NEW";
     case S_READY:
-        estado = "READY";
-        break;
+        return "READY";
     case S_RUNNING:
-        estado = "RUNNING";
-        break;
+        return "RUNNING";
     case S_BLOCKED:
-        estado = "BLOCKED";
-        break;
+        return "BLOCKED";
     case S_SUSPENDED_READY:
-        estado = "SUSPENDED_READY";
-        break;
+        return "SUSPENDED_READY";
     case S_SUSPENDED_BLOCKED:
-        estado = "SUSPENDED_BLOCKED";
-        break;
+        return "SUSPENDED_BLOCKED";
     case S_EXIT:
-        estado = "EXIT";
-        break;
+        return "EXIT";
     }
 
-    pthread_mutex_unlock(&(pcb->mutex_estado));
-
-    return estado;
+    return "ERROR";
 }

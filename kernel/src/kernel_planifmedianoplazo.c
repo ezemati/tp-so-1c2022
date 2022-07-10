@@ -27,9 +27,9 @@ bool mediano_plazo_intentar_pasar_proceso_a_memoria()
 
 void suspender_proceso(t_kernel_pcb *pcb, bool *se_paso_proceso_a_memoria)
 {
-    proceso_cambiar_estado(pcb, S_SUSPENDED_BLOCKED);
+    estado_proceso estado_anterior = proceso_cambiar_estado(pcb, S_SUSPENDED_BLOCKED);
 
-    log_info_with_mutex(logger, &mutex_logger, "Pasando proceso %d de %s a SUSPENDED_BLOCKED", pcb->id, estado_proceso_to_string(pcb));
+    log_info_with_mutex(logger, &mutex_logger, "Pasando proceso %d de %s a SUSPENDED_BLOCKED", pcb->id, estado_proceso_to_string(estado_anterior));
 
     int socket_memoria = crear_conexion(config->ip_memoria, config->puerto_memoria, NULL, NULL);
 
@@ -64,9 +64,9 @@ void suspender_proceso(t_kernel_pcb *pcb, bool *se_paso_proceso_a_memoria)
 
 void agregar_proceso_a_suspended_ready(t_kernel_pcb *pcb)
 {
-    proceso_cambiar_estado(pcb, S_SUSPENDED_READY);
+    estado_proceso estado_anterior = proceso_cambiar_estado(pcb, S_SUSPENDED_READY);
 
-    log_info_with_mutex(logger, &mutex_logger, "Pasando proceso %d de %s a SUSPENDED_READY", pcb->id, estado_proceso_to_string(pcb));
+    log_info_with_mutex(logger, &mutex_logger, "Pasando proceso %d de %s a SUSPENDED_READY", pcb->id, estado_proceso_to_string(estado_anterior));
 
     pthread_mutex_lock(&mutex_lista_suspended_ready);
     list_add(lista_suspended_ready, pcb);

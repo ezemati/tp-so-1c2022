@@ -13,11 +13,14 @@ void *list_get_last_element(t_list *list)
     return element;
 }
 
-void *list_get_minimum_or_null_if_empty(t_list *list, void *(*minimum)(void *, void *))
+void *list_get_minimum_or_null_if_empty_with_mutex(t_list *list, void *(*minimum)(void *, void *), pthread_mutex_t *mutex)
 {
-    return list_size(list) > 0
-               ? list_get_minimum(list, minimum)
-               : NULL;
+    pthread_mutex_lock(mutex);
+    void *minimum_element = list_size(list) > 0
+                                ? list_get_minimum(list, minimum)
+                                : NULL;
+    pthread_mutex_unlock(mutex);
+    return minimum_element;
 }
 
 void list_add_with_mutex(t_list *list, void *element, pthread_mutex_t *mutex)

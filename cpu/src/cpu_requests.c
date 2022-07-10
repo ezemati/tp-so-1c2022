@@ -16,14 +16,14 @@ void atender_handshake_con_kernel(int socket_cliente)
 
 void atender_ejecutar_proceso(int socket_cliente)
 {
+    pthread_mutex_lock(&mutex_hay_proceso_en_ejecucion);
+    hay_proceso_en_ejecucion = true;
+    pthread_mutex_unlock(&mutex_hay_proceso_en_ejecucion);
+
     // Reinicio el flag, por si quedo algun valor perdido
     pthread_mutex_lock(&mutex_hay_interrupcion);
     hay_interrupcion = false;
     pthread_mutex_unlock(&mutex_hay_interrupcion);
-
-    pthread_mutex_lock(&mutex_hay_proceso_en_ejecucion);
-    hay_proceso_en_ejecucion = true;
-    pthread_mutex_unlock(&mutex_hay_proceso_en_ejecucion);
 
     void *buffer_request = NULL;
     recibir_buffer_con_bytes_por_socket(socket_cliente, &buffer_request);
@@ -46,6 +46,7 @@ void atender_ejecutar_proceso(int socket_cliente)
     pthread_create(&thread_ejecucion_id, NULL, (void *)realizar_ejecucion, NULL);
     pthread_detach(thread_ejecucion_id);
 
+    /*
     bool ok = true;
     t_cpu_ejecutarproceso_response *response = ejecutarproceso_response_new(ok);
     int bytes_response_serializada;
@@ -53,4 +54,5 @@ void atender_ejecutar_proceso(int socket_cliente)
     enviar_buffer_serializado_con_bytes_por_socket(socket_cliente, response_serializada, bytes_response_serializada);
     free(response_serializada);
     ejecutarproceso_response_destroy(response);
+    */
 }

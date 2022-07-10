@@ -6,9 +6,9 @@ static t_kernel_pcb *obtener_proximo_para_ejecutar_srt();
 
 void agregar_proceso_a_ready(t_kernel_pcb *pcb)
 {
-    proceso_cambiar_estado(pcb, S_READY);
+    estado_proceso estado_anterior = proceso_cambiar_estado(pcb, S_READY);
 
-    log_info_with_mutex(logger, &mutex_logger, "Pasando proceso %d de %s a READY", pcb->id, estado_proceso_to_string(pcb));
+    log_info_with_mutex(logger, &mutex_logger, "Pasando proceso %d de %s a READY", pcb->id, estado_proceso_to_string(estado_anterior));
 
     list_add_with_mutex(lista_ready, pcb, &mutex_lista_ready);
 
@@ -20,9 +20,9 @@ void agregar_proceso_a_ready(t_kernel_pcb *pcb)
 
 void agregar_proceso_a_ready_en_anteultima_posicion_sin_replanificar(t_kernel_pcb *pcb)
 {
-    proceso_cambiar_estado(pcb, S_READY);
+    estado_proceso estado_anterior = proceso_cambiar_estado(pcb, S_READY);
 
-    log_info_with_mutex(logger, &mutex_logger, "Pasando proceso %d de %s a READY", pcb->id, estado_proceso_to_string(pcb));
+    log_info_with_mutex(logger, &mutex_logger, "Pasando proceso %d de %s a READY", pcb->id, estado_proceso_to_string(estado_anterior));
 
     void *pcb_que_paso_a_ready = list_remove_last_with_mutex(lista_ready, &mutex_lista_ready);
     list_add_with_mutex(lista_ready, pcb, &mutex_lista_ready);
@@ -99,5 +99,5 @@ static t_kernel_pcb *obtener_proximo_para_ejecutar_srt()
                    ? elementPcb1
                    : elementPcb2;
     }
-    return list_get_minimum_or_null_if_empty(lista_ready, pcb_con_tiempo_restante_minimo);
+    return list_get_minimum_or_null_if_empty_with_mutex(lista_ready, pcb_con_tiempo_restante_minimo, &mutex_lista_ready);
 }

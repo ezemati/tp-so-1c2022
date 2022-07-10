@@ -21,7 +21,8 @@
 typedef struct t_memoria_ram
 {
     void *memoria_usuario;
-    bool *bitmap_marcos_libres;   // true significa libre, false significa ocupado (TODO: invertir significado del true y false)
+    bool *bitmap_marcos_libres; // true significa libre, false significa ocupado (TODO: invertir significado del true y false)
+    pthread_mutex_t mutex_bitmap_marcos_libres;
     t_list *tablas_primer_nivel;  // De tipo t_tabla_primernivel, hay una por proceso
     t_list *tablas_segundo_nivel; // De tipo t_tabla_segundonivel
 } t_memoria_ram;

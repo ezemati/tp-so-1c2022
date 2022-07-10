@@ -111,7 +111,10 @@ bool puedo_pasar_proceso_a_memoria()
 
 int calcular_multiprogramacion()
 {
-	return cantidad_procesos_con_estado(S_READY) + cantidad_procesos_con_estado(S_RUNNING) + cantidad_procesos_con_estado(S_BLOCKED);
+	pthread_mutex_lock(&mutex_lista_procesos);
+	uint32_t cant = cantidad_procesos_con_estado(S_READY) + cantidad_procesos_con_estado(S_RUNNING) + cantidad_procesos_con_estado(S_BLOCKED);
+	pthread_mutex_unlock(&mutex_lista_procesos);
+	return cant;
 }
 
 bool intentar_pasar_proceso_a_memoria()
@@ -185,9 +188,10 @@ void sacar_proceso_de_lista(t_list *lista, t_kernel_pcb *pcb)
 
 void bloquear_proceso(t_kernel_pcb *pcb, uint32_t tiempo_bloqueo)
 {
-	log_info_with_mutex(logger, &mutex_logger, "Pasando proceso %d de %s a BLOCKED", pcb->id, estado_proceso_to_string(pcb));
+	estado_proceso estado_anterior = proceso_cambiar_estado(pcb, S_BLOCKED);
 
-	proceso_cambiar_estado(pcb, S_BLOCKED);
+	log_info_with_mutex(logger, &mutex_logger, "Pasando proceso %d de %s a BLOCKED", pcb->id, estado_proceso_to_string(estado_anterior));
+
 	pcb->bloqueo_pendiente = tiempo_bloqueo;
 	pcb->milisegundos_en_running = 0;
 	pcb->time_inicio_bloqueo = current_time();
@@ -300,7 +304,10 @@ t_kernel_pcb *enviar_interrupcion_a_cpu()
 
 void enviar_proceso_a_cpu_para_ejecucion(t_kernel_pcb *pcb_a_ejecutar)
 {
-	log_info_with_mutex(logger, &mutex_logger, "Pasando proceso %d de %s a RUNNING", pcb_a_ejecutar->id, estado_proceso_to_string(pcb_a_ejecutar));
+	sincro_set_bool(&hay_proceso_en_ejecucion, true, &mutex_hay_proceso_en_ejecucion);
+	estado_proceso estado_anterior = proceso_cambiar_estado(pcb_a_ejecutar, S_RUNNING);
+
+	log_info_with_mutex(logger, &mutex_logger, "Pasando proceso %d de %s a RUNNING", pcb_a_ejecutar->id, estado_proceso_to_string(estado_anterior));
 
 	int socket_dispatch_cpu = crear_conexion(config->ip_cpu, config->puerto_cpu_dispatch, NULL, NULL);
 
@@ -311,23 +318,17 @@ void enviar_proceso_a_cpu_para_ejecucion(t_kernel_pcb *pcb_a_ejecutar)
 	free(request_serializada);
 	ejecutarproceso_request_destroy(request);
 
+	/*
 	void *response_serializada = NULL;
 	recibir_buffer_con_bytes_por_socket(socket_dispatch_cpu, &response_serializada);
+	log_debug_with_mutex(logger, &mutex_logger, "CPU mando respuesta al EJECUTAR_PROCESO para el proceso %d", pcb_a_ejecutar->id);
 	t_cpu_ejecutarproceso_response *response = deserializar_ejecutarproceso_response(response_serializada);
 	bool ok = response->ok;
 	ejecutarproceso_response_destroy(response);
 	free(response_serializada);
+	*/
 
 	liberar_conexion(socket_dispatch_cpu);
-
-	if (!ok)
-	{
-		log_error_with_mutex(logger, &mutex_logger, "Error al enviar nuevo proceso para ejecucion (PID %d) a CPU", pcb_a_ejecutar->id);
-	}
-
-	proceso_cambiar_estado(pcb_a_ejecutar, S_RUNNING);
-
-	sincro_set_bool(&hay_proceso_en_ejecucion, true, &mutex_hay_proceso_en_ejecucion);
 }
 
 void handler_atencion_procesos_bloqueados()
@@ -386,7 +387,7 @@ static void handler_chequear_suspension_de_proceso_bloqueado(void *args)
 
 	// Me guardo el time de bloqueo para este bloqueo particular del proceso, en caso
 	// de que el proceso salga de BLOCKED y vuelva a entrar mientras este hilo esta sleepeado
-	time_miliseg time_inicio_bloqueo = pcb->time_inicio_bloqueo;
+	// time_miliseg time_inicio_bloqueo = pcb->time_inicio_bloqueo;
 
 	time_miliseg milisegundos_maximos_de_bloqueo = config->tiempo_maximo_bloqueado;
 	time_microseg microsegundos_maximos_de_bloqueo = milisegundos_a_microsegundos(milisegundos_maximos_de_bloqueo);
@@ -395,7 +396,7 @@ static void handler_chequear_suspension_de_proceso_bloqueado(void *args)
 	// bloqueado, entonces lo suspendo
 	usleep(microsegundos_maximos_de_bloqueo);
 
-	if (existe_proceso_con_pid(pid) && proceso_tiene_estado(pcb, S_BLOCKED) && times_son_iguales(pcb->time_inicio_bloqueo, time_inicio_bloqueo))
+	if (existe_proceso_con_pid(pid) && proceso_tiene_estado(pcb, S_BLOCKED) /*&& times_son_iguales(pcb->time_inicio_bloqueo, time_inicio_bloqueo)*/)
 	{
 		bool se_paso_proceso_a_memoria = false;
 		suspender_proceso(pcb, &se_paso_proceso_a_memoria);

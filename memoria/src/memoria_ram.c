@@ -14,6 +14,7 @@ t_memoria_ram *memoria_ram_new()
 
     uint32_t cantidad_marcos = memoria_ram_obtener_cantidad_marcos_totales();
     memoria->bitmap_marcos_libres = malloc(sizeof(bool) * cantidad_marcos);
+    pthread_mutex_init(&(memoria->mutex_bitmap_marcos_libres), NULL);
     for (int i = 0; i < cantidad_marcos; i++)
     {
         memoria->bitmap_marcos_libres[i] = true;
@@ -28,6 +29,7 @@ void memoria_ram_destroy(t_memoria_ram *memoria)
 {
     free(memoria->memoria_usuario);
     free(memoria->bitmap_marcos_libres);
+    pthread_mutex_destroy(&(memoria->mutex_bitmap_marcos_libres));
 
     list_destroy_and_destroy_elements(memoria->tablas_primer_nivel, (void *)tabla_primernivel_destroy);
 
@@ -235,12 +237,16 @@ int32_t memoria_ram_obtener_numero_marco_libre(t_memoria_ram *self)
 
 void memoria_ram_marcar_marco_ocupado(t_memoria_ram *self, uint32_t numero_marco)
 {
+    pthread_mutex_lock(&(self->mutex_bitmap_marcos_libres));
     self->bitmap_marcos_libres[numero_marco] = false;
+    pthread_mutex_unlock(&(self->mutex_bitmap_marcos_libres));
 }
 
 void memoria_ram_marcar_marco_libre(t_memoria_ram *self, uint32_t numero_marco)
 {
+    pthread_mutex_lock(&(self->mutex_bitmap_marcos_libres));
     self->bitmap_marcos_libres[numero_marco] = true;
+    pthread_mutex_unlock(&(self->mutex_bitmap_marcos_libres));
 }
 
 uint32_t memoria_ram_obtener_cantidad_marcos_totales()
@@ -250,7 +256,10 @@ uint32_t memoria_ram_obtener_cantidad_marcos_totales()
 
 bool memoria_ram_marco_esta_libre(t_memoria_ram *self, uint32_t numero_marco)
 {
-    return self->bitmap_marcos_libres[numero_marco] == true;
+    pthread_mutex_lock(&(self->mutex_bitmap_marcos_libres));
+    bool esta_libre = (self->bitmap_marcos_libres[numero_marco] == true);
+    pthread_mutex_unlock(&(self->mutex_bitmap_marcos_libres));
+    return esta_libre;
 }
 
 t_entrada_segundonivel *memoria_ram_obtener_pagina_en_marco(t_memoria_ram *self, uint32_t numero_marco)

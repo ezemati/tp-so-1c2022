@@ -53,10 +53,11 @@ void actualizar_pcb_desalojado(t_kernel_pcb *pcb, uint32_t nuevo_program_counter
 void actualizar_pcb_bloqueado(t_kernel_pcb *pcb, uint32_t nuevo_program_counter, time_miliseg time_inicio_running, time_miliseg time_fin_running);
 
 bool proceso_tiene_estado(t_kernel_pcb *pcb, estado_proceso estado);
-void proceso_cambiar_estado(t_kernel_pcb *pcb, estado_proceso nuevo_estado);
+estado_proceso proceso_cambiar_estado(t_kernel_pcb *pcb, estado_proceso nuevo_estado);
 
 void cargar_tiempo_ejecucion_en_cpu(t_kernel_pcb *pcb, time_miliseg time_inicio_running, time_miliseg time_fin_running);
 
-char *estado_proceso_to_string(t_kernel_pcb *pcb);
+char *estado_proceso_del_proceso_to_string(t_kernel_pcb *pcb);
+char *estado_proceso_to_string(estado_proceso estado);
 
 #endif
