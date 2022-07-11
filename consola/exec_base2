@@ -2,5 +2,5 @@
 FILE=consola.out
 make
 if test -f "./bin/$FILE"; then
-    valgrind --tool=helgrind ./bin/$FILE cfg/EXTRA_1 50
+    ./bin/$FILE cfg/BASE_2 2048
 fi
