@@ -15,6 +15,8 @@ uint32_t traducir_direccion_logica_a_fisica(uint32_t direccion_logica)
 
     log_info_with_mutex(logger, &mutex_logger, "MMU: traduciendo direccion logica %d (numero_pagina=%d)", direccion_logica, numero_pagina);
 
+    log_debug_with_mutex(logger, &mutex_logger, "----- Entradas de TLB -----");
+    tlb_print_entradas(tlb);
     int numero_marco = tlb_try_read_entry(tlb, numero_pagina);
     if (numero_marco != -1)
     {
@@ -52,6 +54,9 @@ uint32_t traducir_direccion_logica_a_fisica(uint32_t direccion_logica)
             tlb_add_entry(tlb, numero_pagina, numero_marco);
             log_info_with_mutex(logger, &mutex_logger, "TLB: nueva entrada {numero_pagina=%d, numero_marco=%d} agregada", numero_pagina, numero_marco);
         }
+
+        log_debug_with_mutex(logger, &mutex_logger, "----- Nuevas entradas de TLB -----");
+        tlb_print_entradas(tlb);
     }
 
     uint32_t desplazamiento = direccion_logica - (numero_pagina * config->memoria_tamanio_pagina);

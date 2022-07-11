@@ -2,8 +2,10 @@
 
 static bool tlb_tiene_espacios_libres(t_cpu_tlb *self);
 static void tlb_add_entry_in_empty_space(t_cpu_tlb *self, uint32_t numero_pagina, uint32_t numero_marco);
-static t_cpu_entradatlb *tlb_get_entry_to_replace_lru(t_cpu_tlb *self);
 static t_cpu_entradatlb *tlb_get_entry_to_replace_fifo(t_cpu_tlb *self);
+static t_cpu_entradatlb *tlb_get_entry_to_replace_lru(t_cpu_tlb *self);
+static void tlb_print_entradas_fifo(t_cpu_tlb *self);
+static void tlb_print_entradas_lru(t_cpu_tlb *self);
 
 t_cpu_tlb *tlb_new(uint32_t cantidad_entradas_totales)
 {
@@ -38,6 +40,7 @@ void tlb_clear(t_cpu_tlb *self)
     }
 
     self->cantidad_entradas_ocupadas = 0;
+    self->indice_reemplazo_fifo = 0;
 }
 
 void tlb_add_entry(t_cpu_tlb *self, uint32_t numero_pagina, uint32_t numero_marco)
@@ -100,6 +103,18 @@ t_cpu_entradatlb *tlb_get_entry_con_numero_pagina(t_cpu_tlb *self, uint32_t nume
     return entrada_con_pagina;
 }
 
+void tlb_print_entradas(t_cpu_tlb *self)
+{
+    if (string_equals_ignore_case(config->reemplazo_tlb, "FIFO"))
+    {
+        tlb_print_entradas_fifo(self);
+    }
+    else
+    {
+        tlb_print_entradas_lru(self);
+    }
+}
+
 static bool tlb_tiene_espacios_libres(t_cpu_tlb *self)
 {
     return self->cantidad_entradas_ocupadas < self->cantidad_entradas_totales;
@@ -136,4 +151,48 @@ static t_cpu_entradatlb *tlb_get_entry_to_replace_lru(t_cpu_tlb *self)
     }
 
     return list_get_minimum(self->entradas_tlb, (void *)get_least_recently_used);
+}
+
+static void tlb_print_entradas_fifo(t_cpu_tlb *self)
+{
+    for (int i = 0; i < self->cantidad_entradas_ocupadas; i++)
+    {
+        t_cpu_entradatlb *entrada = list_get(self->entradas_tlb, i);
+        if (self->indice_reemplazo_fifo == i)
+        {
+            log_debug_with_mutex(logger, &mutex_logger, " --> [%d] - {numero_pagina=%d, numero_marco=%d}", i, entrada->numero_pagina, entrada->numero_marco);
+        }
+        else
+        {
+            log_debug_with_mutex(logger, &mutex_logger, "     [%d] - {numero_pagina=%d, numero_marco=%d}", i, entrada->numero_pagina, entrada->numero_marco);
+        }
+    }
+
+    for (int i = self->cantidad_entradas_ocupadas; i < config->entradas_tlb; i++)
+    {
+        log_debug_with_mutex(logger, &mutex_logger, "     [%d] - _______", i);
+    }
+}
+
+static void tlb_print_entradas_lru(t_cpu_tlb *self)
+{
+    t_cpu_entradatlb *entrada_a_reemplazar = tlb_get_entry_to_replace_lru(self);
+
+    for (int i = 0; i < self->cantidad_entradas_ocupadas; i++)
+    {
+        t_cpu_entradatlb *entrada = list_get(self->entradas_tlb, i);
+        if (entrada == entrada_a_reemplazar)
+        {
+            log_debug_with_mutex(logger, &mutex_logger, " --> [%d] - {numero_pagina=%d, numero_marco=%d, last_used=%lldms}", i, entrada->numero_pagina, entrada->numero_marco, entrada->last_used);
+        }
+        else
+        {
+            log_debug_with_mutex(logger, &mutex_logger, "     [%d] - {numero_pagina=%d, numero_marco=%d, last_used=%lldms}", i, entrada->numero_pagina, entrada->numero_marco, entrada->last_used);
+        }
+    }
+
+    for (int i = self->cantidad_entradas_ocupadas; i < config->entradas_tlb; i++)
+    {
+        log_debug_with_mutex(logger, &mutex_logger, "     [%d] - _______", i);
+    }
 }

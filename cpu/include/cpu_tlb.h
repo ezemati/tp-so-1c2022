@@ -40,4 +40,6 @@ void tlb_replace_entry(t_cpu_tlb *tlb, struct t_cpu_entradatlb *entrada, uint32_
 
 struct t_cpu_entradatlb *tlb_get_entry_con_numero_pagina(t_cpu_tlb *tlb, uint32_t numero_pagina);
 
+void tlb_print_entradas(t_cpu_tlb *tlb);
+
 #endif

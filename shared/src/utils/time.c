@@ -25,5 +25,9 @@ bool times_son_iguales(time_miliseg t1, time_miliseg t2)
 
 int comparar_times(time_miliseg t1, time_miliseg t2)
 {
-    return t1 - t2;
+    return t1 > t2
+               ? 1
+               : (t1 < t2
+                      ? -1
+                      : 0);
 }
