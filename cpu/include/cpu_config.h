@@ -10,10 +10,16 @@
 #include <commons/log.h>
 #include <commons/string.h>
 
+typedef enum algoritmo_reemplazo_tlb
+{
+    T_FIFO = 1,
+    T_LRU
+} algoritmo_reemplazo_tlb;
+
 typedef struct t_cpu_config
 {
     uint32_t entradas_tlb;
-    char *reemplazo_tlb;
+    algoritmo_reemplazo_tlb reemplazo_tlb;
     time_miliseg retardo_noop;
     char *ip_memoria;
     uint32_t puerto_memoria;

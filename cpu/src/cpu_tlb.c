@@ -55,7 +55,7 @@ void tlb_add_entry(t_cpu_tlb *self, uint32_t numero_pagina, uint32_t numero_marc
         return;
     }
 
-    t_cpu_entradatlb *entrada_a_reemplazar = string_equals_ignore_case(config->reemplazo_tlb, "FIFO")
+    t_cpu_entradatlb *entrada_a_reemplazar = config->reemplazo_tlb == T_FIFO
                                                  ? tlb_get_entry_to_replace_fifo(self)
                                                  : tlb_get_entry_to_replace_lru(self);
 
@@ -105,7 +105,7 @@ t_cpu_entradatlb *tlb_get_entry_con_numero_pagina(t_cpu_tlb *self, uint32_t nume
 
 void tlb_print_entradas(t_cpu_tlb *self)
 {
-    if (string_equals_ignore_case(config->reemplazo_tlb, "FIFO"))
+    if (config->reemplazo_tlb == T_FIFO)
     {
         tlb_print_entradas_fifo(self);
     }

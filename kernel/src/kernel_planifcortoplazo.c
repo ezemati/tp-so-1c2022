@@ -77,7 +77,7 @@ static t_kernel_pcb *obtener_proximo_para_ejecutar()
 {
     print_procesos_listaready();
 
-    t_kernel_pcb *pcb_a_ejecutar = string_equals_ignore_case(config->algoritmo_planificacion, "FIFO")
+    t_kernel_pcb *pcb_a_ejecutar = config->algoritmo_planificacion == P_FIFO
                                        ? obtener_proximo_para_ejecutar_fifo()
                                        : obtener_proximo_para_ejecutar_srt();
     return pcb_a_ejecutar;

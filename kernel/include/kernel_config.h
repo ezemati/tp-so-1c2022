@@ -10,6 +10,12 @@
 #include <commons/log.h>
 #include <commons/string.h>
 
+typedef enum algoritmo_planificacion
+{
+    P_FIFO = 1,
+    P_SRT
+} algoritmo_planificacion;
+
 typedef struct t_kernel_config
 {
     char *ip_memoria;
@@ -18,7 +24,7 @@ typedef struct t_kernel_config
     uint32_t puerto_cpu_dispatch;
     uint32_t puerto_cpu_interrupt;
     uint32_t puerto_escucha;
-    char *algoritmo_planificacion;
+    algoritmo_planificacion algoritmo_planificacion;
     time_miliseg estimacion_inicial;
     double alfa;
     uint32_t grado_multiprogramacion;

@@ -213,7 +213,7 @@ void bloquear_proceso(t_kernel_pcb *pcb, uint32_t tiempo_bloqueo)
 
 bool algoritmo_es_con_desalojo()
 {
-	return string_equals_ignore_case(config->algoritmo_planificacion, "SRT");
+	return config->algoritmo_planificacion == P_SRT;
 }
 
 void print_instrucciones(t_kernel_pcb *pcb)
