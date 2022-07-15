@@ -3,13 +3,17 @@
 
 #include <types/instruccion.h>
 #include <serialization/serialization_utils.h>
+#include <utils/logs.h>
 #include <utils/pointers.h>
+#include <utils/string.h>
 
+#include <pthread.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <commons/collections/list.h>
+#include <commons/log.h>
 #include <commons/string.h>
 
 typedef struct t_programa
@@ -22,7 +26,7 @@ typedef struct t_programa
 /**
  * @brief Crea un t_programa en base al archivo de la ruta especificada
  */
-t_programa *programa_new(char *ruta, uint32_t tamanio);
+t_programa *programa_new(char *ruta, uint32_t tamanio, t_log *logger, pthread_mutex_t *mutex_logger);
 
 /**
  * @brief Crea un t_programa usando las instrucciones pasadas por parametro
@@ -42,7 +46,7 @@ void programa_destroy(t_programa *programa);
 /**
  * @brief Crea una lista de instrucciones en base al archivo de la ruta especificada
  */
-t_list *crear_instrucciones_de_archivo(char *ruta);
+t_list *crear_instrucciones_de_archivo(char *ruta, t_log *logger, pthread_mutex_t *mutex_logger);
 
 void *serializar_programa(t_programa *programa, int *bytes);
 t_programa *deserializar_programa(void *buffer);

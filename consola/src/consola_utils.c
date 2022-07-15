@@ -7,9 +7,9 @@ void inicializar_consola(int argc, char **argv)
 							: "cfg/consola.config";
 
 	config = consola_config_new(ruta_config, logger);
-	programa = programa_new(argv[1], string_to_long(argv[2]));
 
 	pthread_mutex_init(&mutex_logger, NULL);
+	programa = programa_new(argv[1], string_to_long(argv[2]), logger, &mutex_logger);
 }
 
 void terminar_consola()

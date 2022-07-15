@@ -2,9 +2,9 @@
 
 static void agregar_instruccion(char *linea, t_list *instrucciones);
 
-t_programa *programa_new(char *ruta, uint32_t tamanio)
+t_programa *programa_new(char *ruta, uint32_t tamanio, t_log *logger, pthread_mutex_t *mutex_logger)
 {
-    t_list *instrucciones = crear_instrucciones_de_archivo(ruta);
+    t_list *instrucciones = crear_instrucciones_de_archivo(ruta, logger, mutex_logger);
     t_programa *programa = programa_new_with_instructions(instrucciones, tamanio);
     programa->ruta = string_duplicate(ruta);
     return programa;
@@ -31,7 +31,7 @@ void programa_destroy(t_programa *programa)
     free(programa);
 }
 
-t_list *crear_instrucciones_de_archivo(char *ruta)
+t_list *crear_instrucciones_de_archivo(char *ruta, t_log *logger, pthread_mutex_t *mutex_logger)
 {
     FILE *archivo = fopen(ruta, "r");
 
@@ -41,14 +41,20 @@ t_list *crear_instrucciones_de_archivo(char *ruta)
     size_t len = 0;
     ssize_t read;
 
+    int pos_instruccion = 0;
     while ((read = getline(&line, &len, archivo)) != -1)
     {
-        string_trim(&line);
+        log_debug_with_mutex(logger, mutex_logger, "Instruccion [%d] leida (antes de trim): %s--", pos_instruccion, line);
+
+        my_string_trim(&line);
+
+        log_debug_with_mutex(logger, mutex_logger, "Instruccion [%d] leida trimeada: %s--", pos_instruccion, line);
 
         // Las lineas que empiezan con "//" son comentarios y no se tienen en cuenta
         if (!string_starts_with(line, "//") && !string_is_empty(line))
         {
             agregar_instruccion(line, instrucciones);
+            pos_instruccion++;
         }
     }
 
