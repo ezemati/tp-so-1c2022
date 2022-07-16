@@ -30,6 +30,7 @@ void log_error_if_logger_not_null(t_log *logger, char *format, ...);
 void log_trace_with_mutex(t_log *logger, pthread_mutex_t *mutex, char *format, ...);
 void log_debug_with_mutex(t_log *logger, pthread_mutex_t *mutex, char *format, ...);
 void log_info_with_mutex(t_log *logger, pthread_mutex_t *mutex, char *format, ...);
+void log_warning_with_mutex(t_log *logger, pthread_mutex_t *mutex, char *format, ...);
 void log_error_with_mutex(t_log *logger, pthread_mutex_t *mutex, char *format, ...);
 
 char *get_log_file_name(char *module);

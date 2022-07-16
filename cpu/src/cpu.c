@@ -89,7 +89,7 @@ void *interrupt_listener()
 			{
 				// Si ya no hay un proceso ejecutandose, se responde con una respuesta "falsa" a
 				// la request de desalojo
-				log_error_with_mutex(logger, &mutex_logger, "No hay ningun proceso en ejecucion, asi que se ignora la interrupcion");
+				log_warning_with_mutex(logger, &mutex_logger, "No hay ningun proceso en ejecucion, asi que se ignora la interrupcion");
 				enviar_pcb_falso_a_kernel_por_interrupcion_de_desalojo();
 			}
 

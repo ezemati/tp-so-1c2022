@@ -64,6 +64,16 @@ void log_info_with_mutex(t_log *logger, pthread_mutex_t *mutex, char *format, ..
     va_end(args);
 }
 
+void log_warning_with_mutex(t_log *logger, pthread_mutex_t *mutex, char *format, ...)
+{
+    va_list args;
+    va_start(args, format);
+
+    log_with_mutex(logger, mutex, LOG_LEVEL_WARNING, format, args);
+
+    va_end(args);
+}
+
 void log_error_with_mutex(t_log *logger, pthread_mutex_t *mutex, char *format, ...)
 {
     va_list args;
