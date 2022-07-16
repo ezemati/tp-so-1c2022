@@ -8,13 +8,15 @@ def cambiar_ip_de_modulo_en_modulo(ruta_modulo: str, modulo_a_cambiar: str, nuev
     nombres_archivos = [f for f in listdir(
         ruta_configs) if isfile(join(ruta_configs, f))]
     for nombre_archivo in nombres_archivos:
-        with open(f"{ruta_configs}/{nombre_archivo}", "r") as f:
+        ruta_archivo = join(ruta_configs, nombre_archivo)
+        with open(ruta_archivo, "r") as f:
             lineas = f.readlines()
-        with open(f"{ruta_configs}/{nombre_archivo}", "w") as f:
+        with open(ruta_archivo, "w") as f:
             for linea in lineas:
                 modulo_upper = modulo_a_cambiar.upper()
-                if f"IP_{modulo_upper}" in linea:
-                    f.write(f"IP_{modulo_upper}={nueva_ip}\n")
+                key_config_ip = "IP_{}".format(modulo_upper)
+                if key_config_ip in linea:
+                    f.write("{}={}\n".format(key_config_ip, nueva_ip))
                 else:
                     f.write(linea)
 
